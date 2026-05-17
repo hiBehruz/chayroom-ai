@@ -9,7 +9,7 @@ const navLinks = [
   { label: 'FAQ', href: '#faq' }
 ]
 
-function scrollTo(href: string) {
+function scrollToSection(href: string) {
   document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
 }
 </script>
@@ -42,7 +42,7 @@ function scrollTo(href: string) {
             v-for="link in navLinks"
             :key="link.label"
             class="text-sm font-medium text-cx-ink hover:opacity-50 transition-opacity duration-200 cursor-pointer"
-            @click="scrollTo(link.href)"
+            @click="scrollToSection(link.href)"
           >
             {{ link.label }}
           </button>

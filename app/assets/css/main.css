@@ -1,0 +1,30 @@
+/* app/assets/css/main.css */
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  --color-cx-ink: #0A0A0B;
+  --color-cx-ink-soft: #1A1A1D;
+  --color-cx-blue: #2962FF;
+  --color-cx-blue-soft: #E8EEFF;
+  --color-cx-paper: #FFFFFF;
+  --color-cx-surface: #FFFFFF;
+  --color-cx-line: #E8E8EB;
+  --color-cx-muted: #6B6B72;
+  --color-cx-faint: #9A9AA1;
+
+  --shadow-card: 0 1px 2px rgba(10,10,11,.04), 0 8px 24px rgba(10,10,11,.04);
+  --shadow-lift: 0 2px 4px rgba(10,10,11,.05), 0 16px 40px rgba(10,10,11,.08);
+  --shadow-blue: 0 2px 4px rgba(41,98,255,.1), 0 16px 40px rgba(41,98,255,.1);
+
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@layer base {
+  html { color-scheme: light; }
+  body { -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { text-decoration: none; color: inherit; }
+}

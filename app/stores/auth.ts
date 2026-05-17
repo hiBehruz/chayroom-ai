@@ -34,6 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function devLogin() {
+    if (!import.meta.dev) return
     login({
       id: 123456789,
       first_name: 'Behruz',

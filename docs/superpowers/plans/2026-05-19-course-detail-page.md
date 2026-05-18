@@ -566,6 +566,61 @@ git commit -m "feat: add course detail page with module accordion and subscripti
 
 ---
 
+### Task 4: Obuna holati — sahifalar bo'yicha behavior tekshirish
+
+**Files:**
+- Verify: `app/pages/dashboard.vue`
+- Verify: `app/pages/courses/[slug].vue`
+
+`hasSubscription = ref(false)` hozir har bir sahifada alohida. Bu task ikki faylda `true` qilib, barcha kutilgan o'zgarishlarni tekshiradi.
+
+- [ ] **Step 1: `dashboard.vue` da vaqtincha `hasSubscription = ref(true)` qilib tekshirish**
+
+`dashboard.vue` script qismida:
+
+```ts
+const hasSubscription = ref(true)  // vaqtincha test uchun
+```
+
+`/dashboard` sahifasida quyidagilar bo'lishi kerak:
+
+- "O'quv dashboardingni och" banner YO'Q (`v-if="!user || !hasSubscription"` → `false`)
+- Dashboard kontenti to'liq rangli, deactive emas
+- Telegram bo'limida "Obuna bo'lgandan keyin kirish ochiladi." YO'Q — uning o'rnida **"Telegramga kirish"** tugmasi bor
+- Kurs badge'lari: `free: true` → "Bepul", `free: false` → "Mavjud" (yashil)
+
+- [ ] **Step 2: `courses/[slug].vue` da vaqtincha `hasSubscription = ref(true)` qilib tekshirish**
+
+`courses/[slug].vue` script qismida:
+
+```ts
+const hasSubscription = ref(true)  // vaqtincha test uchun
+```
+
+`/courses/hermes-ai-agent` sahifasida:
+
+- O'ng sidebar'da CTA karta YO'Q (`v-if="!hasSubscription"` → `false`)
+- Dars ikonkalari: lock `i-lucide-lock` o'rnida play `i-lucide-play-circle` (ko'k)
+
+- [ ] **Step 3: Har ikkala faylni `ref(false)` ga qaytarish**
+
+```ts
+// dashboard.vue
+const hasSubscription = ref(false)
+
+// courses/[slug].vue
+const hasSubscription = ref(false)
+```
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add app/pages/dashboard.vue app/pages/courses/
+git commit -m "test: verify subscription state behavior across dashboard and course detail"
+```
+
+---
+
 ## Self-Review Natijasi
 
 - `/courses/[slug].vue` → Task 3 ✓

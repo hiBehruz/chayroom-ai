@@ -1,4 +1,7 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
+  if (!config.supabaseUrl) return DEMO_GUIDES
+
   const db = useServerSupabase()
   const query = getQuery(event)
   const showAll = query.all === 'true' && isAdminRequest(event)

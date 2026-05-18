@@ -19,6 +19,7 @@ const courses = [
     title: 'Hermes asosida AI agent yaratish va sozlash',
     desc: "Bu kursda biz noldan agent yaratamiz, unga ko'nikmalar va yaxshilanishlar qo'shamiz.",
     tags: ['AI', 'AI agent', 'Hermes'],
+    slug: 'hermes-ai-agent',
     free: true,
     progress: 0,
   },
@@ -26,6 +27,7 @@ const courses = [
     title: 'Vibe coding noldan',
     desc: "Kod bilmasdan kerakli digital yechimlar: saytlar, vositalar va ilovalarni yaratish.",
     tags: ['Vibe coding'],
+    slug: 'vibe-coding',
     free: true,
     progress: 100,
   },
@@ -104,7 +106,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
           <UIcon name="i-lucide-users-round" class="size-5 text-cx-blue mt-0.5 shrink-0" />
           <div class="flex-1 min-w-0">
             <div class="text-[15px] font-bold text-[#1a1a1a] mb-1">
-              Telegramdagi yopiq hamjamiyat
+              Telegram yopiq kanal
             </div>
             <div class="text-[13px] text-cx-muted mb-4">
               Ishtirokchilar bilan muloqot, efirlar va yangiliklar.
@@ -137,10 +139,11 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
             <h2 class="text-[15px] font-bold text-[#1a1a1a]">Mening kurslarim</h2>
           </div>
           <div class="flex flex-col gap-3">
-            <div
+            <NuxtLink
               v-for="course in courses"
               :key="course.title"
-              class="group bg-[#f8f8fa] border border-cx-line rounded-2xl p-5"
+              :to="`/courses/${course.slug}`"
+              class="group bg-[#f8f8fa] border border-cx-line rounded-2xl p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_24px_rgba(0,0,0,0.07)] block"
             >
               <div class="flex items-start justify-between gap-3 mb-2">
                 <span class="text-[14px] font-semibold text-[#1a1a1a] leading-[1.4]">
@@ -181,7 +184,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
                   class="px-2.5 py-0.5 rounded-full bg-white border border-cx-line text-[11px] text-cx-muted font-medium"
                 >{{ tag }}</span>
               </div>
-            </div>
+            </NuxtLink>
           </div>
         </div>
 

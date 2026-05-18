@@ -1,6 +1,9 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
 const localeStore = useLocaleStore()
+const route = useRoute()
+const showNav = computed(() => ['/', '/dashboard', '/guides', '/courses'].includes(route.path))
+const showSiteChrome = computed(() => route.path === '/')
 
 onMounted(() => {
   authStore.restoreFromStorage()
@@ -24,7 +27,7 @@ useSeoMeta({
 
 <template>
   <UApp>
-    <AppNav />
+    <AppNav v-if="showNav" />
     <NuxtPage />
     <AppFooter />
   </UApp>

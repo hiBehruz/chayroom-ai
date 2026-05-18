@@ -15,36 +15,72 @@ const usagePills = [
   { key: 'brand', label: 'Личный бренд', quote: 'Строй экспертный образ, создавай контент-стратегию и расти как эксперт в своей нише.' }
 ]
 
-const active = ref(usagePills[0].key)
-const activeQuote = computed(() => usagePills.find(p => p.key === active.value)?.quote ?? '')
-const activeLabel = computed(() => usagePills.find(p => p.key === active.value)?.label ?? '')
+const active = ref<string | null>(null)
+const activeQuote = computed<string>(() => usagePills.find(p => p.key === active.value)?.quote ?? '')
+const activeLabel = computed<string>(() => usagePills.find(p => p.key === active.value)?.label ?? '')
+
+function toggle(key: string) {
+  active.value = active.value === key ? null : key
+}
+
+function closeActive() { active.value = null }
+onMounted(() => document.addEventListener('click', closeActive))
+onUnmounted(() => document.removeEventListener('click', closeActive))
 </script>
 
 <template>
   <section class="py-16 bg-cx-surface">
     <div class="max-w-[1180px] mx-auto px-10">
-      <UiSectionHeader eyebrow="Применение" title="Как и где применить AI" subtitle="Десятки способов упростить себе жизнь, улучшить проекты и открыть новые возможности." class="mb-12" />
+      <UiSectionDivider class="mb-10" />
+      <UiSectionHeader
+        title="Как и где применить AI"
+        subtitle="Десятки способов упростить себе жизнь, улучшить проекты и открыть новые возможности."
+        class="mb-12"
+      />
       <div class="flex flex-wrap gap-2.5 justify-center">
-        <button
+        <div
           v-for="pill in usagePills"
           :key="pill.key"
-          :class="[
-            'px-5 py-2.5 rounded-full text-sm font-medium border transition-all duration-200',
-            active === pill.key
-              ? 'bg-cx-ink text-white border-cx-ink'
-              : 'bg-white text-cx-ink border-cx-line hover:bg-cx-ink hover:text-white hover:border-cx-ink'
-          ]"
-          @click="active = pill.key"
+          class="relative"
         >
-          {{ pill.label }}
-        </button>
-      </div>
-      <div class="mt-8 text-center p-6 px-8 bg-white border border-cx-line rounded-[20px]">
-        <div class="text-[11px] font-semibold tracking-[.06em] uppercase text-cx-blue mb-2.5">
-          AI о теме «{{ activeLabel }}»
+          <button
+            :class="[
+              'px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
+              active === pill.key
+                ? 'bg-cx-blue text-white shadow-blue'
+                : 'bg-[#f7f7f5] text-cx-ink hover:bg-[#ebebea]'
+            ]"
+            @click.stop="toggle(pill.key)"
+          >
+            {{ pill.label }}
+          </button>
+
+          <Transition name="slide-down">
+            <div
+              v-if="active === pill.key"
+              class="absolute top-[calc(100%+10px)] left-0 z-30 w-65 bg-white border border-cx-line rounded-2xl p-4 shadow-lift text-left"
+            >
+              <!-- arrow -->
+              <span class="absolute -top-1.75 left-5 w-3 h-3 bg-white border-l border-t border-cx-line rotate-45" />
+              <p class="text-sm leading-relaxed text-cx-ink">
+                {{ pill.quote }}
+              </p>
+            </div>
+          </Transition>
         </div>
-        <p class="text-base leading-[1.6] text-cx-ink">«{{ activeQuote }}»</p>
       </div>
     </div>
   </section>
 </template>
+
+<style scoped>
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.slide-down-enter-from,
+.slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+</style>

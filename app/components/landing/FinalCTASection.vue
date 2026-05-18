@@ -1,27 +1,55 @@
 <script setup lang="ts">
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-const sectionRef = ref<HTMLElement>()
+
+const bannerRef = ref<HTMLElement>()
+
+function scrollToPricing() {
+  document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' })
+}
+
 onMounted(() => {
   gsap.registerPlugin(ScrollTrigger)
-  gsap.from(sectionRef.value!, {
-    scrollTrigger: { trigger: sectionRef.value, start: 'top 85%', once: true },
+  gsap.from(bannerRef.value!, {
+    scrollTrigger: { trigger: bannerRef.value, start: 'top 85%', once: true },
     y: 32, opacity: 0, duration: 0.7, ease: 'power2.out'
   })
 })
 </script>
 
 <template>
-  <section ref="sectionRef" class="bg-cx-surface">
-    <div class="max-w-[1180px] mx-auto px-10 py-20 text-center">
-      <h2 class="text-[48px] font-extrabold tracking-[-0.03em] mb-4 leading-[1.1]">Готовы начать?</h2>
-      <p class="text-[17px] text-cx-muted max-w-[480px] mx-auto mb-9 leading-[1.6]">Вступай в сообщество и начни внедрять ИИ в свою жизнь, работу и бизнес уже сегодня.</p>
-      <button
-        class="px-8 py-4 rounded-full bg-cx-ink text-white font-semibold text-base hover:bg-cx-ink-soft transition-colors duration-200 active:scale-[.98]"
-        @click="document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' })"
+  <section class="py-16">
+    <div class="max-w-295 mx-auto px-10">
+      <div
+        ref="bannerRef"
+        class="bg-[#dbeafe] rounded-3xl flex items-center gap-14 w-209.25 h-73.75 px-14 mx-auto"
       >
-        Получить доступ →
-      </button>
+        <!-- Door Lottie animation -->
+        <ClientOnly>
+          <div class="shrink-0 w-44 h-44">
+            <DotLottieVue
+              src="/animations/Door.lottie?v=2"
+              :autoplay="true"
+              :loop="true"
+              class="w-full h-full"
+            />
+          </div>
+        </ClientOnly>
+
+        <!-- Text -->
+        <div class="flex flex-col gap-4">
+          <h2 class="text-[32px] font-extrabold text-[#1a1a1a] tracking-tight leading-[1.1]">
+            Готовы начать?
+          </h2>
+          <p class="text-[15px] text-cx-muted leading-[1.6] max-w-100">
+            Вступай в сообщество и начни внедрять ИИ в свою жизнь, работу и бизнес уже сегодня.
+          </p>
+          <button class="btn-primary self-start text-[13px]! px-5! py-2.5!" @click="scrollToPricing">
+            Получить доступ
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 </template>

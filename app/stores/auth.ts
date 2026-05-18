@@ -1,5 +1,6 @@
 export interface TelegramUser {
   id: number
+  telegramId?: number
   first_name: string
   last_name?: string
   username?: string
@@ -9,27 +10,64 @@ export interface TelegramUser {
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<TelegramUser | null>(null)
+  const isRestored = ref(false)
+  const userCookie = useCookie<TelegramUser | null>('cx-user', {
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: 'lax'
+  })
+
+  const displayName = computed(() => {
+    if (!user.value) return ''
+    return [user.value.first_name, user.value.last_name].filter(Boolean).join(' ')
+  })
+
+  const initials = computed(() => {
+    if (!user.value) return ''
+    return `${user.value.first_name[0] ?? ''}${user.value.last_name?.[0] ?? ''}`.toUpperCase()
+  })
 
   function login(telegramUser: TelegramUser) {
-    user.value = telegramUser
+    user.value = {
+      ...telegramUser,
+      telegramId: telegramUser.telegramId ?? telegramUser.id
+    }
+    userCookie.value = user.value
     if (import.meta.client) {
-      localStorage.setItem('cx-user', JSON.stringify(telegramUser))
+      localStorage.setItem('cx-user', JSON.stringify(user.value))
     }
   }
 
   function logout() {
     user.value = null
+    userCookie.value = null
     if (import.meta.client) {
       localStorage.removeItem('cx-user')
     }
   }
 
   function restoreFromStorage() {
+    if (isRestored.value) return
+    isRestored.value = true
+    if (userCookie.value) {
+      user.value = {
+        ...userCookie.value,
+        telegramId: userCookie.value.telegramId ?? userCookie.value.id
+      }
+      return
+    }
+
     if (!import.meta.client) return
+
     const stored = localStorage.getItem('cx-user')
     if (stored) {
-      try { user.value = JSON.parse(stored) }
-      catch { localStorage.removeItem('cx-user') }
+      try {
+        const parsed = JSON.parse(stored) as TelegramUser
+        user.value = {
+          ...parsed,
+          telegramId: parsed.telegramId ?? parsed.id
+        }
+        userCookie.value = user.value
+      } catch { localStorage.removeItem('cx-user') }
     }
   }
 
@@ -45,5 +83,5 @@ export const useAuthStore = defineStore('auth', () => {
     })
   }
 
-  return { user, login, logout, restoreFromStorage, devLogin }
+  return { user, displayName, initials, login, logout, restoreFromStorage, devLogin }
 })

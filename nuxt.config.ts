@@ -10,17 +10,23 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  routeRules: {
-    '/': { prerender: true }
-  },
-
-  compatibilityDate: '2025-01-15',
-
   colorMode: {
     preference: 'light',
     fallback: 'light',
     classSuffix: ''
   },
+
+  runtimeConfig: {
+    public: {
+      telegramBotUsername: ''
+    }
+  },
+
+  routeRules: {
+    '/': { prerender: true }
+  },
+
+  compatibilityDate: '2025-01-15',
 
   eslint: {
     config: {

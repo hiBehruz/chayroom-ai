@@ -1,5 +1,5 @@
 <template>
-  <footer class="border-t border-cx-line">
+  <footer class="border-t border-cx-line bg-[#efefef]">
     <div class="max-w-[1180px] mx-auto px-10 py-12">
       <div class="grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-10">
         <div>
@@ -11,35 +11,46 @@
           </p>
         </div>
         <div>
-          <h4 class="text-[12px] font-bold tracking-[.06em] uppercase text-cx-muted mb-3.5">Навигация</h4>
+          <h4 class="text-[12px] font-bold tracking-[.06em] uppercase text-cx-muted mb-3.5">
+            Навигация
+          </h4>
           <div class="flex flex-col gap-2">
-            <a v-for="link in ['Курсы', 'Гайды', 'Тарифы', 'FAQ']" :key="link"
-              class="text-sm text-cx-muted hover:text-cx-ink transition-colors duration-200 cursor-pointer">
+            <a
+              v-for="link in ['Курсы', 'Гайды', 'Тарифы', 'FAQ']"
+              :key="link"
+              class="text-sm text-cx-muted hover:text-cx-ink transition-colors duration-200 cursor-pointer"
+            >
               {{ link }}
             </a>
           </div>
         </div>
         <div>
-          <h4 class="text-[12px] font-bold tracking-[.06em] uppercase text-cx-muted mb-3.5">Поддержка</h4>
+          <h4 class="text-[12px] font-bold tracking-[.06em] uppercase text-cx-muted mb-3.5">
+            Поддержка
+          </h4>
           <div class="flex flex-col gap-2">
             <a class="text-sm text-cx-muted hover:text-cx-ink transition-colors duration-200 cursor-pointer">Написать в Telegram</a>
             <a class="text-sm text-cx-muted hover:text-cx-ink transition-colors duration-200 cursor-pointer">support@airoomclub.ru</a>
           </div>
         </div>
         <div>
-          <h4 class="text-[12px] font-bold tracking-[.06em] uppercase text-cx-muted mb-3.5">Документы</h4>
+          <h4 class="text-[12px] font-bold tracking-[.06em] uppercase text-cx-muted mb-3.5">
+            Документы
+          </h4>
           <div class="flex flex-col gap-2">
-            <a v-for="doc in ['Политика конфиденциальности', 'Обработка персональных данных', 'Оферта']"
+            <a
+              v-for="doc in ['Политика конфиденциальности', 'Обработка персональных данных', 'Оферта']"
               :key="doc"
-              class="text-sm text-cx-muted hover:text-cx-ink transition-colors duration-200 cursor-pointer">
+              class="text-sm text-cx-muted hover:text-cx-ink transition-colors duration-200 cursor-pointer"
+            >
               {{ doc }}
             </a>
           </div>
         </div>
       </div>
       <div class="border-t border-cx-line mt-10 pt-5 flex justify-between items-center">
-        <span class="text-xs text-cx-faint">© 2026 Chayroom AI Club</span>
-        <span class="text-xs text-cx-faint">Оплата через Tribute · Telegram</span>
+        <span class="text-xs text-cx-faint">© 2026 Chayroom AI Club. Все права защищены.</span>
+        <span class="text-xs text-cx-faint">MVP: Telegram · Production: Click / Payme</span>
       </div>
     </div>
   </footer>

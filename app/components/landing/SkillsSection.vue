@@ -16,6 +16,7 @@ const skills = [
 const ITEMS_PER_PAGE = 2
 const totalPages = computed(() => Math.ceil(skills.length / ITEMS_PER_PAGE))
 const currentPage = ref(0)
+const activeNum = computed(() => skills[currentPage.value * ITEMS_PER_PAGE].num)
 const trackRef = ref<HTMLElement>()
 
 function goToPage(page: number) {
@@ -25,8 +26,17 @@ function goToPage(page: number) {
   currentPage.value = page
 }
 
-function prev() { if (currentPage.value > 0) goToPage(currentPage.value - 1) }
-function next() { if (currentPage.value < totalPages.value - 1) goToPage(currentPage.value + 1) }
+function prev() {
+  if (currentPage.value > 0) {
+    goToPage(currentPage.value - 1)
+  }
+}
+
+function next() {
+  if (currentPage.value < totalPages.value - 1) {
+    goToPage(currentPage.value + 1)
+  }
+}
 
 function skillsForPage(page: number) {
   return skills.slice(page * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE + ITEMS_PER_PAGE)
@@ -36,41 +46,69 @@ function skillsForPage(page: number) {
 <template>
   <section class="py-16 bg-cx-surface">
     <div class="max-w-[1180px] mx-auto px-10">
-      <div class="flex justify-between items-center mb-8">
-        <UiSectionHeader eyebrow="Навыки" title="Чему ты научишься в нашем сообществе?" align="left" class="[&_h2]:text-[36px]" />
-        <div class="flex gap-2 shrink-0">
-          <button
-            :class="['w-10 h-10 rounded-full bg-white border border-cx-line flex items-center justify-center text-base transition-colors duration-200', currentPage === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer']"
-            :disabled="currentPage === 0"
-            @click="prev"
-          >←</button>
-          <button
-            :class="['w-10 h-10 rounded-full bg-white border border-cx-line flex items-center justify-center text-base transition-colors duration-200', currentPage === totalPages - 1 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer']"
-            :disabled="currentPage === totalPages - 1"
-            @click="next"
-          >→</button>
-        </div>
-      </div>
+      <UiSectionHeader
+        eyebrow="Навыки"
+        title="Чему ты научишься в нашем сообществе?"
+        class="[&_h2]:text-[36px] [&>div:first-child]:text-[14px] mb-8"
+      />
 
-      <div class="overflow-hidden">
-        <div ref="trackRef" class="flex" :style="{ width: `${totalPages * 100}%` }">
+      <div class="flex items-center gap-4">
+        <!-- Prev -->
+        <button
+          :class="['shrink-0 w-10 h-10 rounded-full bg-white border border-cx-line flex items-center justify-center text-base transition-colors duration-200', currentPage === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer']"
+          :disabled="currentPage === 0"
+          aria-label="Предыдущие навыки"
+          @click="prev"
+        >
+          ←
+        </button>
+
+        <div class="flex-1 overflow-hidden">
           <div
-            v-for="page in totalPages"
-            :key="page"
-            class="grid grid-cols-2 gap-5"
-            :style="{ width: `${100 / totalPages}%` }"
+            ref="trackRef"
+            class="flex"
+            :style="{ width: `${totalPages * 100}%` }"
           >
             <div
-              v-for="skill in skillsForPage(page - 1)"
-              :key="skill.num"
-              class="bg-white border border-cx-line rounded-3xl p-8 shadow-card"
+              v-for="page in totalPages"
+              :key="page"
+              class="grid grid-cols-2 gap-5"
+              :style="{ width: `${100 / totalPages}%` }"
             >
-              <div class="text-[32px] font-extrabold text-cx-line mb-4">{{ skill.num }}</div>
-              <div class="text-[19px] font-bold mb-2.5 leading-[1.3]">{{ skill.title }}</div>
-              <div class="text-sm text-cx-muted leading-[1.6]">{{ skill.body }}</div>
+              <div
+                v-for="skill in skillsForPage(page - 1)"
+                :key="skill.num"
+                v-sparkle
+                class="group bg-[#f7f7f5] rounded-3xl p-8"
+              >
+                <div
+                  :class="[
+                    'text-[32px] font-extrabold transition-colors duration-500 ease-in-out mb-4',
+                    skill.num === activeNum ? 'text-[#1a1a1a]' : 'text-cx-line group-hover:text-[#1a1a1a]'
+                  ]"
+                >
+                  {{ skill.num }}
+                </div>
+                <div class="text-[19px] font-bold mb-2.5 leading-[1.3]">
+                  {{ skill.title }}
+                </div>
+                <div class="text-sm text-cx-muted leading-[1.6]">
+                  {{ skill.body }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Next -->
+        <button
+          :class="['shrink-0 w-10 h-10 rounded-full bg-white border border-cx-line flex items-center justify-center text-base transition-colors duration-200', currentPage === totalPages - 1 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer']"
+          :disabled="currentPage === totalPages - 1"
+          aria-label="Следующие навыки"
+          @click="next"
+        >
+          →
+        </button>
       </div>
 
       <!-- Dots -->
@@ -83,7 +121,7 @@ function skillsForPage(page: number) {
             currentPage === i - 1 ? 'w-5 h-2 bg-cx-ink' : 'w-2 h-2 bg-cx-line hover:bg-cx-muted'
           ]"
           @click="goToPage(i - 1)"
-        ></button>
+        />
       </div>
     </div>
   </section>

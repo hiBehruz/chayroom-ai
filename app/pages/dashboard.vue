@@ -109,10 +109,21 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
             <div class="text-[13px] text-cx-muted mb-4">
               Ishtirokchilar bilan muloqot, efirlar va yangiliklar.
             </div>
-            <button class="btn-primary text-[13px]! px-5! py-2!">
-              Telegramga kirish
-              <UIcon name="i-lucide-external-link" class="size-3.5" />
-            </button>
+            <!-- Obuna bor — kirish tugmasi -->
+            <template v-if="hasSubscription">
+              <button class="btn-primary text-[13px]! px-5! py-2!">
+                Telegramga kirish
+                <UIcon name="i-lucide-external-link" class="size-3.5" />
+              </button>
+            </template>
+
+            <!-- Obuna yo'q — qulflangan matn -->
+            <template v-else>
+              <p class="flex items-center gap-1.5 text-[13px] text-cx-muted">
+                <UIcon name="i-lucide-lock" class="size-4 shrink-0" />
+                Obuna bo'lgandan keyin kirish ochiladi.
+              </p>
+            </template>
           </div>
         </div>
       </div>

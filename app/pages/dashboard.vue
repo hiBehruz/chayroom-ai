@@ -5,34 +5,34 @@ const authStore = useAuthStore()
 onMounted(() => authStore.restoreFromStorage())
 
 const user = computed(() => authStore.user)
+const hasSubscription = ref(false)
 
-const stats = computed(() => [
-  { label: 'Курсов', value: user.value ? '2' : '0', icon: 'i-lucide-book-open' },
-  { label: 'Пройдено уроков', value: user.value ? '0 / 38' : '—', icon: 'i-lucide-circle-check' },
-  { label: 'Часов обучения', value: user.value ? '0h' : '—', icon: 'i-lucide-clock' },
-  { label: 'Сертификаты', value: '0', icon: 'i-lucide-timer' }
-])
+const stats = [
+  { label: 'Kurslar', value: '2', icon: 'i-lucide-book-open', iconColor: 'text-cx-blue' },
+  { label: "O'tilgan darslar", value: '31 / 38', icon: 'i-lucide-circle-check', iconColor: 'text-green-500' },
+  { label: "O'qish soatlari", value: '8h', icon: 'i-lucide-clock', iconColor: 'text-yellow-500' },
+  { label: 'Sertifikatlar', value: '0', icon: 'i-lucide-timer', iconColor: 'text-purple-500' },
+]
 
 const courses = [
   {
-    title: 'Создание и Кастомизация AI-агента на базе Hermes',
-    desc: 'Курс, в котором мы с нуля создадим агента и добавим в него навыки и улучшения.',
-    tags: ['AI', 'AI-агент', 'Hermes'],
-    locked: true,
-    progress: 0
+    title: 'Hermes asosida AI agent yaratish va sozlash',
+    desc: "Bu kursda biz noldan agent yaratamiz, unga ko'nikmalar va yaxshilanishlar qo'shamiz.",
+    tags: ['AI', 'AI agent', 'Hermes'],
+    free: true,
+    progress: 0,
   },
   {
-    title: 'Вайбкодинг с 0',
-    desc: 'Как без знания кода, собирать нужные сайты, инструменты, приложения.',
-    tags: ['Вайбкодинг'],
-    locked: true,
-    progress: 0
-  }
+    title: 'Vibe coding noldan',
+    desc: "Kod bilmasdan kerakli digital yechimlar: saytlar, vositalar va ilovalarni yaratish.",
+    tags: ['Vibe coding'],
+    free: true,
+    progress: 100,
+  },
 ]
 
-const hasSubscription = ref(false)
 
-useSeoMeta({ title: 'Панель — Chayroom AI' })
+useSeoMeta({ title: 'Panel — Chayroom AI' })
 </script>
 
 <template>
@@ -40,118 +40,137 @@ useSeoMeta({ title: 'Панель — Chayroom AI' })
     <div class="max-w-295 mx-auto px-10 py-8">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-sm text-cx-muted mb-6">
-        <NuxtLink to="/" class="hover:text-cx-ink transition-colors">Главная</NuxtLink>
+        <NuxtLink to="/" class="hover:text-cx-ink transition-colors">Bosh sahifa</NuxtLink>
         <span>/</span>
-        <span class="text-cx-ink font-medium">Панель</span>
+        <span class="text-cx-ink font-medium">Panel</span>
       </div>
+
+      <!-- Paywall CTA — tepada, obuna yo'q bo'lganda -->
+      <div
+        v-if="!user || !hasSubscription"
+        class="mb-8 rounded-2xl border border-cx-blue/20 bg-linear-to-r from-[#f0f6ff] to-[#f5f0ff] p-6 flex items-center gap-6"
+      >
+        <div class="w-11 h-11 rounded-xl bg-linear-to-br from-cx-blue to-[#1A4FE0] flex items-center justify-center shrink-0">
+          <UIcon name="i-lucide-lock" class="size-5 text-white" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[15px] font-bold text-[#1a1a1a] mb-0.5">
+            O'quv dashboardingni och
+          </div>
+          <div class="text-[13px] text-cx-muted">
+            Barcha kurslar, progress kuzatuvi va sertifikatlarga kirish huquqini ol.
+          </div>
+        </div>
+        <button
+          class="btn-primary shrink-0 text-[13px]! px-5! py-2.5!"
+          @click="navigateTo('/#pricing')"
+        >
+          <UIcon name="i-lucide-sparkles" class="size-3.5" />
+          To'liq kirish huquqini olish →
+        </button>
+      </div>
+
+      <!-- Dashboard content — deactive when no subscription -->
+      <div :class="(!user || !hasSubscription) ? 'opacity-40 grayscale pointer-events-none select-none' : ''">
 
       <!-- Welcome -->
       <div class="mb-7">
         <h1 class="text-[28px] font-extrabold tracking-tight text-[#1a1a1a]">
-          С возвращением!
+          Qaytganing bilan!
         </h1>
         <p class="text-cx-muted mt-1 text-[14px]">
-          Продолжай учиться. Ты отлично продвигаешься.
+          O'qishni davom ettir. Juda yaxshi harakat qilyapsan.
         </p>
       </div>
 
       <!-- Stats -->
       <div class="grid grid-cols-4 gap-4 mb-6">
-        <UCard
+        <div
           v-for="stat in stats"
           :key="stat.label"
-          :ui="{
-            root: 'bg-[#fafafa] border border-cx-line rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.08)]',
-            body: 'p-5 flex flex-col gap-2'
-          }"
+          class="bg-[#f8f8fa] border border-cx-line rounded-2xl p-5 flex flex-col gap-2"
         >
-          <UIcon :name="stat.icon" class="size-5 text-cx-muted" />
+          <UIcon :name="stat.icon" :class="['size-5', stat.iconColor]" />
           <div class="text-[22px] font-extrabold tracking-tight text-[#1a1a1a]">
             {{ stat.value }}
           </div>
-          <div class="text-[13px] text-cx-muted">
-            {{ stat.label }}
-          </div>
-        </UCard>
+          <div class="text-[13px] text-cx-muted">{{ stat.label }}</div>
+        </div>
       </div>
 
-      <!-- Telegram community -->
-      <div class="bg-[#f8f8fa] rounded-2xl px-6 py-5 flex items-center gap-4 mb-8">
-        <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 fill-cx-blue">
-            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/>
-          </svg>
-        </div>
-        <div>
-          <div class="text-[14px] font-bold text-[#1a1a1a]">
-            Закрытое сообщество в Telegram
-          </div>
-          <div class="text-[13px] text-cx-muted mt-0.5">
-            Общение с участниками, эфиры и новости.
-          </div>
-          <div class="text-[13px] text-cx-muted">
-            Доступно после оформления подписки.
+      <!-- Telegram -->
+      <div class="bg-[#f8f8fa] border border-cx-line rounded-2xl px-6 py-5 mb-8">
+        <div class="flex items-start gap-4">
+          <UIcon name="i-lucide-users-round" class="size-5 text-cx-blue mt-0.5 shrink-0" />
+          <div class="flex-1 min-w-0">
+            <div class="text-[15px] font-bold text-[#1a1a1a] mb-1">
+              Telegramdagi yopiq hamjamiyat
+            </div>
+            <div class="text-[13px] text-cx-muted mb-4">
+              Ishtirokchilar bilan muloqot, efirlar va yangiliklar.
+            </div>
+            <button class="btn-primary text-[13px]! px-5! py-2!">
+              Telegramga kirish
+              <UIcon name="i-lucide-external-link" class="size-3.5" />
+            </button>
           </div>
         </div>
       </div>
 
       <!-- Main grid -->
-      <div class="relative">
-        <div class="grid grid-cols-[1fr_380px] gap-6">
-          <!-- Courses -->
-          <div>
-            <div class="flex items-center gap-2 mb-5">
-              <UIcon name="i-lucide-book-open" class="size-4 text-cx-muted" />
-              <h2 class="text-[15px] font-bold text-[#1a1a1a]">
-                Мои курсы
-              </h2>
-            </div>
-            <div class="flex flex-col gap-4">
-              <UCard
-                v-for="course in courses"
-                :key="course.title"
-                :ui="{
-                  root: 'bg-[#fafafa] border border-cx-line rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.08)] group',
-                  body: 'p-5'
-                }"
-              >
-                <div class="flex items-start justify-between gap-3 mb-2">
-                  <span class="text-[14px] font-semibold text-[#1a1a1a] leading-[1.4] group-hover:text-cx-blue transition-colors duration-200">
-                    {{ course.title }}
-                  </span>
-                  <span
-                    v-if="course.locked"
-                    class="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#ebebea] text-cx-muted text-[11px] font-medium"
-                  >
-                    <UIcon name="i-lucide-lock" class="size-3" />
-                    Заблокировано
-                  </span>
-                </div>
-                <p class="text-[12px] text-cx-muted leading-[1.6] mb-3">
-                  {{ course.desc }}
-                </p>
-                <div class="flex flex-wrap gap-1.5">
-                  <span
-                    v-for="tag in course.tags"
-                    :key="tag"
-                    class="px-2.5 py-0.5 rounded-full bg-white border border-cx-line text-[11px] text-cx-muted font-medium"
-                  >
-                    {{ tag }}
-                  </span>
-                </div>
-              </UCard>
+      <div class="grid grid-cols-[1fr_380px] gap-6 mb-8">
+        <!-- Courses -->
+        <div>
+          <div class="flex items-center gap-2 mb-5">
+            <UIcon name="i-lucide-graduation-cap" class="size-4 text-cx-blue" />
+            <h2 class="text-[15px] font-bold text-[#1a1a1a]">Mening kurslarim</h2>
+          </div>
+          <div class="flex flex-col gap-3">
+            <div
+              v-for="course in courses"
+              :key="course.title"
+              class="group bg-[#f8f8fa] border border-cx-line rounded-2xl p-5"
+            >
+              <div class="flex items-start justify-between gap-3 mb-2">
+                <span class="text-[14px] font-semibold text-[#1a1a1a] leading-[1.4]">
+                  {{ course.title }}
+                </span>
+                <span
+                  v-if="course.free"
+                  class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-600 text-[11px] font-semibold border border-green-100"
+                >
+                  <UIcon name="i-lucide-link" class="size-3" />
+                  Mavjud
+                </span>
+                <span
+                  v-else
+                  class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ebebea] text-cx-muted text-[11px] font-medium"
+                >
+                  <UIcon name="i-lucide-lock" class="size-3" />
+                  Yopiq
+                </span>
+              </div>
+              <p class="text-[12px] text-cx-muted leading-[1.6] mb-3">{{ course.desc }}</p>
+              <div class="flex flex-wrap gap-1.5">
+                <span
+                  v-for="tag in course.tags"
+                  :key="tag"
+                  class="px-2.5 py-0.5 rounded-full bg-white border border-cx-line text-[11px] text-cx-muted font-medium"
+                >{{ tag }}</span>
+              </div>
             </div>
           </div>
+        </div>
 
+        <!-- Right column -->
+        <div class="flex flex-col gap-6">
           <!-- Progress -->
           <div>
             <div class="flex items-center gap-2 mb-5">
-              <UIcon name="i-lucide-bar-chart-2" class="size-4 text-cx-muted" />
-              <h2 class="text-[15px] font-bold text-[#1a1a1a]">
-                Прогресс обучения
-              </h2>
+              <UIcon name="i-lucide-bar-chart-2" class="size-4 text-cx-blue" />
+              <h2 class="text-[15px] font-bold text-[#1a1a1a]">O'qish progressi</h2>
             </div>
-            <div class="bg-[#f8f8fa] rounded-2xl p-5 flex flex-col gap-4">
+            <div class="bg-[#f8f8fa] border border-cx-line rounded-2xl p-5 flex flex-col gap-4">
               <div
                 v-for="course in courses"
                 :key="course.title"
@@ -159,7 +178,7 @@ useSeoMeta({ title: 'Панель — Chayroom AI' })
               >
                 <div class="flex items-center justify-between">
                   <span class="text-[12px] text-cx-muted truncate max-w-55">{{ course.title }}</span>
-                  <span class="text-[12px] font-semibold text-cx-muted">{{ course.progress }}%</span>
+                  <span class="text-[12px] font-semibold text-cx-muted shrink-0 ml-2">{{ course.progress }}%</span>
                 </div>
                 <div class="h-1.5 bg-[#e5e5e5] rounded-full overflow-hidden">
                   <div
@@ -170,34 +189,26 @@ useSeoMeta({ title: 'Панель — Chayroom AI' })
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Paywall overlay -->
-        <div
-          v-if="!user || !hasSubscription"
-          class="absolute inset-0 flex items-end justify-center pb-0"
-        >
-          <div class="absolute inset-0 bg-linear-to-t from-white via-white/80 to-transparent" />
-          <div class="relative z-10 bg-white rounded-2xl border border-cx-line shadow-lift p-8 mx-auto max-w-lg text-center mb-4">
-            <h3 class="text-[18px] font-extrabold text-[#1a1a1a] mb-2">
-              Откройте свой учебный дашборд
-            </h3>
-            <p class="text-[13px] text-cx-muted leading-[1.6] mb-5">
-              Получите доступ ко всем курсам, отслеживанию прогресса и сертификатам.
-            </p>
-            <button
-              class="btn-primary w-full text-[14px]! px-6! py-3.5!"
-              @click="navigateTo('/#pricing')"
-            >
-              <UIcon name="i-lucide-sparkles" class="size-4" />
-              Получить полный доступ →
-            </button>
-            <p class="text-[11px] text-cx-muted mt-3">
-              Оплата в Telegram. Доступ ко всем курсам и материалам.
-            </p>
+          <!-- Instructor -->
+          <div class="bg-[#f8f8fa] border border-cx-line rounded-2xl p-5">
+            <div class="text-[10px] font-bold text-cx-muted uppercase tracking-widest mb-3">
+              Instruktor
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-linear-to-br from-cx-blue to-[#1A4FE0] flex items-center justify-center text-white font-bold text-[14px] shrink-0">
+                AI
+              </div>
+              <div>
+                <div class="text-[14px] font-bold text-[#1a1a1a]">Chayroom AI Club</div>
+                <div class="text-[12px] text-cx-muted">Ekspertlar jamoasi</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      </div><!-- end dashboard content -->
     </div>
   </div>
 </template>

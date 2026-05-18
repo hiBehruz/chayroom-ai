@@ -29,5 +29,16 @@ export default defineNuxtConfig({
         braceStyle: '1tbs'
       }
     }
+  },
+
+  runtimeConfig: {
+    adminTelegramId: '',
+    supabaseUrl: '',
+    supabaseServiceKey: '',
+    notionApiKey: '',
+    public: {
+      telegramBotUsername: '',
+      adminTelegramId: ''
+    }
   }
 })

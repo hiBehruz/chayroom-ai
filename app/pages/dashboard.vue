@@ -135,19 +135,31 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
                 <span class="text-[14px] font-semibold text-[#1a1a1a] leading-[1.4]">
                   {{ course.title }}
                 </span>
+                <!-- Bepul kurs — har doim ochiq -->
                 <span
                   v-if="course.free"
                   class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-600 text-[11px] font-semibold border border-green-100"
                 >
-                  <UIcon name="i-lucide-link" class="size-3" />
+                  <UIcon name="i-lucide-lock-keyhole-open" class="size-3" />
+                  Bepul
+                </span>
+
+                <!-- Pullik + obuna bor -->
+                <span
+                  v-else-if="hasSubscription"
+                  class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-600 text-[11px] font-semibold border border-green-100"
+                >
+                  <UIcon name="i-lucide-lock-keyhole-open" class="size-3" />
                   Mavjud
                 </span>
+
+                <!-- Pullik + obuna yo'q -->
                 <span
                   v-else
-                  class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ebebea] text-cx-muted text-[11px] font-medium"
+                  class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-500 text-[11px] font-semibold border border-red-100"
                 >
-                  <UIcon name="i-lucide-lock" class="size-3" />
-                  Yopiq
+                  <UIcon name="i-lucide-lock-keyhole" class="size-3" />
+                  Obuna orqali
                 </span>
               </div>
               <p class="text-[12px] text-cx-muted leading-[1.6] mb-3">{{ course.desc }}</p>

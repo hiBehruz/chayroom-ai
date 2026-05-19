@@ -13,10 +13,10 @@ const skills = [
   { num: '09', title: 'AI voronkalar yaratish', body: 'Birinchi kontaktdan sotuvgacha AI personalizatsiyasi bilan marketing voronkalar qurish.' }
 ]
 
-const ITEMS_PER_PAGE = 2
-const totalPages = computed(() => Math.ceil(skills.length / ITEMS_PER_PAGE))
+const itemsPerPage = ref(2)
+const totalPages = computed(() => Math.ceil(skills.length / itemsPerPage.value))
 const currentPage = ref(0)
-const activeNum = computed(() => skills[currentPage.value * ITEMS_PER_PAGE]?.num ?? '')
+const activeNum = computed(() => skills[currentPage.value * itemsPerPage.value]?.num ?? '')
 const trackRef = ref<HTMLElement>()
 
 function goToPage(page: number) {
@@ -27,20 +27,30 @@ function goToPage(page: number) {
 }
 
 function prev() {
-  if (currentPage.value > 0) {
-    goToPage(currentPage.value - 1)
-  }
+  if (currentPage.value > 0) goToPage(currentPage.value - 1)
 }
 
 function next() {
-  if (currentPage.value < totalPages.value - 1) {
-    goToPage(currentPage.value + 1)
-  }
+  if (currentPage.value < totalPages.value - 1) goToPage(currentPage.value + 1)
 }
 
 function skillsForPage(page: number) {
-  return skills.slice(page * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE + ITEMS_PER_PAGE)
+  return skills.slice(page * itemsPerPage.value, page * itemsPerPage.value + itemsPerPage.value)
 }
+
+onMounted(() => {
+  const update = () => {
+    const next = window.innerWidth < 768 ? 1 : 2
+    if (next !== itemsPerPage.value) {
+      itemsPerPage.value = next
+      currentPage.value = 0
+      if (trackRef.value) gsap.set(trackRef.value, { x: 0 })
+    }
+  }
+  update()
+  window.addEventListener('resize', update, { passive: true })
+  onUnmounted(() => window.removeEventListener('resize', update))
+})
 </script>
 
 <template>

@@ -24,7 +24,7 @@ onMounted(() => {
         class="bg-[#f5e6c8] rounded-3xl flex items-center gap-14 w-209.25 h-73.75 px-14 mx-auto max-md:w-full max-md:h-auto max-md:flex-col max-md:px-6 max-md:py-8 max-md:gap-6 max-md:text-center"
       >
         <!-- Book Lottie + sparkles -->
-        <div class="relative shrink-0 w-56 h-56 flex items-center justify-center max-md:w-36 max-md:h-36">
+        <div class="relative shrink-0 w-56 h-56 flex items-center justify-center max-md:w-52 max-md:h-52">
           <!-- Sparkles -->
           <span class="sparkle sparkle-1 absolute top-2 left-6 text-[#3b82f6] text-[18px]">✦</span>
           <span class="sparkle sparkle-2 absolute top-6 right-4 text-[#94a3b8] text-[12px]">✦</span>

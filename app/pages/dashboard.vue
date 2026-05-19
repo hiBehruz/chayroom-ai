@@ -57,7 +57,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
         class="mb-8 rounded-2xl bg-[#f7f7f5] px-10 py-8 flex items-center justify-center gap-8 paywall-enter sticky top-20 z-10 mx-32 max-md:mx-0 max-md:flex-col max-md:px-6 max-md:py-6 max-md:text-center max-md:gap-4"
       >
         <ClientOnly>
-          <div class="shrink-0 w-36 h-36">
+          <div class="shrink-0 w-36 h-36 max-md:w-52 max-md:h-52">
             <DotLottieVue
               src="/animations/Door.lottie"
               :autoplay="true"

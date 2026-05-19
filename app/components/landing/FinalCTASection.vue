@@ -27,7 +27,7 @@ onMounted(() => {
       >
         <!-- Door Lottie animation -->
         <ClientOnly>
-          <div class="shrink-0 w-56 h-56 max-md:w-36 max-md:h-36">
+          <div class="shrink-0 w-56 h-56 max-md:w-52 max-md:h-52">
             <DotLottieVue
               src="/animations/Door.lottie?v=2"
               :autoplay="true"

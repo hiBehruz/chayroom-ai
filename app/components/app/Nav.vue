@@ -236,7 +236,7 @@ function logout() {
         <!-- Hamburger -->
         <button
           class="flex items-center justify-center w-9 h-9 rounded-xl hover:bg-[#f2f2f0] transition-colors duration-200 focus:outline-none"
-          aria-label="Menyuni ochish"
+          :aria-label="isMobileMenuOpen ? 'Menyuni yopish' : 'Menyuni ochish'"
           @click="isMobileMenuOpen = !isMobileMenuOpen"
         >
           <UIcon
@@ -277,7 +277,7 @@ function logout() {
           </div>
           <NuxtLink
             to="/profile"
-            class="flex items-center gap-2.5 px-4 py-3 rounded-xl text-[14px] font-medium text-[#1a1a1a] hover:bg-[#f7f7f5] transition-colors"
+            class="flex items-center gap-2.5 px-4 py-3 rounded-xl text-[14px] font-medium text-[#1a1a1a] hover:bg-[#f7f7f5] transition-colors duration-200"
             @click="isMobileMenuOpen = false"
           >
             <UIcon name="i-lucide-user-round" class="size-4 text-cx-muted" />

@@ -45,7 +45,7 @@ function skillsForPage(page: number) {
 
 <template>
   <section class="py-16 bg-cx-surface">
-    <div class="max-w-[1180px] mx-auto px-10">
+    <div class="max-w-[1180px] mx-auto px-10 max-md:px-5">
       <UiSectionHeader
         eyebrow="Ko‘nikmalar"
         title="Telegram yopiq kanalda nimalarni o‘rganasan?"
@@ -72,7 +72,7 @@ function skillsForPage(page: number) {
             <div
               v-for="page in totalPages"
               :key="page"
-              class="grid grid-cols-2 gap-5"
+              class="grid grid-cols-1 md:grid-cols-2 gap-5"
               :style="{ width: `${100 / totalPages}%` }"
             >
               <div

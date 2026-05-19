@@ -29,14 +29,14 @@ onMounted(() => {
     ref="sectionRef"
     class="pt-0 pb-16 -mt-2"
   >
-    <div class="max-w-[1180px] mx-auto px-10">
+    <div class="max-w-[1180px] mx-auto px-10 max-md:px-5">
       <UiSectionDivider class="mb-10" />
       <UiSectionHeader
         title="Bizning klub sen uchun, agar..."
         subtitle="Biz AIni haqiqiy ustunlik sifatida ishlatmoqchi bo‘lganlar uchun muhit yaratdik."
         class="mb-10"
       />
-      <div class="grid grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div
           v-for="card in cards"
           :key="card.num"

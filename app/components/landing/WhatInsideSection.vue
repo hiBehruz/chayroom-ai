@@ -32,17 +32,17 @@ onMounted(() => {
     ref="sectionRef"
     class="py-16 bg-white scroll-mt-20"
   >
-    <div class="max-w-[1180px] mx-auto px-10">
+    <div class="max-w-[1180px] mx-auto px-10 max-md:px-5">
       <UiSectionDivider class="mb-10" />
       <div class="text-center mb-12">
-        <h2 class="text-[36px] font-extrabold tracking-tight leading-[1.1] text-[#1a1a1a]">
+        <h2 class="text-[36px] max-md:text-[24px] font-extrabold tracking-tight leading-[1.1] text-[#1a1a1a]">
           Chayroom AI ichida nimalar bor?
         </h2>
-        <p class="text-[36px] font-extrabold tracking-tight leading-[1.1] text-[#1a1a1a]">
+        <p class="text-[36px] max-md:text-[24px] font-extrabold tracking-tight leading-[1.1] text-[#1a1a1a]">
           Va nega biz bilan rivojlanish<br>to‘g‘ri tanlov
         </p>
       </div>
-      <div class="grid grid-cols-3 gap-4.5">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4.5">
         <div
           v-for="f in features"
           :key="f.title"

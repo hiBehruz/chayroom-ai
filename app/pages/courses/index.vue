@@ -178,28 +178,58 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
               {{ course.desc }}
             </p>
 
-            <div class="flex items-center gap-4 text-[12px] text-cx-muted">
-              <span class="flex items-center gap-1">
-                <UIcon name="i-lucide-layout-list" class="size-3.5" />
-                {{ course.modules }} modul
-              </span>
-              <span class="flex items-center gap-1">
-                <UIcon name="i-lucide-play-circle" class="size-3.5" />
-                {{ course.lessons }} dars
-              </span>
-              <span class="flex items-center gap-1">
-                <UIcon name="i-lucide-clock" class="size-3.5" />
-                {{ course.duration }}
-              </span>
+            <!-- Unsubscribed footer -->
+            <div v-if="!hasSubscription" class="mt-auto pt-3 border-t border-cx-line">
+              <div class="text-[10px] font-bold text-cx-muted uppercase tracking-widest mb-2">
+                1 oylik tarifi
+              </div>
+              <div class="flex items-center gap-4 text-[12px] text-cx-muted mb-3">
+                <span class="flex items-center gap-1">
+                  <UIcon name="i-lucide-layout-list" class="size-3.5" />
+                  {{ course.modules }} modul
+                </span>
+                <span class="flex items-center gap-1">
+                  <UIcon name="i-lucide-play-circle" class="size-3.5" />
+                  {{ course.lessons }} dars
+                </span>
+                <span class="flex items-center gap-1">
+                  <UIcon name="i-lucide-clock" class="size-3.5" />
+                  {{ course.duration }}
+                </span>
+              </div>
+              <button
+                class="btn-primary w-full text-[13px]! py-2.5! flex items-center justify-center gap-2"
+                @click.stop="isAccessModalOpen = true"
+              >
+                <span>Kirish huquqini olish</span>
+                <span class="btn-arrow">→</span>
+              </button>
             </div>
 
-            <NuxtLink
-              :to="`/courses/${course.slug}`"
-              class="btn-primary w-full text-[13px]! py-2.5! flex items-center justify-center gap-2"
-            >
-              <span>Kursni ko'rish</span>
-              <span class="btn-arrow">→</span>
-            </NuxtLink>
+            <!-- Subscribed footer -->
+            <div v-else class="mt-auto pt-3 border-t border-cx-line">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[12px] font-semibold text-cx-muted">Ваш прогресс</span>
+                <span class="text-[12px] font-bold text-[#1a1a1a]">{{ course.progress }}%</span>
+              </div>
+              <div class="h-1.5 bg-[#e5e5e5] rounded-full overflow-hidden mb-2">
+                <div
+                  class="h-full bg-cx-blue rounded-full transition-all duration-500"
+                  :style="{ width: `${course.progress}%` }"
+                />
+              </div>
+              <div class="text-[12px] text-cx-muted mb-3">
+                {{ course.progress === 0 ? 0 : Math.round(course.lessons * course.progress / 100) }} из {{ course.lessons }} уроков
+              </div>
+              <NuxtLink
+                :to="`/courses/${course.slug}`"
+                class="btn-primary w-full text-[13px]! py-2.5! flex items-center justify-center gap-2"
+                @click.stop
+              >
+                <span>{{ course.progress > 0 ? 'Davom ettirish' : 'Начать обучение' }}</span>
+                <span class="btn-arrow">→</span>
+              </NuxtLink>
+            </div>
           </div>
         </div>
       </TransitionGroup>

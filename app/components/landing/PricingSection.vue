@@ -2,45 +2,45 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-const authStore = useAuthStore()
+const isAccessModalOpen = ref(false)
 
 const plans = [
   {
     id: 'monthly',
-    period: 'Месяц',
-    desc: 'Сможешь попробовать и протестировать',
-    oldPrice: '249 000 сум',
+    period: '1 oy',
+    desc: "Сможешь попробовать и протестировать",
+    oldPrice: "249 000 so'm",
     price: '199 000',
-    unit: 'сум / мес',
+    unit: "so'm / oy",
     featured: false,
     badge: null,
     savings: null
   },
   {
     id: 'quarterly',
-    period: '3 Месяца',
-    desc: 'Достаточно времени, чтобы увидеть результаты',
-    oldPrice: '597 000 сум',
+    period: '3 oy',
+    desc: "Достаточно времени, чтобы увидеть серьёзные результаты",
+    oldPrice: "597 000 so'm",
     price: '507 450',
-    unit: 'сум / 3 мес',
+    unit: "so'm / 3 oy",
     featured: true,
-    badge: 'Выгодный и Популярный',
-    savings: 'Экономия 15%'
+    badge: 'Foydali va ommabop',
+    savings: '15% tejash'
   },
   {
     id: 'half-year',
-    period: '6 Месяцев',
-    desc: 'Максимальный фокус на внедрении AI',
-    oldPrice: '1 194 000 сум',
+    period: '6 oy',
+    desc: "Максимальный фокус на том, чтобы AI стал частью твоей жизни",
+    oldPrice: "1 194 000 so'm",
     price: '955 200',
-    unit: 'сум / 6 мес',
+    unit: "so'm / 6 oy",
     featured: false,
     badge: null,
-    savings: 'Экономия 20%'
+    savings: '20% tejash'
   }
 ]
 
-const features = ['Все курсы и гайды', 'Закрытый чат сообщества', 'Разборы AI-инструментов', 'Пошаговые инструкции', 'Доступ к новым материалам']
+const features = ["Barcha kurslar va qo'llanmalar", 'Telegram yopiq kanal', 'AI vositalar tahlili', "Qadam-baqadam yo'riqnomalar", 'Yangi materiallarga kirish']
 
 const sectionRef = ref<HTMLElement>()
 
@@ -52,11 +52,8 @@ onMounted(() => {
   })
 })
 
-function requestAccess(planId: string) {
-  return navigateTo({
-    path: authStore.user ? '/dashboard' : '/login',
-    query: { plan: planId }
-  })
+function requestAccess(_planId: string) {
+  isAccessModalOpen.value = true
 }
 </script>
 
@@ -66,23 +63,23 @@ function requestAccess(planId: string) {
     ref="sectionRef"
     class="py-16 scroll-mt-20"
   >
-    <div class="max-w-[1180px] mx-auto px-10">
+    <div class="max-w-295 mx-auto px-10">
       <UiSectionHeader
-        eyebrow="Тарифы"
-        title="Выбери свой формат"
-        subtitle="Подписка — доступно, удобно и выгодно. Без скрытых условий."
+        eyebrow="Tariflar"
+        title="O'zingga mos formatni tanla"
+        subtitle="Obuna qulay, tushunarli va foydali. Yashirin shartlarsiz."
         class="[&>div:first-child]:text-[14px] mb-12"
       />
-      <div class="grid grid-cols-3 gap-8 items-end">
+      <div class="grid grid-cols-3 gap-4 items-end">
         <div
           v-for="plan in plans"
           :key="plan.period"
-          class="relative"
+          class="relative flex justify-center"
           :class="plan.badge ? 'pt-4' : ''"
         >
           <div
             v-if="plan.badge"
-            class="absolute top-0 left-1/2 -translate-x-1/2 bg-cx-blue text-white text-[11px] font-bold px-3.5 py-1 rounded-full tracking-[.04em] whitespace-nowrap z-10"
+            class="pricing-badge absolute top-0 left-1/2 -translate-x-1/2 text-[11px] font-bold px-3.5 py-1 rounded-full tracking-[.04em] whitespace-nowrap z-10"
           >
             {{ plan.badge }}
           </div>
@@ -90,7 +87,7 @@ function requestAccess(planId: string) {
             v-sparkle
             :class="[
               'price-card bg-[#f7f7f5] rounded-3xl flex flex-col',
-              plan.featured ? 'p-7 shadow-lift scale-105' : 'p-6'
+              plan.featured ? 'w-[331.84px] h-[530.4px] p-7 shadow-lift' : 'w-[325.33px] h-130 p-6'
             ]"
           >
             <!-- Period + desc: fixed height for cross-card alignment -->
@@ -110,7 +107,7 @@ function requestAccess(planId: string) {
 
             <!-- Main price + unit -->
             <div class="text-center mb-6">
-              <span class="text-[42px] font-extrabold tracking-[-0.03em] leading-none text-cx-blue">{{ plan.price }}</span>
+              <span class="price-amount text-[42px] font-extrabold tracking-[-0.03em] leading-none">{{ plan.price }}</span>
               <span class="text-sm text-cx-muted ml-1">{{ plan.unit }}</span>
             </div>
 
@@ -122,12 +119,19 @@ function requestAccess(planId: string) {
                 class="flex items-center gap-2.5 text-sm"
               >
                 <svg
-                  class="w-3 h-3 text-cx-blue shrink-0"
-                  viewBox="0 0 24 24"
+                  class="w-4 h-4 text-green-500 shrink-0 mt-0.5"
                   fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                   stroke-width="2.5"
-                ><path d="M20 6L9 17l-5-5" /></svg>
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4.5 12.75l6 6 9-13.5"
+                  />
+                </svg>
                 {{ feat }}
               </li>
               <li
@@ -135,12 +139,19 @@ function requestAccess(planId: string) {
                 class="flex items-center gap-2.5 text-sm"
               >
                 <svg
-                  class="w-3 h-3 text-cx-blue shrink-0"
-                  viewBox="0 0 24 24"
+                  class="w-4 h-4 text-green-500 shrink-0 mt-0.5"
                   fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                   stroke-width="2.5"
-                ><path d="M20 6L9 17l-5-5" /></svg>
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4.5 12.75l6 6 9-13.5"
+                  />
+                </svg>
                 {{ plan.savings }}
               </li>
               <!-- placeholder to keep height consistent -->
@@ -148,7 +159,10 @@ function requestAccess(planId: string) {
                 v-else
                 class="invisible flex items-center gap-2.5 text-sm"
               >
-                <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" /><span>placeholder</span>
+                <svg
+                  class="w-3 h-3 shrink-0"
+                  viewBox="0 0 24 24"
+                /><span>placeholder</span>
               </li>
             </ul>
 
@@ -159,13 +173,25 @@ function requestAccess(planId: string) {
               ]"
               @click="requestAccess(plan.id)"
             >
-              <span>Получить доступ</span>
-              <svg class="price-btn-arrow" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Kirish huquqini olish</span>
+              <svg
+                class="price-btn-arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+              ><path
+                d="M3 8h10M9 4l4 4-4 4"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              /></svg>
             </button>
           </div>
         </div>
       </div>
     </div>
+
+    <AppAccessModal v-model="isAccessModalOpen" />
   </section>
 </template>
 
@@ -178,13 +204,14 @@ function requestAccess(planId: string) {
   gap: 8px;
   width: 100%;
   padding: 14px 24px;
+  border: 1px solid rgba(120, 184, 255, 0.72);
   border-radius: 14px;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.01em;
   cursor: pointer;
   overflow: hidden;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
 }
 
 .price-btn:active {
@@ -198,21 +225,59 @@ function requestAccess(planId: string) {
   flex-shrink: 0;
 }
 
-.price-btn:hover .price-btn-arrow {
+.price-btn:hover .price-btn-arrow,
+.price-card:hover .price-btn-arrow {
   transform: translateX(3px);
 }
 
-/* Featured — gradient shimmer */
-.price-btn--featured {
-  background: linear-gradient(135deg, #0075de 0%, #0ea5e9 60%, #0075de 100%);
-  background-size: 200% 100%;
+.pricing-badge {
+  border: 1px solid rgba(0, 84, 185, 0.72);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.08), transparent 22%),
+    linear-gradient(105deg, #064aaf 0%, #006fd1 38%, #064b9f 68%, #03265f 100%);
   color: #fff;
-  box-shadow: 0 4px 20px rgba(0, 117, 222, 0.38), 0 1px 3px rgba(0,0,0,0.12);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.28) inset,
+    0 -1px 0 rgba(0,14,56,0.34) inset,
+    0 10px 24px rgba(0, 91, 200, 0.24);
+}
+
+.price-amount {
+  display: inline-block;
+  background:
+    linear-gradient(128deg, #b9ecff 0%, #008cff 10%, #0a64d8 28%, #0642a7 52%, #062b78 76%, #020f3f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.22),
+    0 14px 30px rgba(0, 63, 150, 0.22);
+  filter: drop-shadow(0 2px 0 rgba(1, 32, 92, 0.12));
+}
+
+.price-btn--featured {
+  border-color: rgba(2, 43, 120, 0.92);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.08), transparent 22%),
+    linear-gradient(105deg, #064aaf 0%, #006fd1 38%, #064b9f 68%, #03265f 100%);
+  background-size: 100% 100%;
+  color: #fff;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.28) inset,
+    0 -1px 0 rgba(0,14,56,0.34) inset,
+    0 14px 32px rgba(0, 63, 150, 0.3);
   animation: btn-shimmer 3s ease infinite;
 }
 
 .price-btn--featured:hover {
-  box-shadow: 0 6px 28px rgba(0, 117, 222, 0.52), 0 2px 6px rgba(0,0,0,0.14);
+  border-color: rgba(3, 38, 108, 0.98);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.1), transparent 22%),
+    linear-gradient(105deg, #0754bf 0%, #0878dc 38%, #0755ad 68%, #032a68 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.32) inset,
+    0 -1px 0 rgba(0,14,56,0.32) inset,
+    0 18px 40px rgba(0, 63, 150, 0.36);
   transform: translateY(-1px);
 }
 
@@ -220,21 +285,19 @@ function requestAccess(planId: string) {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.22) 50%, transparent 60%);
+  background: linear-gradient(105deg, transparent 24%, rgba(255,255,255,0.44) 50%, transparent 76%);
   transform: translateX(-100%);
-  transition: transform 0.55s ease;
+  transition: transform 1.05s ease;
 }
 
 .price-btn--featured:hover::after {
   transform: translateX(100%);
 }
 
-/* Monthly / Half-year — light blue, fill rises on hover */
 .price-btn--dark {
-  background: #e8f2fd;
-  color: #0075de;
-  border: none;
-  box-shadow: none;
+  background: linear-gradient(180deg, #f6fbff 0%, #eaf5ff 100%);
+  color: #006bd1;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 6px 18px rgba(0,117,222,0.08);
   transition: color 0.28s ease, box-shadow 0.28s ease, transform 0.18s ease;
 }
 
@@ -242,7 +305,7 @@ function requestAccess(planId: string) {
   content: '';
   position: absolute;
   inset: 0;
-  background: #0075de;
+  background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(214,235,255,0.9) 100%);
   border-radius: inherit;
   transform: scaleX(0);
   transform-origin: left;
@@ -250,8 +313,9 @@ function requestAccess(planId: string) {
 }
 
 .price-btn--dark:hover {
-  color: #fff;
-  box-shadow: 0 6px 24px rgba(0,117,222,0.35);
+  color: #005fbd;
+  border-color: rgba(73, 163, 255, 0.82);
+  box-shadow: 0 1px 0 rgba(255,255,255,1) inset, 0 10px 24px rgba(0,117,222,0.13);
   transform: translateY(-1px);
 }
 
@@ -263,7 +327,7 @@ function requestAccess(planId: string) {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.65) 50%, transparent 60%);
   transform: translateX(-100%);
   transition: transform 0.5s ease 0.15s;
   border-radius: inherit;
@@ -278,7 +342,6 @@ function requestAccess(planId: string) {
   position: relative;
   z-index: 1;
 }
-
 
 @keyframes btn-shimmer {
   0%, 100% { background-position: 0% 50%; }

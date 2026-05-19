@@ -3,12 +3,12 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const features = [
-  { icon: 'i-lucide-wrench', title: 'Практические инструменты', body: 'Разбор самых актуальных инструментов на рынке AI под разные цели и задачи, а также чек-листы по внедрению.' },
-  { icon: 'i-lucide-book-open', title: 'Курсы и гайды', body: 'Пошаговые инструкции с 0 — для бизнеса, работы, контента и повседневной жизни. Не просто теория, а конкретные мануалы.' },
-  { icon: 'i-lucide-message-circle', title: 'Закрытый чат сообщества', body: 'Общение с единомышленниками, у которых есть одна общая цель — сделать ИИ своим преимуществом в жизни и бизнесе.' },
-  { icon: 'i-lucide-zap', title: 'Готовые связки', body: 'Ежедневно тестируем различные решения и делимся ими внутри нашего комьюнити.' },
-  { icon: 'i-lucide-mic', title: 'Прямые эфиры и воркшопы', body: 'Живые созвоны, ответы на вопросы, практические воркшопы, на которых мы вместе пробуем что-то сделать.' },
-  { icon: 'i-lucide-rocket', title: 'Свежие тренды из мира AI', body: 'Одними из первых узнаёте последние новости и тестируете всё самое интересное в нише искусственного интеллекта.' }
+  { icon: 'i-lucide-wrench', title: 'Amaliy vositalar', body: 'AI bozoridagi eng dolzarb vositalarni turli maqsad va vazifalar bo‘yicha tahlil qilamiz, joriy qilish uchun chek-listlar beramiz.' },
+  { icon: 'i-lucide-book-open', title: 'Kurslar va qo‘llanmalar', body: 'Biznes, ish, kontent va kundalik hayot uchun noldan boshlab qadam-baqadam yo‘riqnomalar. Faqat nazariya emas, aniq amaliy qo‘llanmalar.' },
+  { icon: 'i-lucide-message-circle', title: 'Telegram yopiq kanal', body: 'Hayot va biznesda AIni ustunlikka aylantirishni istagan fikrdoshlar bilan muloqot.' },
+  { icon: 'i-lucide-zap', title: 'Tayyor bog‘lamlar', body: 'Har kuni turli yechimlarni sinab ko‘ramiz va eng foydali natijalarni Telegram yopiq kanalda ulashamiz.' },
+  { icon: 'i-lucide-mic', title: 'Jonli efirlar va workshoplar', body: 'Savol-javoblar, jonli uchrashuvlar va birgalikda amaliy ish qilinadigan workshoplar.' },
+  { icon: 'i-lucide-rocket', title: 'AI olamidagi yangi trendlar', body: 'Sun’iy intellekt sohasidagi so‘nggi yangiliklarni birinchilardan bilasiz va eng qiziqarli vositalarni sinab ko‘rasiz.' }
 ]
 
 const sectionRef = ref<HTMLElement>()
@@ -36,10 +36,10 @@ onMounted(() => {
       <UiSectionDivider class="mb-10" />
       <div class="text-center mb-12">
         <h2 class="text-[36px] font-extrabold tracking-tight leading-[1.1] text-[#1a1a1a]">
-          Что внутри Chayroom AI?
+          Chayroom AI ichida nimalar bor?
         </h2>
         <p class="text-[36px] font-extrabold tracking-tight leading-[1.1] text-[#1a1a1a]">
-          И почему развиваться с нами<br>— правильное решение
+          Va nega biz bilan rivojlanish<br>to‘g‘ri tanlov
         </p>
       </div>
       <div class="grid grid-cols-3 gap-4.5">
@@ -50,7 +50,10 @@ onMounted(() => {
           class="feature-card bg-[#f7f7f5] hover:bg-[#ebebea] rounded-2xl p-8 flex flex-col gap-3 transition-all duration-200"
         >
           <div class="feature-card-icon">
-            <UIcon :name="f.icon" class="size-8" />
+            <UIcon
+              :name="f.icon"
+              class="size-8"
+            />
           </div>
           <div class="text-[16px] font-bold leading-[1.3] text-[#1a1a1a]">
             {{ f.title }}

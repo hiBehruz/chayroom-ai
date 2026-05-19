@@ -2,21 +2,21 @@
 import gsap from 'gsap'
 
 const skills = [
-  { num: '01', title: 'Работать с AI-ассистентами', body: 'Эффективно общаться с ChatGPT, Claude и другими моделями, чтобы получать нужный результат с первого раза.' },
-  { num: '02', title: 'Создавать AI-агентов', body: 'Строить автономных агентов, которые выполняют задачи самостоятельно: исследуют, пишут, публикуют.' },
-  { num: '03', title: 'Автоматизировать рутину', body: 'Настраивать потоки автоматизации с Make, n8n и Zapier, чтобы освободить десятки часов в месяц.' },
-  { num: '04', title: 'Генерировать контент', body: 'Создавать тексты, изображения, видео и голос с помощью AI-инструментов для любых платформ.' },
-  { num: '05', title: 'Строить сайты без кода', body: 'Собирать полноценные веб-приложения, лендинги и сервисы с помощью vibe-coding подхода.' },
-  { num: '06', title: 'Писать промпты профессионально', body: 'Создавать системные промпты и знать методологии, которые дают стабильный и предсказуемый результат.' },
-  { num: '07', title: 'Монетизировать AI-навыки', body: 'Продавать услуги на основе ИИ: автоматизацию, контент, агентов, консалтинг.' },
-  { num: '08', title: 'Внедрять ИИ в бизнес', body: 'Находить точки применения ИИ в бизнес-процессах и внедрять их системно.' },
-  { num: '09', title: 'Создавать AI-воронки', body: 'Строить маркетинговые воронки с AI-персонализацией, от первого контакта до продажи.' }
+  { num: '01', title: 'AI assistentlar bilan ishlash', body: 'ChatGPT, Claude va boshqa modellar bilan samarali muloqot qilib, kerakli natijani birinchi urinishdayoq olish.' },
+  { num: '02', title: 'AI agentlar yaratish', body: 'Vazifalarni mustaqil bajaradigan avtonom agentlar qurish: izlash, yozish, nashr qilish.' },
+  { num: '03', title: 'Rutina ishlarni avtomatlashtirish', body: 'Make, n8n va Zapier orqali avtomatizatsiya oqimlarini sozlab, oyiga o‘nlab soatlarni tejash.' },
+  { num: '04', title: 'Kontent generatsiya qilish', body: 'Har qanday platforma uchun AI vositalari yordamida matn, rasm, video va ovoz yaratish.' },
+  { num: '05', title: 'Kodsiz saytlar qurish', body: 'Vibe coding yondashuvi yordamida web ilovalar, landing sahifalar va servislar yig‘ish.' },
+  { num: '06', title: 'Promptlarni professional yozish', body: 'Barqaror va oldindan kutiladigan natija beradigan system promptlar va metodologiyalarni bilish.' },
+  { num: '07', title: 'AI ko‘nikmalarni monetizatsiya qilish', body: 'AI asosida xizmatlar sotish: avtomatizatsiya, kontent, agentlar va konsalting.' },
+  { num: '08', title: 'AIni biznesga joriy qilish', body: 'Biznes jarayonlarida AI qo‘llash nuqtalarini topish va ularni tizimli joriy qilish.' },
+  { num: '09', title: 'AI voronkalar yaratish', body: 'Birinchi kontaktdan sotuvgacha AI personalizatsiyasi bilan marketing voronkalar qurish.' }
 ]
 
 const ITEMS_PER_PAGE = 2
 const totalPages = computed(() => Math.ceil(skills.length / ITEMS_PER_PAGE))
 const currentPage = ref(0)
-const activeNum = computed(() => skills[currentPage.value * ITEMS_PER_PAGE].num)
+const activeNum = computed(() => skills[currentPage.value * ITEMS_PER_PAGE]?.num ?? '')
 const trackRef = ref<HTMLElement>()
 
 function goToPage(page: number) {
@@ -47,8 +47,8 @@ function skillsForPage(page: number) {
   <section class="py-16 bg-cx-surface">
     <div class="max-w-[1180px] mx-auto px-10">
       <UiSectionHeader
-        eyebrow="Навыки"
-        title="Чему ты научишься в нашем сообществе?"
+        eyebrow="Ko‘nikmalar"
+        title="Telegram yopiq kanalda nimalarni o‘rganasan?"
         class="[&_h2]:text-[36px] [&>div:first-child]:text-[14px] mb-8"
       />
 
@@ -57,7 +57,7 @@ function skillsForPage(page: number) {
         <button
           :class="['shrink-0 w-10 h-10 rounded-full bg-white border border-cx-line flex items-center justify-center text-base transition-colors duration-200', currentPage === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer']"
           :disabled="currentPage === 0"
-          aria-label="Предыдущие навыки"
+          aria-label="Oldingi ko‘nikmalar"
           @click="prev"
         >
           ←
@@ -104,7 +104,7 @@ function skillsForPage(page: number) {
         <button
           :class="['shrink-0 w-10 h-10 rounded-full bg-white border border-cx-line flex items-center justify-center text-base transition-colors duration-200', currentPage === totalPages - 1 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer']"
           :disabled="currentPage === totalPages - 1"
-          aria-label="Следующие навыки"
+          aria-label="Keyingi ko‘nikmalar"
           @click="next"
         >
           →

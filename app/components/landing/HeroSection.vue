@@ -1,17 +1,23 @@
 <!-- app/components/landing/HeroSection.vue -->
 <script setup lang="ts">
+import gsap from 'gsap'
 import teapotHero from '~/assets/images/herochoynak.png'
 
-const keywords = ['AI-инструменты', 'AI-агенты', 'Трендовые решения', 'Вайбкодинг']
+const keywords = ['AI vositalar', 'AI agentlar', 'Trend yechimlar', 'Vibe coding', 'AI Choyxona']
 const currentKeyword = ref(0)
 const heroArtStyle = ref({ '--hero-art-x': '0px', '--hero-art-y': '0px', '--hero-circle-x': '0px', '--hero-circle-y': '0px' })
+
+const heroLeft = ref<HTMLElement>()
+const heroRight = ref<HTMLElement>()
 
 let keywordInterval: ReturnType<typeof setInterval>
 let rafId = 0
 const target = { x: 0, y: 0 }
 const current = { x: 0, y: 0 }
 
-function lerp(a: number, b: number, t: number) { return a + (b - a) * t }
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t
+}
 
 function applyStyle() {
   heroArtStyle.value = {
@@ -35,6 +41,10 @@ function nextKeyword() {
 
 onMounted(() => {
   keywordInterval = setInterval(nextKeyword, 2500)
+
+  gsap.timeline({ delay: 0.15, defaults: { duration: 0.75, ease: 'power3.out' } })
+    .from(heroLeft.value!, { x: -60, opacity: 0 }, 0)
+    .from(heroRight.value!, { x: 60, opacity: 0 }, 0)
 })
 
 onUnmounted(() => {
@@ -68,18 +78,19 @@ function resetHeroArtMove() {
     <div class="relative z-10 max-w-295 mx-auto px-10">
       <div class="grid min-h-140 grid-cols-[46%_1fr] items-center gap-0">
         <!-- Left: text -->
+        <div ref="heroLeft" class="relative z-20">
         <div
           class="relative z-20 flex min-w-0 translate-x-22 flex-col items-start justify-center gap-5.5"
         >
           <h1 class="text-[72px] font-extrabold leading-[1.05] tracking-[-0.03em]">
             <span class="whitespace-nowrap">
               <span class="hero-title-gradient">Chayroom</span>
-              <span class="hero-ai-title text-cx-blue"> AI</span>
+              <span class="hero-ai-title brand-ai-gradient"> AI</span>
             </span>
           </h1>
 
           <p class="hero-desc max-w-105">
-            Внедряй ИИ в работу и жизнь, создавай свои проекты и осваивай новые навыки вместе с сильным окружением.
+            AIni ish va hayotingga joriy qil, o‘z loyihalaringni yarat va kuchli muhit bilan yangi ko‘nikmalarni o‘zlashtir.
           </p>
 
           <div class="flex items-center min-h-8 overflow-hidden">
@@ -96,16 +107,18 @@ function resetHeroArtMove() {
           <div
             class="flex gap-3 mt-1"
           >
-            <button class="btn-primary" @click="scrollToPricing">
-              Получить доступ →
+            <button class="btn-primary btn-primary-dark" @click="scrollToPricing">
+              Kirish huquqini olish →
             </button>
             <button class="btn-secondary" @click="scrollToFeatures">
-              Что меня ждёт
+              Meni nima kutadi
             </button>
           </div>
         </div>
+        </div>
 
         <!-- Right: art -->
+        <div ref="heroRight" class="relative z-10">
         <div
           class="relative flex items-center justify-start w-full overflow-visible"
         >
@@ -189,10 +202,11 @@ function resetHeroArtMove() {
             </div>
             <img
               :src="teapotHero"
-              alt="Chayroom AI teapot"
+              alt="Chayroom AI choynagi"
               class="hero-art-image relative z-10 w-full h-auto block"
             >
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -233,7 +247,8 @@ function resetHeroArtMove() {
     radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.2) 24%, transparent 42%),
     linear-gradient(145deg, rgba(0, 117, 222, 0.22), rgba(232, 243, 255, 0.86) 54%, rgba(0, 117, 222, 0.12));
   box-shadow: none;
-  transform: translate(calc(-50% + var(--hero-circle-x, 0px)), calc(-50% + var(--hero-circle-y, 0px)));
+  translate: var(--hero-circle-x, 0px) var(--hero-circle-y, 0px);
+  transform: translate(-50%, -50%);
   transform-origin: center;
   animation: hero-circle-float 7.5s ease-in-out infinite;
 }
@@ -675,64 +690,48 @@ function resetHeroArtMove() {
   0%, 100% {
     transform:
       translate3d(0, 0, 0)
-  
-  
       rotate(0deg)
       scale(1);
   }
   18% {
     transform:
       translate3d(1px, -3px, 0)
-  
-  
       rotate(0deg)
       scale(1.004);
   }
   22% {
     transform:
       translate3d(-1px, -4px, 0)
-  
-  
       rotate(0deg)
       scale(1.006);
   }
   26% {
     transform:
       translate3d(1px, -5px, 0)
-  
-  
       rotate(0deg)
       scale(1.008);
   }
   45% {
     transform:
       translate3d(0, -10px, 0)
-  
-  
       rotate(0deg)
       scale(1.015);
   }
   58% {
     transform:
       translate3d(1px, -5px, 0)
-  
-  
       rotate(0deg)
       scale(1.006);
   }
   62% {
     transform:
       translate3d(-1px, -4px, 0)
-  
-  
       rotate(0deg)
       scale(1.004);
   }
   72% {
     transform:
       translate3d(0, 4px, 0)
-  
-  
       rotate(0deg)
       scale(0.995);
   }
@@ -811,7 +810,7 @@ function resetHeroArtMove() {
   font-size: 17px;
   line-height: 1.7;
   color: transparent;
-  background: linear-gradient(135deg, #1a1a1a 0%, #3a3a3a 50%, #6b6b6b 100%);
+  background: linear-gradient(135deg, #4a4a4f 0%, #6b6b72 52%, #8d8d94 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

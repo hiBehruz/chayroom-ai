@@ -1,14 +1,14 @@
 <script setup lang="ts">
 const items = [
-  { q: 'Это сообщество для новичков или для тех, кто уже в теме?', a: 'Для всех. Если ты новичок — получишь понятный путь с нуля. Если уже знаком с ИИ — найдёшь продвинутые инструменты, свежие тренды и сообщество единомышленников.' },
-  { q: 'Нужно ли уметь программировать?', a: 'Нет. Большинство инструментов и подходов, которые мы разбираем, не требуют навыков программирования. Даже сложные AI-инструменты мы объясняем просто и по шагам.' },
-  { q: 'Что я получу внутри?', a: 'Курсы и гайды, закрытый чат сообщества, разборы AI-инструментов, готовые связки и автоматизации, прямые эфиры и воркшопы с командой.' },
-  { q: 'Подойдёт ли мне, если я предприниматель?', a: 'Да. Мы специально включаем материалы по автоматизации бизнес-процессов, оптимизации расходов и созданию AI-команд для бизнеса.' },
-  { q: 'Подойдёт ли мне, если я работаю в найме или на фрилансе?', a: 'Да. Мы разбираем, как внедрить ИИ в повседневную работу, ускорить выполнение задач и стать более ценным специалистом на рынке.' },
-  { q: 'Чем это отличается от бесплатного контента?', a: 'Бесплатный контент разрозненный и поверхностный. Внутри Chayroom AI — структурированные материалы, живое сообщество, обратная связь и постоянно обновляемая база знаний от практиков.' },
-  { q: 'Будет ли живое общение?', a: 'Да. Регулярные прямые эфиры, воркшопы и закрытый чат, где можно задать вопрос и получить ответ от команды и других участников сообщества.' },
-  { q: 'Как устроена оплата?', a: 'Оплата доступна через Click и Payme. После подтверждения оплаты доступ активируется автоматически.' },
-  { q: 'Можно ли отменить подписку?', a: 'Да. Ты можешь отменить подписку в любой момент — доступ сохраняется до конца оплаченного периода.' }
+  { q: 'Bu Telegram yopiq kanal yangi boshlovchilar uchunmi yoki tajribali foydalanuvchilar uchun hammi?', a: 'Hamma uchun. Yangi boshlovchi bo‘lsang, noldan tushunarli yo‘l xaritasini olasan. AI bilan tanish bo‘lsang, ilg‘or vositalar, yangi trendlar va fikrdoshlar muhitini topasan.' },
+  { q: 'Dasturlashni bilish kerakmi?', a: 'Yo‘q. Biz ko‘rib chiqadigan aksariyat vosita va yondashuvlar dasturlashni talab qilmaydi. Murakkab AI vositalarini ham sodda va qadam-baqadam tushuntiramiz.' },
+  { q: 'Ichkarida nimalar olaman?', a: 'Kurslar va qo‘llanmalar, Telegram yopiq kanal, AI vositalar tahlili, tayyor bog‘lamlar va avtomatizatsiyalar, jonli efirlar hamda jamoa bilan workshoplar.' },
+  { q: 'Tadbirkor bo‘lsam, menga mos keladimi?', a: 'Ha. Biz biznes jarayonlarini avtomatlashtirish, xarajatlarni optimallashtirish va biznes uchun AI jamoalar yaratish bo‘yicha materiallarni alohida kiritganmiz.' },
+  { q: 'Ishda yoki frilansda ishlasam, foydasi bormi?', a: 'Ha. Kundalik ishga AIni joriy qilish, vazifalarni tezroq bajarish va bozorda qimmatroq mutaxassis bo‘lish yo‘llarini ko‘rib chiqamiz.' },
+  { q: 'Bu bepul kontentdan nimasi bilan farq qiladi?', a: 'Bepul kontent tarqoq va yuzaki bo‘ladi. Chayroom AI ichida esa strukturali materiallar, Telegram yopiq kanal, feedback va amaliyotchilar tomonidan doim yangilanadigan bilim bazasi bor.' },
+  { q: 'Jonli muloqot bo‘ladimi?', a: 'Ha. Muntazam jonli efirlar, workshoplar va yopiq chat bo‘ladi. U yerda jamoa va boshqa ishtirokchilardan savollaringga javob olasan.' },
+  { q: 'To‘lov qanday amalga oshiriladi?', a: 'To‘lov Click va Payme orqali amalga oshiriladi. To‘lov tasdiqlangach, kirish avtomatik faollashadi.' },
+  { q: 'Obunani bekor qilsam bo‘ladimi?', a: 'Ha. Obunani istalgan vaqtda bekor qilishing mumkin, kirish huquqi to‘langan davr oxirigacha saqlanadi.' }
 ]
 
 const openIndex = ref<number | null>(0)
@@ -26,7 +26,7 @@ function toggle(i: number) {
     <div class="max-w-295 mx-auto px-10">
       <UiSectionHeader
         eyebrow=""
-        title="Частые вопросы"
+        title="Ko‘p so‘raladigan savollar"
 
         class="mb-10"
       />

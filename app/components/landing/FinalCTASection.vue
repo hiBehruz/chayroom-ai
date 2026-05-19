@@ -27,12 +27,12 @@ onMounted(() => {
       >
         <!-- Door Lottie animation -->
         <ClientOnly>
-          <div class="shrink-0 w-44 h-44">
+          <div class="shrink-0 w-56 h-56">
             <DotLottieVue
               src="/animations/Door.lottie?v=2"
               :autoplay="true"
               :loop="true"
-              class="w-full h-full"
+              style="width:100%;height:100%;display:block"
             />
           </div>
         </ClientOnly>
@@ -40,13 +40,13 @@ onMounted(() => {
         <!-- Text -->
         <div class="flex flex-col gap-4">
           <h2 class="text-[32px] font-extrabold text-[#1a1a1a] tracking-tight leading-[1.1]">
-            Готовы начать?
+            Boshlashga tayyormisan?
           </h2>
           <p class="text-[15px] text-cx-muted leading-[1.6] max-w-100">
-            Вступай в сообщество и начни внедрять ИИ в свою жизнь, работу и бизнес уже сегодня.
+            Telegram yopiq kanalga qo‘shil va bugunoq AIni hayot, ish va biznesingga joriy qilishni boshlagin.
           </p>
-          <button class="btn-primary self-start text-[13px]! px-5! py-2.5!" @click="scrollToPricing">
-            Получить доступ
+          <button class="btn-primary btn-primary-dark self-start text-[13px]! px-5! py-2.5!" @click="scrollToPricing">
+            Kirish huquqini olish
           </button>
         </div>
       </div>

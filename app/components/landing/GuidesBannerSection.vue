@@ -39,7 +39,7 @@ onMounted(() => {
               src="/animations/Book.lottie"
               :autoplay="true"
               :loop="true"
-              class="w-full h-full"
+              style="width:100%;height:100%;display:block"
             />
           </ClientOnly>
         </div>
@@ -47,13 +47,13 @@ onMounted(() => {
         <!-- Text -->
         <div class="flex flex-col gap-4">
           <h2 class="text-[32px] font-extrabold text-[#1a1a1a] tracking-tight leading-[1.1]">
-            Бесплатные гайды
+            Bepul qo‘llanmalar
           </h2>
           <p class="text-[15px] text-cx-muted leading-[1.6] max-w-105">
-            Практические руководства о том, как сделать AI частью своей жизни, работы и бизнеса.
+            AIni hayot, ish va biznesingning bir qismiga aylantirish bo‘yicha amaliy qo‘llanmalar.
           </p>
-          <button class="btn-primary self-start text-[13px]! px-5! py-2.5!">
-            Открыть
+          <button class="btn-primary btn-primary-dark self-start text-[13px]! px-5! py-2.5!">
+            Ochish
           </button>
         </div>
       </div>

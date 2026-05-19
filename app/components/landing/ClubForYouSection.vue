@@ -3,10 +3,10 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const cards = [
-  { num: '01', icon: 'i-lucide-trending-up', title: 'Хочешь зарабатывать с помощью ИИ', body: 'Ищешь навык на годы вперёд, который будет приносить стабильный доход. Работая над своими проектами или выполняя заказы для других.' },
-  { num: '02', icon: 'i-lucide-briefcase-business', title: 'Владеешь бизнесом, но тонешь в операционке', body: 'Хочешь сократить расходы с помощью ИИ, оптимизировать бизнес-процессы или создать свою команду AI-сотрудников.' },
-  { num: '03', icon: 'i-lucide-radar', title: 'Чувствуешь, что теряешь актуальность на рынке', body: 'Видишь, как другие эксперты уже внедряют ИИ и получают преимущество. Хочешь освоить новые инструменты.' },
-  { num: '04', icon: 'i-lucide-clock-3', title: 'Хочешь идти в ногу со временем', body: 'Чувствуешь, что пора внедрять ИИ в свою жизнь, но пока не понимаешь с чего начать и как это поможет вырасти в доходе.' }
+  { num: '01', icon: 'i-lucide-trending-up', title: 'AI yordamida daromad qilishni xohlaysan', body: 'Yillar davomida qiymatini yo‘qotmaydigan va barqaror daromad keltiradigan ko‘nikma izlayapsan. O‘z loyihalaring ustida ishlash yoki boshqalarga xizmat ko‘rsatish orqali.' },
+  { num: '02', icon: 'i-lucide-briefcase-business', title: 'Biznesing bor, lekin operatsion ishlar bosib ketgan', body: 'AI yordamida xarajatlarni qisqartirish, biznes jarayonlarini optimallashtirish yoki AI xodimlar jamoasini yaratishni xohlaysan.' },
+  { num: '03', icon: 'i-lucide-radar', title: 'Bozorda dolzarblikni yo‘qotayotgandek his qilyapsan', body: 'Boshqa mutaxassislar AIni joriy qilib, ustunlik olayotganini ko‘ryapsan. Sen ham yangi vositalarni o‘zlashtirishni xohlaysan.' },
+  { num: '04', icon: 'i-lucide-clock-3', title: 'Zamon bilan hamnafas bo‘lishni xohlaysan', body: 'AIni hayotingga joriy qilish vaqti kelganini his qilyapsan, lekin nimadan boshlash va bu daromadga qanday ta’sir qilishini hali bilmayapsan.' }
 ]
 
 const sectionRef = ref<HTMLElement>()
@@ -32,8 +32,8 @@ onMounted(() => {
     <div class="max-w-[1180px] mx-auto px-10">
       <UiSectionDivider class="mb-10" />
       <UiSectionHeader
-        title="Наш клуб для тебя, если ты..."
-        subtitle="Мы создали пространство для людей, которые хотят использовать ИИ как настоящее преимущество."
+        title="Bizning klub sen uchun, agar..."
+        subtitle="Biz AIni haqiqiy ustunlik sifatida ishlatmoqchi bo‘lganlar uchun muhit yaratdik."
         class="mb-10"
       />
       <div class="grid grid-cols-2 gap-5">

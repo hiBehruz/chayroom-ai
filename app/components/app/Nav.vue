@@ -3,6 +3,7 @@ import teapotHero from '~/assets/images/herochoynak.png'
 
 const authStore = useAuthStore()
 const isProfileOpen = ref(false)
+const isMobileMenuOpen = ref(false)
 const route = useRoute()
 const scrolled = ref(false)
 
@@ -37,6 +38,7 @@ function scrollToSection(href: string) {
 
 watch(route, () => {
   isProfileOpen.value = false
+  isMobileMenuOpen.value = false
 })
 
 let scrollHandler: () => void
@@ -68,7 +70,7 @@ function logout() {
     <!-- floating pill -->
     <nav
       :class="[
-        'max-w-295 mx-auto flex items-center h-13 px-10 gap-8 rounded-2xl border transition-all duration-300',
+        'max-w-295 mx-auto flex items-center h-13 px-4 md:px-10 gap-4 md:gap-8 rounded-2xl border transition-all duration-300',
         scrolled
           ? 'bg-white/98 backdrop-blur-2xl border-cx-line/70'
           : 'bg-white/85 backdrop-blur-xl border-cx-line/40'
@@ -95,10 +97,10 @@ function logout() {
       </NuxtLink>
 
       <!-- divider -->
-      <div class="w-px h-5 bg-cx-line shrink-0" />
+      <div class="hidden md:block w-px h-5 bg-cx-line shrink-0" />
 
       <!-- Nav links -->
-      <div class="relative flex items-center gap-0.5 flex-1 justify-center">
+      <div class="relative hidden md:flex items-center gap-0.5 flex-1 justify-center">
         <button
           v-for="link in navLinks"
           :key="link.label"
@@ -117,10 +119,10 @@ function logout() {
       </div>
 
       <!-- divider -->
-      <div class="w-px h-5 bg-cx-line shrink-0" />
+      <div class="hidden md:block w-px h-5 bg-cx-line shrink-0" />
 
       <!-- Right -->
-      <div class="flex items-center gap-2.5 shrink-0">
+      <div class="hidden md:flex items-center gap-2.5 shrink-0">
         <template v-if="authStore.user">
           <div class="relative">
             <button
@@ -211,7 +213,95 @@ function logout() {
           </NuxtLink>
         </template>
       </div>
+
+      <!-- Mobile right -->
+      <div class="flex md:hidden items-center gap-2 ml-auto shrink-0">
+        <template v-if="authStore.user">
+          <button
+            class="flex items-center gap-1.5 px-2 py-1 rounded-xl hover:bg-[#f2f2f0] transition-colors duration-200 cursor-pointer focus:outline-none"
+            @click="isMobileMenuOpen = true"
+          >
+            <AppPixelAgentAvatar :variant="authStore.resolvedAgentVariant" />
+          </button>
+        </template>
+        <template v-else>
+          <NuxtLink
+            to="/login"
+            class="btn-primary btn-primary-dark text-[13px]! px-3! py-1.5!"
+          >
+            Kirish
+          </NuxtLink>
+        </template>
+
+        <!-- Hamburger -->
+        <button
+          class="flex items-center justify-center w-9 h-9 rounded-xl hover:bg-[#f2f2f0] transition-colors duration-200 focus:outline-none"
+          aria-label="Menyuni ochish"
+          @click="isMobileMenuOpen = !isMobileMenuOpen"
+        >
+          <UIcon
+            :name="isMobileMenuOpen ? 'i-lucide-x' : 'i-lucide-menu'"
+            class="size-5 text-[#1a1a1a]"
+          />
+        </button>
+      </div>
     </nav>
+
+    <!-- Mobile drawer -->
+    <Transition name="mobile-drawer">
+      <div
+        v-if="isMobileMenuOpen"
+        class="md:hidden absolute left-0 right-0 top-full bg-white border-t border-cx-line shadow-[0_16px_40px_rgba(0,0,0,0.10)] px-5 py-4 flex flex-col gap-1 z-50"
+      >
+        <button
+          v-for="link in navLinks"
+          :key="link.label"
+          :class="[
+            'flex items-center px-4 py-3 rounded-xl text-[15px] font-medium transition-colors duration-200 text-left w-full cursor-pointer focus:outline-none',
+            isActive(link.href) ? 'bg-[#f2f2f0] text-[#0a0a0b] font-semibold' : 'text-cx-muted hover:bg-[#f7f7f5] hover:text-[#0a0a0b]'
+          ]"
+          @click="scrollToSection(link.href); isMobileMenuOpen = false"
+        >
+          {{ link.label }}
+        </button>
+
+        <div class="h-px bg-cx-line my-2" />
+
+        <template v-if="authStore.user">
+          <div class="flex items-center gap-3 px-4 py-2 mb-1">
+            <AppPixelAgentAvatar :variant="authStore.resolvedAgentVariant" />
+            <div>
+              <div class="text-[14px] font-bold text-[#1a1a1a]">{{ authStore.displayName || authStore.user.first_name }}</div>
+              <div v-if="authStore.user.username" class="text-[12px] text-cx-muted">@{{ authStore.user.username }}</div>
+            </div>
+          </div>
+          <NuxtLink
+            to="/profile"
+            class="flex items-center gap-2.5 px-4 py-3 rounded-xl text-[14px] font-medium text-[#1a1a1a] hover:bg-[#f7f7f5] transition-colors"
+            @click="isMobileMenuOpen = false"
+          >
+            <UIcon name="i-lucide-user-round" class="size-4 text-cx-muted" />
+            Profil sozlamalari
+          </NuxtLink>
+          <button
+            class="flex items-center gap-2.5 w-full px-4 py-3 rounded-xl text-[14px] font-medium text-red-500 hover:bg-red-50 transition-colors focus:outline-none"
+            @click="logout"
+          >
+            <UIcon name="i-lucide-log-out" class="size-4" />
+            Chiqish
+          </button>
+        </template>
+        <template v-else>
+          <NuxtLink
+            to="/login"
+            class="btn-primary btn-primary-dark text-[14px]! mx-2"
+            @click="isMobileMenuOpen = false"
+          >
+            Kirish (Telegram)
+          </NuxtLink>
+        </template>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -371,6 +461,21 @@ function logout() {
     opacity: 0;
     transform: translate(2px, -28px) scale(1.5) rotate(8deg);
   }
+}
+
+.mobile-drawer-enter-active {
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.mobile-drawer-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.mobile-drawer-enter-from {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+.mobile-drawer-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
 @keyframes logo-teapot-breathe {

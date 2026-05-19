@@ -2,10 +2,11 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
 
-onMounted(() => authStore.restoreFromStorage())
+authStore.restoreFromStorage()
 
 const user = computed(() => authStore.user)
-const hasSubscription = ref(false)
+const hasSubscription = computed(() => authStore.hasSubscription)
+const isAccessModalOpen = ref(false)
 
 const stats = [
   { label: 'Kurslar', value: '2', icon: 'i-lucide-book-open', iconColor: 'text-cx-blue' },
@@ -65,7 +66,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
         </div>
         <button
           class="btn-primary shrink-0 text-[13px]! px-5! py-2.5!"
-          @click="navigateTo('/#pricing')"
+          @click="isAccessModalOpen = true"
         >
           <UIcon name="i-lucide-sparkles" class="size-3.5" />
           To'liq kirish huquqini olish →
@@ -236,5 +237,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
 
       </div><!-- end dashboard content -->
     </div>
+
+    <AppAccessModal v-model="isAccessModalOpen" />
   </div>
 </template>

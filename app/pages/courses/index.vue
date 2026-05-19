@@ -3,7 +3,12 @@ const authStore = useAuthStore()
 const categories = ['Hammasi', 'Vibe coding', 'AI agentlar', 'Neyrotarmoqlar', 'Kontent']
 const activeCategory = ref('Hammasi')
 const hasSubscription = computed(() => authStore.hasSubscription)
+const isOwner = computed(() => authStore.isOwner)
 const isAccessModalOpen = ref(false)
+
+function openCourse(slug: string) {
+  navigateTo(`/courses/${slug}`)
+}
 const categoryFilterRef = ref<HTMLElement | null>(null)
 const categoryRefs = ref<HTMLElement[]>([])
 const categoryIndicatorStyle = ref({ left: '6px', width: '0px', opacity: '0' })
@@ -46,56 +51,28 @@ onUnmounted(() => {
   window.removeEventListener('resize', categoryResizeHandler)
 })
 
-const courses = [
-  {
-    slug: 'hermes-ai-agent',
-    title: 'Hermes asosida AI agent yaratish va sozlash',
-    desc: "Bu kursda biz noldan agent yaratamiz, unga ko'nikmalar va yaxshilanishlar qo'shamiz.",
-    tags: ['AI', 'AI agent', 'Hermes'],
-    category: 'AI agentlar',
-    level: "Boshlang'ich",
-    levelColor: '#22c55e',
-    modules: 3,
-    lessons: 7,
-    duration: '~2h',
-    bg: '#f0f4ff',
-    dark: false,
-    badge: 'kurs',
-    accentTitle: ['AI agent', 'Hermes'],
-    accentColor: '#0075DE',
-    progress: 0
-  },
-  {
-    slug: 'vibe-coding',
-    title: 'Vibe coding noldan',
-    desc: 'Kod bilmasdan turib AI yordamida kerakli digital yechimlar: saytlar, vositalar va ilovalar yaratish.',
-    tags: ['Vibe coding'],
-    category: 'Vibe coding',
-    level: "Boshlang'ich",
-    levelColor: '#22c55e',
-    modules: 5,
-    lessons: 31,
-    duration: '~8h',
-    bg: '#0d1117',
-    dark: true,
-    badge: 'kurs',
-    accentTitle: [],
-    accentColor: '#f97316',
-    progress: 0
-  }
-]
+const coursesStore = useCoursesStore()
+onMounted(() => coursesStore.load())
 
-const filtered = computed(() =>
-  activeCategory.value === 'Hammasi'
-    ? courses
-    : courses.filter(c => c.category === activeCategory.value)
-)
+const filtered = computed(() => {
+  const all = coursesStore.all
+  if (activeCategory.value === 'Hammasi') return all
+  return all.filter(c => c.tags.some(t => t === activeCategory.value))
+})
+
+function moduleLabel(count: number) {
+  return count === 1 ? 'модуль' : count < 5 ? 'модуля' : 'модулей'
+}
+
+function lessonLabel(count: number) {
+  return count === 1 ? 'урок' : count < 5 ? 'урока' : 'уроков'
+}
 
 useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="bg-white">
     <div class="max-w-295 mx-auto px-10 py-8">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-sm text-cx-muted mb-6">
@@ -105,13 +82,23 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
       </div>
 
       <!-- Header -->
-      <div class="mb-6">
-        <h1 class="text-[32px] font-extrabold tracking-tight text-[#1a1a1a]">
-          Kurslar
-        </h1>
-        <p class="text-cx-muted mt-1 text-[15px]">
-          AIni ish va hayotga joriy qilish bo'yicha qadam-baqadam dasturlar
-        </p>
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-[32px] font-extrabold tracking-tight text-[#1a1a1a]">
+            Kurslar
+          </h1>
+          <p class="text-cx-muted mt-1 text-[15px]">
+            AIni ish va hayotga joriy qilish bo'yicha qadam-baqadam dasturlar
+          </p>
+        </div>
+        <NuxtLink
+          v-if="isOwner"
+          to="/admin/courses/new"
+          class="btn-primary btn-primary-dark flex items-center gap-2 px-4! py-2.5! text-[13px]! shrink-0"
+        >
+          <UIcon name="i-lucide-plus" class="size-4" />
+          Kurs qo'shish
+        </NuxtLink>
       </div>
 
       <!-- Category filter -->
@@ -138,20 +125,15 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
       </div>
 
       <!-- Course cards -->
-      <TransitionGroup
-        tag="div"
-        enter-active-class="transition-[opacity,transform] duration-150 ease-out"
-        enter-from-class="opacity-0 translate-y-5"
-        class="grid grid-cols-3 gap-5"
-      >
+      <div class="grid grid-cols-3 gap-5">
         <div
           v-for="course in filtered"
           :key="course.title"
-          class="group flex flex-col overflow-hidden rounded-2xl border border-cx-line bg-[#fafafa] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_36px_rgba(0,0,0,0.10)] hover:border-cx-line/60"
-          @click="hasSubscription ? navigateTo(`/courses/${course.slug}`) : (isAccessModalOpen = true)"
+          class="group flex flex-col overflow-hidden rounded-2xl border border-[#D4D4D1] bg-[#fafafa] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_36px_rgba(0,0,0,0.10)] hover:border-[#D4D4D1]/60"
+          @click="openCourse(course.slug)"
         >
           <!-- Header -->
-          <div class="relative h-52 overflow-hidden shrink-0" :style="{ backgroundColor: course.bg }">
+          <div class="relative h-44 overflow-hidden shrink-0" :style="{ backgroundColor: course.bg }">
             <div class="absolute top-3 left-4 flex items-center gap-2">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-black/20 text-white">{{ course.badge }}</span>
             </div>
@@ -190,12 +172,12 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
           </div>
 
           <!-- Body -->
-          <div class="flex flex-col flex-1 p-5 gap-3">
+          <div class="flex h-[264.5px] flex-col px-5 pt-5 pb-5 gap-3">
             <div class="flex flex-wrap gap-1.5">
               <span
                 v-for="tag in course.tags"
                 :key="tag"
-                class="px-2.5 py-0.5 rounded-full border border-cx-line text-[11px] text-cx-muted font-medium bg-white"
+                class="inline-flex h-7 items-center rounded-full bg-[#EAEAE8] border border-[#D4D4D1] px-3 text-[12px] font-medium text-[#6B6B6B]"
               >{{ tag }}</span>
             </div>
 
@@ -207,63 +189,53 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
               {{ course.desc }}
             </p>
 
-            <!-- Unsubscribed footer -->
-            <div v-if="!hasSubscription" class="mt-auto pt-3 border-t border-cx-line">
-              <div class="text-[10px] font-bold text-cx-muted uppercase tracking-widest mb-2">
-                1 oylik tarifi
-              </div>
-              <div class="flex items-center gap-4 text-[12px] text-cx-muted mb-3">
-                <span class="flex items-center gap-1">
-                  <UIcon name="i-lucide-layout-list" class="size-3.5" />
-                  {{ course.modules }} modul
+            <div class="mt-auto pt-3">
+              <div class="mb-3 grid grid-cols-3 gap-2 text-[12px] font-medium text-cx-muted">
+                <span class="flex items-center gap-1.5 whitespace-nowrap">
+                  <UIcon
+                    name="i-lucide-layout-list"
+                    class="size-3.5 shrink-0"
+                  />
+                  {{ course.modules }} {{ moduleLabel(course.modules) }}
                 </span>
-                <span class="flex items-center gap-1">
-                  <UIcon name="i-lucide-play-circle" class="size-3.5" />
-                  {{ course.lessons }} dars
+                <span class="flex items-center gap-1.5 whitespace-nowrap">
+                  <UIcon
+                    name="i-lucide-play-circle"
+                    class="size-3.5 shrink-0"
+                  />
+                  {{ course.lessons }} {{ lessonLabel(course.lessons) }}
                 </span>
-                <span class="flex items-center gap-1">
-                  <UIcon name="i-lucide-clock" class="size-3.5" />
+                <span class="flex items-center gap-1.5 whitespace-nowrap">
+                  <UIcon
+                    name="i-lucide-clock"
+                    class="size-3.5 shrink-0"
+                  />
                   {{ course.duration }}
                 </span>
               </div>
+
               <button
                 class="btn-primary w-full text-[13px]! py-2.5! flex items-center justify-center gap-2"
-                @click.stop="isAccessModalOpen = true"
+                @click.stop="openCourse(course.slug)"
               >
-                <span>Kirish huquqini olish</span>
+                <span>Смотреть курс</span>
                 <span class="btn-arrow">→</span>
               </button>
             </div>
-
-            <!-- Subscribed footer -->
-            <div v-else class="mt-auto pt-3 border-t border-cx-line">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[12px] font-semibold text-cx-muted">Ваш прогресс</span>
-                <span class="text-[12px] font-bold text-cx-ink">{{ course.progress }}%</span>
-              </div>
-              <div class="h-1.5 bg-[#e5e5e5] rounded-full overflow-hidden mb-2">
-                <div
-                  class="h-full bg-cx-blue rounded-full transition-all duration-500"
-                  :style="{ width: `${course.progress}%` }"
-                />
-              </div>
-              <div class="text-[12px] text-cx-muted mb-3">
-                {{ course.progress === 0 ? 0 : Math.round(course.lessons * course.progress / 100) }} из {{ course.lessons }} уроков
-              </div>
-              <NuxtLink
-                :to="`/courses/${course.slug}`"
-                class="btn-primary w-full text-[13px]! py-2.5! flex items-center justify-center gap-2"
-                @click.stop
-              >
-                <span>{{ course.progress > 0 ? 'Davom ettirish' : 'Начать обучение' }}</span>
-                <span class="btn-arrow">→</span>
-              </NuxtLink>
-            </div>
           </div>
         </div>
-      </TransitionGroup>
-    </div>
-  </div>
 
-  <AppAccessModal v-model="isAccessModalOpen" />
+        <div
+          v-if="!filtered.length"
+          class="col-span-3 flex min-h-105 flex-col items-center justify-center gap-3 text-cx-muted"
+        >
+        <UIcon name="i-lucide-book-open" class="size-9 opacity-40" />
+        <p class="text-[15px] font-semibold">Bu kategoriyada kurslar hali yo'q</p>
+      </div>
+
+      </div>
+    </div>
+
+    <AppAccessModal v-model="isAccessModalOpen" />
+  </div>
 </template>

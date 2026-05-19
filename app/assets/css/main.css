@@ -3,7 +3,7 @@
 @import "@nuxt/ui";
 
 @theme {
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Inter', 'Inter Fallback', sans-serif;
 
   --color-cx-ink: #0A0A0B;
   --color-cx-ink-soft: #1A1A1D;
@@ -23,8 +23,23 @@
 }
 
 @layer base {
-  html { color-scheme: light; }
-  body { -webkit-font-smoothing: antialiased; }
+  html {
+    color-scheme: light;
+    font-family: 'Inter', 'Inter Fallback', sans-serif;
+  }
+
+  body {
+    font-family: 'Inter', 'Inter Fallback', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
   * { box-sizing: border-box; }
   a { text-decoration: none; color: inherit; }
 }
@@ -37,13 +52,17 @@
     justify-content: center;
     gap: 8px;
     padding: 12px 26px;
-    border-radius: 12px;
+    border: 1px solid rgba(120, 184, 255, 0.72);
+    border-radius: 14px;
     font-size: 15px;
-    font-weight: 600;
-    color: #fff;
-    background: linear-gradient(135deg, #0075DE 0%, #0055cc 100%);
-    box-shadow: 0 1px 2px rgba(0,117,222,0.15), 0 4px 16px rgba(0,117,222,0.25);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    font-weight: 700;
+    color: #0067c8;
+    background: linear-gradient(180deg, #f4faff 0%, #e6f3ff 48%, #d9ecff 100%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.95) inset,
+      0 -1px 0 rgba(0,101,200,0.08) inset,
+      0 8px 20px rgba(0,117,222,0.13);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
     cursor: pointer;
     overflow: hidden;
     white-space: nowrap;
@@ -53,20 +72,91 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0) 58%);
     border-radius: inherit;
     pointer-events: none;
   }
 
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0,117,222,0.2), 0 8px 28px rgba(0,117,222,0.35);
-    background: linear-gradient(135deg, #0085f0 0%, #0065dd 100%);
+    border-color: rgba(73, 163, 255, 0.88);
+    background: linear-gradient(180deg, #ffffff 0%, #edf7ff 44%, #d7ebff 100%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,1) inset,
+      0 -1px 0 rgba(0,101,200,0.1) inset,
+      0 12px 28px rgba(0,117,222,0.18);
+  }
+
+  .btn-primary .btn-arrow {
+    display: inline-block;
+    transition: transform 0.22s var(--ease-out);
+  }
+
+  .btn-primary:hover .btn-arrow,
+  .group:hover .btn-primary .btn-arrow {
+    transform: translateX(5px);
   }
 
   .btn-primary:active {
     transform: translateY(0) scale(0.98);
-    box-shadow: 0 1px 4px rgba(0,117,222,0.2);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.9) inset,
+      0 4px 14px rgba(0,117,222,0.12);
+  }
+
+  .brand-ai-gradient {
+    display: inline-block;
+    background:
+      linear-gradient(128deg, #b9ecff 0%, #008cff 10%, #0a64d8 28%, #0642a7 52%, #062b78 76%, #020f3f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.22),
+      0 10px 24px rgba(0, 63, 150, 0.16);
+    filter: drop-shadow(0 1px 0 rgba(1, 32, 92, 0.1));
+  }
+
+  .btn-primary-dark {
+    color: #fff;
+    border-color: rgba(2, 43, 120, 0.92);
+    background:
+      radial-gradient(circle at 18% 18%, rgba(255,255,255,0.08), transparent 22%),
+      linear-gradient(105deg, #064aaf 0%, #006fd1 38%, #064b9f 68%, #03265f 100%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.28) inset,
+      0 -1px 0 rgba(0,14,56,0.34) inset,
+      0 12px 26px rgba(0, 63, 150, 0.26);
+    text-shadow: 0 1px 0 rgba(0, 20, 64, 0.2);
+  }
+
+  .btn-primary-dark::after {
+    background: linear-gradient(105deg, transparent 24%, rgba(255,255,255,0.44) 50%, transparent 76%);
+    transform: translateX(-130%);
+    transition: transform 1.05s ease;
+  }
+
+  .btn-primary-dark:hover {
+    color: #fff;
+    border-color: rgba(3, 38, 108, 0.98);
+    background:
+      radial-gradient(circle at 18% 18%, rgba(255,255,255,0.1), transparent 22%),
+      linear-gradient(105deg, #0754bf 0%, #0878dc 38%, #0755ad 68%, #032a68 100%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.32) inset,
+      0 -1px 0 rgba(0,14,56,0.32) inset,
+      0 16px 34px rgba(0, 63, 150, 0.32);
+  }
+
+  .btn-primary-dark:hover::after {
+    transform: translateX(130%);
+  }
+
+  .btn-primary-dark:active {
+    transform: translateY(0) scale(0.985);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.18) inset,
+      0 5px 14px rgba(1, 32, 92, 0.2);
   }
 
   .btn-secondary {
@@ -76,26 +166,51 @@
     justify-content: center;
     gap: 8px;
     padding: 12px 26px;
-    border-radius: 12px;
+    border-radius: 14px;
     font-size: 15px;
     font-weight: 600;
-    color: #0075DE;
-    background: #fff;
-    border: 1.5px solid #0075DE;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+    color: #0067c8;
+    background: rgba(238, 247, 255, 0.78);
+    border: 1px solid rgba(120, 184, 255, 0.62);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 6px 18px rgba(0,117,222,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     cursor: pointer;
     white-space: nowrap;
   }
 
   .btn-secondary:hover {
     transform: translateY(-2px);
-    background: #0075DE;
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(0,117,222,0.2), 0 8px 28px rgba(0,117,222,0.3);
+    color: #005fbd;
+    border-color: rgba(73, 163, 255, 0.82);
+    background: #e4f2ff;
+    box-shadow: 0 1px 0 rgba(255,255,255,1) inset, 0 10px 24px rgba(0,117,222,0.13);
   }
 
   .btn-secondary:active {
     transform: translateY(0) scale(0.98);
+  }
+
+  .btn-soft-blue {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid rgba(126, 188, 255, 0.55);
+    border-radius: 16px;
+    color: #006bd1;
+    background: linear-gradient(180deg, #f6fbff 0%, #eaf5ff 100%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 6px 18px rgba(0,117,222,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .btn-soft-blue:hover {
+    transform: translateY(-1px);
+    border-color: rgba(73, 163, 255, 0.78);
+    background: linear-gradient(180deg, #ffffff 0%, #e2f1ff 100%);
+    box-shadow: 0 1px 0 rgba(255,255,255,1) inset, 0 10px 24px rgba(0,117,222,0.12);
+  }
+
+  .btn-soft-blue:active {
+    transform: translateY(0) scale(0.99);
   }
 }

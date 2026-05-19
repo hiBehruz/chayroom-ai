@@ -20,14 +20,14 @@ onMounted(() => {
 
 <template>
   <section class="py-16">
-    <div class="max-w-295 mx-auto px-10">
+    <div class="max-w-295 mx-auto px-10 max-md:px-4">
       <div
         ref="bannerRef"
-        class="bg-[#dbeafe] rounded-3xl flex items-center gap-14 w-209.25 h-73.75 px-14 mx-auto"
+        class="bg-[#dbeafe] rounded-3xl flex items-center gap-14 w-209.25 h-73.75 px-14 mx-auto max-md:w-full max-md:h-auto max-md:flex-col max-md:px-6 max-md:py-8 max-md:gap-6 max-md:text-center"
       >
         <!-- Door Lottie animation -->
         <ClientOnly>
-          <div class="shrink-0 w-56 h-56">
+          <div class="shrink-0 w-56 h-56 max-md:w-36 max-md:h-36">
             <DotLottieVue
               src="/animations/Door.lottie?v=2"
               :autoplay="true"
@@ -45,7 +45,7 @@ onMounted(() => {
           <p class="text-[15px] text-cx-muted leading-[1.6] max-w-100">
             Telegram yopiq kanalga qo‘shil va bugunoq AIni hayot, ish va biznesingga joriy qilishni boshlagin.
           </p>
-          <button class="btn-primary btn-primary-dark self-start text-[13px]! px-5! py-2.5!" @click="scrollToPricing">
+          <button class="btn-primary btn-primary-dark self-start text-[13px]! px-5! py-2.5! max-md:self-center" @click="scrollToPricing">
             Kirish huquqini olish
           </button>
         </div>

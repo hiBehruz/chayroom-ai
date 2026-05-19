@@ -87,7 +87,7 @@ function requestAccess(_planId: string) {
             v-sparkle
             :class="[
               'price-card bg-[#f7f7f5] rounded-3xl flex flex-col max-md:w-full max-md:h-auto',
-              plan.featured ? 'w-[331.84px] h-[530.4px] p-7 shadow-lift' : 'w-[325.33px] h-130 p-6'
+              plan.featured ? 'w-[331.84px] h-[530.4px] p-7 shadow-lift max-md:ring-2 max-md:ring-cx-blue/40 max-md:ring-offset-2' : 'w-[325.33px] h-130 p-6'
             ]"
           >
             <!-- Period + desc: fixed height for cross-card alignment -->

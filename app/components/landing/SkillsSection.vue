@@ -117,9 +117,10 @@ function skillsForPage(page: number) {
           v-for="i in totalPages"
           :key="i"
           :class="[
-            'rounded-full transition-all duration-200',
+            'rounded-full transition-all duration-200 max-md:p-2 max-md:-m-2',
             currentPage === i - 1 ? 'w-5 h-2 bg-cx-ink' : 'w-2 h-2 bg-cx-line hover:bg-cx-muted'
           ]"
+          :aria-label="`${i}-sahifaga o'tish`"
           @click="goToPage(i - 1)"
         />
       </div>

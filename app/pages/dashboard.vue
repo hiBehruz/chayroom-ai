@@ -66,7 +66,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
             />
           </div>
         </ClientOnly>
-        <div class="flex flex-col items-start text-left">
+        <div class="flex flex-col items-start text-left max-md:items-center max-md:text-center">
           <h2 class="text-[20px] font-extrabold text-[#1a1a1a] mb-2">
             O'quv dashboardingni och
           </h2>

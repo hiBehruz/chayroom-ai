@@ -94,7 +94,7 @@ function resetHeroArtMove() {
             AIni ish va hayotingga joriy qil, o‘z loyihalaringni yarat va kuchli muhit bilan yangi ko‘nikmalarni o‘zlashtir.
           </p>
 
-          <div class="flex items-center min-h-8 overflow-hidden">
+          <div class="flex items-center min-h-8 overflow-hidden max-md:justify-center">
             <Transition name="keyword" mode="out-in">
               <span
                 :key="currentKeyword"

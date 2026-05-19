@@ -255,6 +255,15 @@ function logout() {
       </div>
     </nav>
 
+    <!-- Mobile backdrop -->
+    <Transition name="backdrop-fade">
+      <div
+        v-if="isMobileMenuOpen"
+        class="md:hidden fixed inset-0 bg-black/20 z-40"
+        @click="isMobileMenuOpen = false"
+      />
+    </Transition>
+
     <!-- Mobile drawer -->
     <Transition name="mobile-drawer">
       <div
@@ -469,6 +478,17 @@ function logout() {
     opacity: 0;
     transform: translate(2px, -28px) scale(1.5) rotate(8deg);
   }
+}
+
+.backdrop-fade-enter-active {
+  transition: opacity 0.2s ease;
+}
+.backdrop-fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+.backdrop-fade-enter-from,
+.backdrop-fade-leave-to {
+  opacity: 0;
 }
 
 .hb-line {

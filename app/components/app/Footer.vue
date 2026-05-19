@@ -1,8 +1,8 @@
 <template>
   <footer class="bg-[#efefef]">
-    <div class="max-w-[1180px] mx-auto px-10 py-12">
-      <div class="grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-10">
-        <div>
+    <div class="max-w-[1180px] mx-auto px-10 py-12 max-md:px-5 max-md:py-8">
+      <div class="grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-10 max-md:grid-cols-2 max-md:gap-6">
+        <div class="max-md:col-span-2">
           <div class="font-extrabold text-lg tracking-tight mb-2">
             Chayroom <span class="brand-ai-gradient">AI</span>
           </div>
@@ -48,7 +48,7 @@
           </div>
         </div>
       </div>
-      <div class="border-t border-cx-line mt-10 pt-5 flex justify-between items-center">
+      <div class="border-t border-cx-line mt-10 pt-5 flex justify-between items-center max-md:flex-col max-md:items-start max-md:gap-2">
         <span class="text-xs text-cx-faint">© 2026 Chayroom AI Club. Barcha huquqlar himoyalangan.</span>
         <span class="text-xs text-cx-faint">MVP: Telegram · Production: Click / Payme</span>
       </div>

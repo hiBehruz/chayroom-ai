@@ -103,27 +103,27 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 
       <!-- Category filter -->
       <div class="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-8 scrollbar-none">
-      <div
-        ref="categoryFilterRef"
-        class="relative inline-flex items-center bg-[#f0f0f0] rounded-2xl p-1.5 whitespace-nowrap"
-      >
-        <span
-          class="absolute top-1.5 bottom-1.5 rounded-xl bg-white shadow-sm transition-[left,width,opacity] duration-250 ease-out pointer-events-none"
-          :style="categoryIndicatorStyle"
-        />
-        <button
-          v-for="(cat, i) in categories"
-          :key="cat"
-          :ref="el => { if (el) categoryRefs[i] = el as HTMLElement }"
-          :class="[
-            'relative z-10 px-5 py-2 rounded-xl text-[13px] font-semibold transition-colors duration-200',
-            activeCategory === cat ? 'text-[#1a1a1a]' : 'text-cx-muted hover:text-cx-ink'
-          ]"
-          @click="selectCategory(cat)"
+        <div
+          ref="categoryFilterRef"
+          class="relative inline-flex items-center bg-[#f0f0f0] rounded-2xl p-1.5 whitespace-nowrap"
         >
-          {{ cat }}
-        </button>
-      </div>
+          <span
+            class="absolute top-1.5 bottom-1.5 rounded-xl bg-white shadow-sm transition-[left,width,opacity] duration-250 ease-out pointer-events-none"
+            :style="categoryIndicatorStyle"
+          />
+          <button
+            v-for="(cat, i) in categories"
+            :key="cat"
+            :ref="el => { if (el) categoryRefs[i] = el as HTMLElement }"
+            :class="[
+              'relative z-10 px-5 py-2 rounded-xl text-[13px] font-semibold transition-colors duration-200',
+              activeCategory === cat ? 'text-[#1a1a1a]' : 'text-cx-muted hover:text-cx-ink'
+            ]"
+            @click="selectCategory(cat)"
+          >
+            {{ cat }}
+          </button>
+        </div>
       </div>
 
       <!-- Course cards -->

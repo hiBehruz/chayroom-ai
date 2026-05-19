@@ -78,7 +78,7 @@ function resetHeroArtMove() {
     <div class="relative z-10 max-w-295 mx-auto px-10 max-md:px-5">
       <div class="grid min-h-140 grid-cols-[46%_1fr] items-center gap-0 max-md:flex max-md:flex-col max-md:min-h-0 max-md:gap-6 max-md:pt-6 max-md:pb-4">
         <!-- Left: text -->
-        <div ref="heroLeft" class="relative z-20">
+        <div ref="heroLeft" class="relative z-20 max-md:order-2">
         <div
           class="relative z-20 flex min-w-0 translate-x-22 max-md:translate-x-0 flex-col items-start justify-center gap-5.5"
         >
@@ -105,7 +105,7 @@ function resetHeroArtMove() {
           </div>
 
           <div
-            class="flex gap-3 mt-1"
+            class="flex gap-3 mt-1 max-md:flex-col max-md:w-full"
           >
             <button class="btn-primary btn-primary-dark" @click="scrollToPricing">
               Kirish huquqini olish →
@@ -118,7 +118,7 @@ function resetHeroArtMove() {
         </div>
 
         <!-- Right: art -->
-        <div ref="heroRight" class="relative z-10">
+        <div ref="heroRight" class="relative z-10 max-md:order-1">
         <div
           class="relative flex items-center justify-start w-full overflow-visible"
         >

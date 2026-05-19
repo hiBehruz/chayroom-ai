@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const hasSubscription = ref(false)
+const isAccessModalOpen = ref(false)
 
 interface Lesson {
   title: string
@@ -307,17 +308,13 @@ useSeoMeta({ title: `${course.title} — Chayroom AI` })
             </div>
           </div>
 
-          <!-- CTA card -->
+          <!-- Sidebar subscription block -->
           <div v-if="!hasSubscription" class="rounded-2xl border border-cx-line bg-white p-6 shadow-lift">
-            <div class="text-[15px] font-bold text-[#1a1a1a] mb-1">
-              Chayroom AI Club'ga to'liq kirish
-            </div>
-            <div class="text-[13px] text-cx-muted mb-4">
-              Barcha kurslarga bitta obuna bilan kirish
-            </div>
+            <div class="text-[10px] font-bold text-cx-muted uppercase tracking-widest mb-1">1 oylik tarifi</div>
+            <div class="text-[15px] font-bold text-cx-ink mb-4">Chayroom AI Club</div>
             <button
               class="btn-primary w-full text-[14px]! py-3! mb-5"
-              @click="navigateTo('/#pricing')"
+              @click="isAccessModalOpen = true"
             >
               Kirish huquqini olish
             </button>
@@ -334,15 +331,35 @@ useSeoMeta({ title: `${course.title} — Chayroom AI` })
                   'Efirlar va tahlillarga kirish'
                 ]"
                 :key="item"
-                class="flex items-start gap-2 text-[13px] text-[#1a1a1a]"
+                class="flex items-start gap-2 text-[13px] text-cx-ink"
               >
                 <UIcon name="i-lucide-check" class="size-3.5 text-green-500 shrink-0 mt-0.5" />
                 {{ item }}
               </li>
             </ul>
           </div>
+
+          <div v-else class="rounded-2xl border border-cx-line bg-[#f8f8fa] p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[13px] font-bold text-cx-ink">Ваш прогресс</span>
+              <span class="text-[13px] font-bold text-cx-ink">0%</span>
+            </div>
+            <div class="h-1.5 bg-[#e5e5e5] rounded-full overflow-hidden mb-2">
+              <div class="h-full bg-cx-blue rounded-full transition-all duration-500" style="width: 0%" />
+            </div>
+            <div class="text-[12px] text-cx-muted mb-4">0 из {{ course.lessons }} уроков</div>
+            <NuxtLink
+              :to="'/courses/' + course.slug"
+              class="btn-primary w-full text-[14px]! py-3! flex items-center justify-center gap-2"
+            >
+              <span>Начать обучение</span>
+              <span class="btn-arrow">→</span>
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </div>
+
+    <AppAccessModal v-model="isAccessModalOpen" />
   </div>
 </template>

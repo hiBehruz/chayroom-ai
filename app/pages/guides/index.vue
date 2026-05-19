@@ -262,13 +262,3 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
     </div>
   </div>
 </template>
-
-<style>
-.scrollbar-none {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-}
-</style>

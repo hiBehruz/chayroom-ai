@@ -119,6 +119,7 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
           v-for="course in filtered"
           :key="course.title"
           class="group flex flex-col overflow-hidden rounded-2xl border border-cx-line bg-[#fafafa] cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_36px_rgba(0,0,0,0.10)] hover:border-cx-line/60"
+          @click="hasSubscription ? navigateTo(`/courses/${course.slug}`) : (isAccessModalOpen = true)"
         >
           <!-- Header -->
           <div class="relative h-52 overflow-hidden shrink-0" :style="{ backgroundColor: course.bg }">

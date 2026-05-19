@@ -42,9 +42,10 @@ function nextKeyword() {
 onMounted(() => {
   keywordInterval = setInterval(nextKeyword, 2500)
 
+  const mobile = window.innerWidth < 768
   gsap.timeline({ delay: 0.15, defaults: { duration: 0.75, ease: 'power3.out' } })
-    .from(heroLeft.value!, { x: -60, opacity: 0 }, 0)
-    .from(heroRight.value!, { x: 60, opacity: 0 }, 0)
+    .from(heroLeft.value!, mobile ? { y: 30, opacity: 0 } : { x: -60, opacity: 0 }, 0)
+    .from(heroRight.value!, mobile ? { y: -30, opacity: 0 } : { x: 60, opacity: 0 }, 0)
 })
 
 onUnmounted(() => {

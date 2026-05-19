@@ -101,7 +101,7 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
         <span class="text-[22px] font-extrabold tracking-tight">AI Room Club</span>
       </NuxtLink>
 
-      <div class="w-full rounded-[26px] border border-[#dedee2] bg-white px-10 py-11 text-center">
+      <div class="w-full rounded-[26px] border border-[#dedee2] bg-white px-10 py-11 max-md:px-6 max-md:py-8 text-center">
         <h1 class="mb-8 text-[25px] font-extrabold tracking-tight text-[#242428]">
           Войди через Telegram
         </h1>

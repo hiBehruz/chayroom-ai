@@ -27,7 +27,7 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
 
 <template>
   <main class="min-h-screen bg-white">
-    <div class="mx-auto max-w-155 px-6 pb-14 pt-10">
+    <div class="mx-auto max-w-155 px-6 pb-14 pt-10 max-md:px-4">
       <header class="mb-7">
         <h1 class="text-[24px] font-extrabold leading-tight tracking-tight text-[#1f1f21]">
           Профиль
@@ -73,7 +73,7 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
             </div>
           </div>
 
-          <div class="grid grid-cols-3 gap-2.5">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
             <button
               v-for="option in agentOptions"
               :key="option.value"

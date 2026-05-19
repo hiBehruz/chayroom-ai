@@ -73,7 +73,7 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 
 <template>
   <div class="bg-white">
-    <div class="max-w-295 mx-auto px-10 py-8">
+    <div class="max-w-295 mx-auto px-10 py-8 max-md:px-4">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-sm text-cx-muted mb-6">
         <NuxtLink to="/" class="hover:text-cx-ink transition-colors">Bosh sahifa</NuxtLink>
@@ -82,7 +82,7 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
       </div>
 
       <!-- Header -->
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center justify-between mb-6 max-md:flex-col max-md:items-start max-md:gap-3">
         <div>
           <h1 class="text-[32px] font-extrabold tracking-tight text-[#1a1a1a]">
             Kurslar
@@ -102,9 +102,10 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
       </div>
 
       <!-- Category filter -->
+      <div class="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-8 scrollbar-none">
       <div
         ref="categoryFilterRef"
-        class="relative inline-flex items-center bg-[#f0f0f0] rounded-2xl p-1.5 mb-8"
+        class="relative inline-flex items-center bg-[#f0f0f0] rounded-2xl p-1.5 whitespace-nowrap"
       >
         <span
           class="absolute top-1.5 bottom-1.5 rounded-xl bg-white shadow-sm transition-[left,width,opacity] duration-250 ease-out pointer-events-none"
@@ -123,9 +124,10 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
           {{ cat }}
         </button>
       </div>
+      </div>
 
       <!-- Course cards -->
-      <div class="grid grid-cols-3 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <div
           v-for="course in filtered"
           :key="course.title"
@@ -227,7 +229,7 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 
         <div
           v-if="!filtered.length"
-          class="col-span-3 flex min-h-105 flex-col items-center justify-center gap-3 text-cx-muted"
+          class="col-span-full flex min-h-105 flex-col items-center justify-center gap-3 text-cx-muted"
         >
         <UIcon name="i-lucide-book-open" class="size-9 opacity-40" />
         <p class="text-[15px] font-semibold">Bu kategoriyada kurslar hali yo'q</p>

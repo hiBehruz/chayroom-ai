@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chayroom AI — Landing Page Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+:root {
+  --cx-ink: #0A0A0B;
+  --cx-ink-soft: #1A1A1D;
+  --cx-blue: #2962FF;
+  --cx-blue-soft: #E8EEFF;
+  --cx-paper: #FFFFFF;
+  --cx-surface: #FFFFFF;
+  --cx-line: #E8E8EB;
+  --cx-text: #0A0A0B;
+  --cx-text-muted: #6B6B72;
+  --cx-text-faint: #9A9AA1;
+  --cx-shadow-card: 0 1px 2px rgba(10,10,11,.04), 0 8px 24px rgba(10,10,11,.04);
+  --cx-shadow-lift: 0 2px 4px rgba(10,10,11,.05), 0 16px 40px rgba(10,10,11,.08);
+  --cx-ease-out: cubic-bezier(0.2,0.7,0.2,1);
+  --cx-dur: 200ms;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--cx-paper);color:var(--cx-text);-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.5;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+.container{max-width:1180px;margin:0 auto;padding:0 40px;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:50;background:#FFFFFF;border-bottom:1px solid var(--cx-line);}
+.nav-inner{display:flex;align-items:center;padding:16px 0;gap:40px;}
+.nav-brand{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.nav-emblem{width:40px;height:40px;background:var(--cx-ink);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.nav-emblem svg{width:24px;height:24px;fill:white;}
+.nav-word{font-weight:800;font-size:20px;letter-spacing:-.02em;}
+.nav-word .ai{color:var(--cx-blue);}
+.nav-tag{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--cx-text-muted);margin-top:2px;}
+.nav-links{display:flex;gap:28px;flex:1;justify-content:center;}
+.nav-links a{font-size:14px;font-weight:500;color:var(--cx-ink);cursor:pointer;transition:opacity var(--cx-dur) var(--cx-ease-out);}
+.nav-links a:hover{opacity:.5;}
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.nav-user{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;border:1px solid var(--cx-line);background:var(--cx-surface);cursor:pointer;}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2962FF,#1A4FE0);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
+.nav-user span{font-size:13px;font-weight:600;}
+.lang-switch{display:flex;gap:2px;background:var(--cx-surface);border:1px solid var(--cx-line);border-radius:8px;padding:3px;}
+.lang-btn{padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;}
+.lang-btn.active{background:var(--cx-ink);color:#fff;}
+
+/* HERO */
+.hero{padding:32px 0 0;}
+.hero-grid{display:grid;grid-template-columns:45% 1fr;gap:0;align-items:center;}
+.hero-left{display:flex;flex-direction:column;gap:22px;align-items:flex-start;padding-bottom:64px;min-width:0;}
+.eyebrow-pill{display:inline-flex;align-items:center;gap:8px;background:var(--cx-surface);border:1px solid var(--cx-line);padding:8px 14px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--cx-ink);}
+.eyebrow-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--cx-blue);flex-shrink:0;}
+.hero-title{font-size:clamp(48px,5vw,88px);font-weight:800;line-height:1.05;letter-spacing:-.03em;}
+.hero-title .ai{color:var(--cx-blue);display:inline;}
+.hero-sub{font-size:17px;line-height:1.6;color:var(--cx-ink);max-width:420px;}
+
+/* Rotating keywords */
+.hero-rotate{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cx-text-muted);min-height:32px;}
+.rotating-word-wrap{position:relative;height:30px;width:180px;overflow:hidden;}
+.rotating-word{
+  position:absolute;inset:0;
+  background:var(--cx-blue-soft);color:var(--cx-blue);
+  padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700;
+  border:none;
+  display:inline-flex;align-items:center;white-space:nowrap;
+  opacity:0;transform:translateY(12px);
+  transition:opacity .4s var(--cx-ease-out), transform .4s var(--cx-ease-out);
+  pointer-events:none;
+}
+.rotating-word.visible{opacity:1;transform:translateY(0);}
+.rotating-word.exit{opacity:0;transform:translateY(-12px);}
+
+.hero-cta{display:flex;gap:12px;margin-top:4px;}
+.btn{font-family:'Inter',sans-serif;font-weight:600;border-radius:999px;padding:14px 26px;font-size:15px;display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;cursor:pointer;transition:background var(--cx-dur) var(--cx-ease-out),transform 120ms var(--cx-ease-out);}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--cx-ink);color:#fff;border-color:var(--cx-ink);}
+.btn-primary:hover{background:var(--cx-ink-soft);}
+.btn-secondary{background:var(--cx-surface);color:var(--cx-ink);border-color:var(--cx-line);}
+.btn-secondary:hover{background:#fafafa;}
+
+/* Hero art */
+.hero-art{display:flex;align-items:flex-end;justify-content:flex-start;position:relative;width:100%;overflow:visible;}
+.hero-art-circle{
+  position:absolute;
+  width:85%;height:85%;border-radius:50%;
+  background:radial-gradient(circle, #dde6ff 0%, rgba(220,230,255,0.18) 55%, transparent 72%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:0;pointer-events:none;
+}
+.hero-art-img-wrap{
+  position:relative;z-index:1;
+  width:130%;
+  margin-right:-30%;
+}
+.hero-art-img-wrap img{
+  width:100%;height:auto;display:block;position:relative;z-index:1;
+}
+#steamSvg{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:none;overflow:visible;
+  z-index:2;
+}
+
+/* DIVIDER */
+.divider-section{padding:12px 0 36px;display:flex;justify-content:center;}
+.divider-line{display:flex;align-items:center;gap:16px;width:100%;max-width:600px;}
+.divider-rule{flex:1;height:1px;background:var(--cx-line);}
+.divider-dot{width:8px;height:8px;border-radius:50%;background:var(--cx-blue);}
+.divider-center{font-size:22px;line-height:1;}
+
+/* SECTION COMMON */
+.section{padding:64px 0;}
+.section-bg{background:var(--cx-surface);}
+.section-eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--cx-text-muted);text-align:center;margin-bottom:10px;}
+.section-title{font-size:40px;font-weight:800;letter-spacing:-.025em;line-height:1.1;text-align:center;margin-bottom:14px;}
+.section-sub{text-align:center;color:var(--cx-text-muted);font-size:16px;max-width:520px;margin:0 auto 48px;}
+
+/* CLUB CARDS — "Наш клуб для тебя" */
+.cards-2x2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+.club-card{background:var(--cx-surface);border:1px solid var(--cx-line);border-radius:24px;padding:32px;box-shadow:var(--cx-shadow-card);transition:transform var(--cx-dur) var(--cx-ease-out),box-shadow var(--cx-dur) var(--cx-ease-out);}
+.club-card:hover{transform:translateY(-2px);box-shadow:var(--cx-shadow-lift);}
+.card-num{font-size:12px;font-weight:700;color:var(--cx-blue);letter-spacing:.04em;margin-bottom:14px;}
+.card-title{font-size:18px;font-weight:700;margin-bottom:10px;line-height:1.3;}
+.card-body{font-size:14px;color:var(--cx-text-muted);line-height:1.6;}
+
+/* FEATURES — "Что внутри" */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.feature-card{background:var(--cx-surface);border:1px solid var(--cx-line);border-radius:24px;padding:28px 24px;box-shadow:var(--cx-shadow-card);display:flex;flex-direction:column;gap:16px;transition:transform var(--cx-dur) var(--cx-ease-out),box-shadow var(--cx-dur) var(--cx-ease-out);}
+.feature-card:hover{transform:translateY(-2px);box-shadow:var(--cx-shadow-lift);}
+.feature-icon{width:44px;height:44px;border-radius:12px;background:var(--cx-blue-soft);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.feature-title{font-size:17px;font-weight:700;line-height:1.3;}
+.feature-body{font-size:13px;color:var(--cx-text-muted);line-height:1.6;}
+
+/* AI USAGE PILLS */
+.pills-wrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:100%;margin:0 auto;}
+.usage-pill{background:var(--cx-surface);border:1px solid var(--cx-line);border-radius:999px;padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;transition:background var(--cx-dur) var(--cx-ease-out),border-color var(--cx-dur) var(--cx-ease-out),color var(--cx-dur) var(--cx-ease-out);}
+.usage-pill:hover,.usage-pill.active{background:var(--cx-ink);color:#fff;border-color:var(--cx-ink);}
+.ai-quote{margin-top:28px;text-align:center;padding:24px 32px;background:var(--cx-surface);border:1px solid var(--cx-line);border-radius:20px;max-width:100%;margin-left:auto;margin-right:auto;}
+.ai-quote p{font-size:16px;line-height:1.6;color:var(--cx-ink);}
+.ai-quote .q-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--cx-blue);margin-bottom:10px;}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.price-card{background:var(--cx-surface);border:1px solid var(--cx-line);border-radius:24px;padding:32px;box-shadow:var(--cx-shadow-card);position:relative;}
+.price-card.featured{border-color:var(--cx-blue);box-shadow:0 2px 4px rgba(41,98,255,.1),0 16px 40px rgba(41,98,255,.1);}
+.price-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--cx-blue);color:#fff;font-size:11px;font-weight:700;padding:4px 14px;border-radius:999px;letter-spacing:.04em;white-space:nowrap;}
+.price-period{font-size:13px;font-weight:600;color:var(--cx-text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+.price-desc{font-size:13px;color:var(--cx-text-muted);margin-bottom:20px;}
+.price-old{font-size:14px;color:var(--cx-text-faint);text-decoration:line-through;margin-bottom:2px;}
+.price-current{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1;}
+.price-unit{font-size:14px;color:var(--cx-text-muted);margin-bottom:24px;margin-top:4px;}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.price-features li{display:flex;align-items:center;gap:10px;font-size:14px;}
+.price-features li::before{content:'';display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--cx-blue-soft);flex-shrink:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232962FF' stroke-width='2.5'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;}
+.price-save{display:inline-block;background:var(--cx-blue-soft);color:var(--cx-blue);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-top:8px;}
+
+/* SKILLS SLIDER */
+.skills-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;}
+.skills-arrows{display:flex;gap:8px;}
+.arrow-btn{width:40px;height:40px;border-radius:50%;background:var(--cx-surface);border:1px solid var(--cx-line);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:background var(--cx-dur) var(--cx-ease-out);}
+.arrow-btn:hover{background:#f1f1f1;}
+.skills-track{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+.skill-card{background:var(--cx-surface);border:1px solid var(--cx-line);border-radius:24px;padding:32px;box-shadow:var(--cx-shadow-card);}
+.skill-num{font-size:32px;font-weight:800;color:var(--cx-line);margin-bottom:16px;}
+.skill-title{font-size:19px;font-weight:700;margin-bottom:10px;line-height:1.3;}
+.skill-body{font-size:14px;color:var(--cx-text-muted);line-height:1.6;}
+
+
+/* GUIDES BANNER */
+.guides-banner{background:var(--cx-ink);border-radius:28px;padding:56px 64px;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:center;}
+.guides-banner h2{font-size:36px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-bottom:10px;}
+.guides-banner p{font-size:16px;color:rgba(255,255,255,.6);max-width:480px;line-height:1.5;}
+.btn-white{background:#fff;color:var(--cx-ink);border-color:#fff;}
+.btn-white:hover{background:#f1f1f1;}
+
+/* FAQ */
+.faq-list{display:flex;flex-direction:column;gap:4px;max-width:780px;margin:0 auto;}
+.faq-item{border:1px solid var(--cx-line);border-radius:16px;overflow:hidden;background:var(--cx-surface);}
+.faq-q{padding:20px 24px;font-weight:600;font-size:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.faq-q .chevron{font-size:18px;color:var(--cx-text-muted);transition:transform var(--cx-dur) var(--cx-ease-out);}
+.faq-item.open .chevron{transform:rotate(180deg);}
+.faq-a{padding:0 24px 20px;font-size:14px;color:var(--cx-text-muted);line-height:1.6;display:none;}
+.faq-item.open .faq-a{display:block;}
+
+/* FINAL CTA */
+.final-cta{text-align:center;padding:80px 0;}
+.final-cta h2{font-size:48px;font-weight:800;letter-spacing:-.03em;margin-bottom:16px;line-height:1.1;}
+.final-cta p{font-size:17px;color:var(--cx-text-muted);max-width:480px;margin:0 auto 36px;line-height:1.6;}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--cx-line);padding:48px 0;}
+.footer-inner{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;}
+.footer-brand .nav-word{font-size:18px;margin-bottom:8px;}
+.footer-brand p{font-size:13px;color:var(--cx-text-muted);line-height:1.6;max-width:240px;}
+.footer-col h4{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--cx-text-muted);margin-bottom:14px;}
+.footer-col a{display:block;font-size:14px;color:var(--cx-text-muted);margin-bottom:8px;cursor:pointer;}
+.footer-col a:hover{color:var(--cx-ink);}
+.footer-bottom{border-top:1px solid var(--cx-line);margin-top:40px;padding-top:20px;display:flex;justify-content:space-between;align-items:center;}
+.footer-bottom span{font-size:12px;color:var(--cx-text-faint);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="nav-emblem">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div class="nav-word">Chayroom <span class="ai">AI</span></div>
+      </div>
+      <div class="nav-links">
+        <a>Курсы</a>
+        <a>Гайды</a>
+        <a>Панель</a>
+        <a>Тарифы</a>
+        <a>FAQ</a>
+      </div>
+      <div class="nav-right">
+        <div class="lang-switch">
+          <div class="lang-btn active">RU</div>
+          <div class="lang-btn">UZ</div>
+        </div>
+        <div class="nav-user">
+          <div class="avatar">BZ</div>
+          <span>Behruz Zaripov</span>
+          <span style="color:var(--cx-text-muted);font-size:12px;">▾</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="container">
+  <div class="hero">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <h1 class="hero-title gsap-hero-title"><span style="white-space:nowrap;">Chayroom <span class="ai">AI</span></span></h1>
+        <p class="hero-sub gsap-fade">Внедряй ИИ в работу и жизнь, создавай свои проекты и осваивай новые навыки вместе с сильным окружением.</p>
+        <div class="hero-rotate gsap-fade">
+          <div class="rotating-word-wrap" id="rotatorWrap">
+            <span class="rotating-word visible" id="rotatorWord">AI-агенты</span>
+          </div>
+        </div>
+        <div class="hero-cta gsap-fade">
+          <button class="btn btn-primary">Получить доступ →</button>
+          <button class="btn btn-secondary">▶ Что меня ждёт</button>
+        </div>
+      </div>
+      <div class="hero-art gsap-hero-art">
+        <div class="hero-art-circle" id="heroCircle"></div>
+        <div class="hero-art-img-wrap" id="heroImgWrap">
+          <img src="/files/teapot-v4.png" alt="Chayroom AI teapot" id="heroImg" />
+          <svg id="steamSvg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="blur1"><feGaussianBlur stdDeviation="2.5"/></filter>
+              <filter id="blur2"><feGaussianBlur stdDeviation="1.8"/></filter>
+            </defs>
+            <!-- 4 steam wisps above the cup area -->
+            <path class="sw" d="M 118 320 C 110 295, 128 272, 116 248" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="4" stroke-linecap="round" filter="url(#blur1)"/>
+            <path class="sw" d="M 134 315 C 142 288, 124 264, 138 238" fill="none" stroke="rgba(255,255,255,0.6)"  stroke-width="3" stroke-linecap="round" filter="url(#blur1)"/>
+            <path class="sw" d="M 108 322 C 100 294, 114 268, 104 242" fill="none" stroke="rgba(255,255,255,0.5)"  stroke-width="2.5" stroke-linecap="round" filter="url(#blur2)"/>
+            <path class="sw" d="M 146 318 C 154 290, 136 262, 150 234" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2"   stroke-linecap="round" filter="url(#blur2)"/>
+          </svg>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIVIDER -->
+<div class="container">
+  <div class="divider-section">
+    <div class="divider-line">
+      <div class="divider-rule"></div>
+      <div class="divider-dot"></div>
+      <div class="divider-center">✦</div>
+      <div class="divider-dot"></div>
+      <div class="divider-rule"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CLUB FOR YOU -->
+<div class="section-bg">
+  <div class="section container">
+    <div class="section-eyebrow">Для кого</div>
+    <h2 class="section-title">Наш клуб для тебя, если ты...</h2>
+    <p class="section-sub" style="margin-bottom:40px;">Мы создали пространство для людей, которые хотят использовать ИИ как настоящее преимущество.</p>
+    <div class="cards-2x2">
+      <div class="club-card">
+        <div class="card-num">01</div>
+        <div class="card-title">Хочешь зарабатывать с помощью ИИ</div>
+        <div class="card-body">Ищешь навык на годы вперёд, который будет приносить стабильный доход. Работая над своими проектами или выполняя заказы для других.</div>
+      </div>
+      <div class="club-card">
+        <div class="card-num">02</div>
+        <div class="card-title">Владеешь бизнесом, но тонешь в операционке</div>
+        <div class="card-body">Хочешь сократить расходы с помощью ИИ, оптимизировать бизнес-процессы или создать свою команду AI-сотрудников.</div>
+      </div>
+      <div class="club-card">
+        <div class="card-num">03</div>
+        <div class="card-title">Чувствуешь, что теряешь актуальность на рынке</div>
+        <div class="card-body">Видишь, как другие эксперты уже внедряют ИИ и получают преимущество. Хочешь освоить новые инструменты.</div>
+      </div>
+      <div class="club-card">
+        <div class="card-num">04</div>
+        <div class="card-title">Хочешь идти в ногу со временем</div>
+        <div class="card-body">Чувствуешь, что пора внедрять ИИ в свою жизнь, но пока не понимаешь с чего начать и как это поможет вырасти в доходе.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT'S INSIDE -->
+<div class="section container">
+  <div class="section-eyebrow">Контент</div>
+  <h2 class="section-title">Что внутри AI Room Club?</h2>
+  <p class="section-sub">И почему развиваться с нами — правильное решение</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🔧</div>
+      <div class="feature-title">Практические инструменты</div>
+      <div class="feature-body">Разбор самых актуальных инструментов на рынке AI под разные цели и задачи, а также чек-листы по внедрению.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📚</div>
+      <div class="feature-title">Курсы и гайды</div>
+      <div class="feature-body">Пошаговые инструкции с 0 — для бизнеса, работы, контента и повседневной жизни. Не просто теория, а конкретные мануалы.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💬</div>
+      <div class="feature-title">Закрытый чат AI Room Club</div>
+      <div class="feature-body">Общение с единомышленниками, у которых есть одна общая цель — сделать ИИ своим преимуществом в жизни и бизнесе.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Готовые связки</div>
+      <div class="feature-body">Ежедневно тестируем различные решения и делимся ими внутри нашего комьюнити.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎙️</div>
+      <div class="feature-title">Прямые эфиры и воркшопы</div>
+      <div class="feature-body">Живые созвоны, ответы на вопросы, практические воркшопы, на которых мы вместе пробуем что-то сделать.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🚀</div>
+      <div class="feature-title">Свежие тренды из мира AI</div>
+      <div class="feature-body">Одними из первых узнаёте последние новости и тестируете всё самое интересное в нише искусственного интеллекта.</div>
+    </div>
+  </div>
+</div>
+
+<!-- AI USAGE PILLS -->
+<div class="section-bg">
+  <div class="section container">
+    <div class="section-eyebrow">Применение</div>
+    <h2 class="section-title">Как и где применить AI</h2>
+    <p class="section-sub">Десятки способов упростить себе жизнь, улучшить проекты и открыть новые возможности.</p>
+    <div class="pills-wrap">
+      <div class="usage-pill active">Обучение</div>
+      <div class="usage-pill">Контент и блогинг</div>
+      <div class="usage-pill">Работа и фриланс</div>
+      <div class="usage-pill">Бизнес и команды</div>
+      <div class="usage-pill">Продажи и лиды</div>
+      <div class="usage-pill">Сайты и сервисы</div>
+      <div class="usage-pill">AI-агенты</div>
+      <div class="usage-pill">Путешествия</div>
+      <div class="usage-pill">Здоровье</div>
+      <div class="usage-pill">Финансы</div>
+      <div class="usage-pill">Исследования</div>
+      <div class="usage-pill">Коммуникация</div>
+      <div class="usage-pill">Личный бренд</div>
+    </div>
+    <div class="ai-quote" style="margin-top:32px;">
+      <div class="q-label">AI о теме «Обучение»</div>
+      <p>«ИИ превращает любую книгу в личного наставника — задавай вопросы, получай объяснения на своём уровне и учись в 10 раз быстрее.»</p>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="section container">
+  <div class="section-eyebrow">Тарифы</div>
+  <h2 class="section-title">Выбери свой формат</h2>
+  <p class="section-sub">Подписка — доступно, удобно и выгодно. Без скрытых условий.</p>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-period">1 Месяц</div>
+      <div class="price-desc">Сможешь попробовать и протестировать</div>
+      <div class="price-old">1 990 ₽</div>
+      <div class="price-current">1 490 ₽</div>
+      <div class="price-unit">/мес</div>
+      <ul class="price-features">
+        <li>Все курсы и гайды</li>
+        <li>Закрытый чат AI Room Club</li>
+        <li>Разборы AI-инструментов</li>
+        <li>Пошаговые инструкции</li>
+        <li>Доступ к новым материалам</li>
+      </ul>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;">Купить в Telegram →</button>
+    </div>
+    <div class="price-card featured">
+      <div class="price-badge">Выгодный и Популярный</div>
+      <div class="price-period">3 Месяца</div>
+      <div class="price-desc">Достаточно времени, чтобы увидеть результаты</div>
+      <div class="price-old">4 470 ₽</div>
+      <div class="price-current">3 790 ₽</div>
+      <div class="price-unit">/3 мес <span class="price-save">Экономия 15%</span></div>
+      <ul class="price-features">
+        <li>Все курсы и гайды</li>
+        <li>Закрытый чат AI Room Club</li>
+        <li>Разборы AI-инструментов</li>
+        <li>Пошаговые инструкции</li>
+        <li>Доступ к новым материалам</li>
+      </ul>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;">Купить в Telegram →</button>
+    </div>
+    <div class="price-card">
+      <div class="price-period">6 Месяцев</div>
+      <div class="price-desc">Максимальный фокус на внедрении AI</div>
+      <div class="price-old">8 940 ₽</div>
+      <div class="price-current">7 150 ₽</div>
+      <div class="price-unit">/6 мес <span class="price-save">Экономия 20%</span></div>
+      <ul class="price-features">
+        <li>Все курсы и гайды</li>
+        <li>Закрытый чат AI Room Club</li>
+        <li>Разборы AI-инструментов</li>
+        <li>Пошаговые инструкции</li>
+        <li>Доступ к новым материалам</li>
+      </ul>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;">Купить в Telegram →</button>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--cx-text-faint);">Оплата через Tribute в Telegram. Доступ активируется автоматически после оплаты.</p>
+</div>
+
+<!-- SKILLS -->
+<div class="section-bg">
+  <div class="section container">
+    <div class="skills-header">
+      <div>
+        <div class="section-eyebrow" style="text-align:left;">Навыки</div>
+        <h2 class="section-title" style="text-align:left;font-size:36px;">Чему ты научишься в нашем сообществе?</h2>
+      </div>
+      <div class="skills-arrows">
+        <button class="arrow-btn" id="skillPrev">←</button>
+        <button class="arrow-btn" id="skillNext">→</button>
+      </div>
+    </div>
+    <div style="overflow:hidden;">
+      <div class="skills-track" id="skillsTrack"></div>
+    </div>
+    <div id="skillsDots" style="display:flex;gap:6px;justify-content:center;margin-top:20px;"></div>
+  </div>
+</div>
+
+<!-- GUIDES BANNER -->
+<div class="section container">
+  <div class="guides-banner">
+    <div>
+      <h2>Бесплатные гайды</h2>
+      <p>Практические руководства о том, как сделать AI частью своей жизни, работы и бизнеса.</p>
+    </div>
+    <button class="btn btn-white" style="flex-shrink:0;">Открыть →</button>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="section container">
+  <h2 class="section-title">Частые вопросы</h2>
+  <p class="section-sub" style="margin-bottom:40px;">Отвечаем на самые популярные вопросы</p>
+  <div class="faq-list">
+    <div class="faq-item open">
+      <div class="faq-q">Это сообщество для новичков или для тех, кто уже в теме? <span class="chevron">▾</span></div>
+      <div class="faq-a">Для всех. Если ты новичок — получишь понятный путь с нуля. Если уже знаком с ИИ — найдёшь продвинутые инструменты, свежие тренды и сообщество единомышленников.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Нужно ли уметь программировать? <span class="chevron">▾</span></div>
+      <div class="faq-a">Нет. Большинство инструментов и подходов, которые мы разбираем, не требуют навыков программирования.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Что я получу внутри? <span class="chevron">▾</span></div>
+      <div class="faq-a">Курсы и гайды, закрытый чат, разборы AI-инструментов, готовые связки, прямые эфиры и воркшопы.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Подойдёт ли мне, если я предприниматель? <span class="chevron">▾</span></div>
+      <div class="faq-a">Да. Мы специально включаем материалы по автоматизации бизнес-процессов и созданию AI-команд.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Как устроена оплата? <span class="chevron">▾</span></div>
+      <div class="faq-a">Оплата через Tribute в Telegram. Доступ активируется автоматически сразу после оплаты.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL CTA -->
+<div class="section-bg">
+  <div class="final-cta container">
+    <h2>Готовы начать?</h2>
+    <p>Вступай в сообщество и начни внедрять ИИ в свою жизнь, работу и бизнес уже сегодня.</p>
+    <button class="btn btn-primary" style="font-size:16px;padding:16px 32px;">Получить доступ →</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="container">
+  <div class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="nav-word">Chayroom <span class="ai">AI</span> Club</div>
+        <p>Закрытое сообщество для тех, кто хочет зарабатывать с помощью ИИ, внедрять его в работу и жизнь.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Навигация</h4>
+        <a>Курсы</a><a>Гайды</a><a>Панель</a><a>Тарифы</a>
+      </div>
+      <div class="footer-col">
+        <h4>Поддержка</h4>
+        <a>Написать в Telegram</a>
+        <a>support@airoomclub.ru</a>
+      </div>
+      <div class="footer-col">
+        <h4>Документы</h4>
+        <a>Политика конфиденциальности</a>
+        <a>Обработка персональных данных</a>
+        <a>Оферта</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Chayroom AI Club</span>
+      <span>Оплата через Tribute · Telegram</span>
+    </div>
+  </div>
+</div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+
+/* ── Steam animation ── */
+document.querySelectorAll('.sw').forEach((path, i) => {
+  const len = path.getTotalLength();
+  gsap.set(path, { strokeDasharray: len, strokeDashoffset: len, opacity: 0 });
+
+  function animateSteam() {
+    const tl = gsap.timeline({ onComplete: animateSteam, delay: i * 0.55 });
+    // draw steam upward
+    tl.to(path, { strokeDashoffset: -len * 0.1, opacity: 0.85, duration: 1.6 + i * 0.2, ease: 'power1.inOut' });
+    // fade out
+    tl.to(path, { opacity: 0, duration: 0.5, ease: 'power2.in' }, '-=0.3');
+    // reset
+    tl.set(path, { strokeDashoffset: len, opacity: 0 });
+    // pause before next loop
+    tl.to(path, { duration: 0.4 + i * 0.15 });
+  }
+  animateSteam();
+});
+
+/* ── Hero entrance ── */
+const heroTl = gsap.timeline({ defaults:{ ease:'power3.out' } });
+heroTl
+  .from('.gsap-hero-title', { y: 40, opacity:0, duration:.9 })
+  .from('.hero-sub',        { y: 24, opacity:0, duration:.7 }, '-=.5')
+  .from('.hero-rotate',     { y: 16, opacity:0, duration:.5 }, '-=.4')
+  .from('.hero-cta',        { y: 16, opacity:0, duration:.5 }, '-=.3')
+  .from('.gsap-hero-art',   { x: 40, opacity:0, duration:.9, ease:'power2.out' }, '<-.6');
+
+/* ── ScrollTrigger helper ── */
+function revealSection(selector, stagger=0.12) {
+  gsap.from(selector, {
+    scrollTrigger:{ trigger:selector, start:'top 85%', once:true },
+    y: 32, opacity:0, duration:.7, stagger, ease:'power2.out'
+  });
+}
+
+/* Club cards */
+revealSection('.club-card');
+/* Feature cards */
+revealSection('.feature-card');
+/* Section titles + subs */
+gsap.utils.toArray('.section-title').forEach(el => {
+  gsap.from(el, { scrollTrigger:{ trigger:el, start:'top 88%', once:true }, y:24, opacity:0, duration:.7, ease:'power2.out' });
+});
+gsap.utils.toArray('.section-sub').forEach(el => {
+  gsap.from(el, { scrollTrigger:{ trigger:el, start:'top 88%', once:true }, y:16, opacity:0, duration:.6, delay:.1, ease:'power2.out' });
+});
+/* Usage pills */
+gsap.from('.usage-pill', {
+  scrollTrigger:{ trigger:'.pills-wrap', start:'top 85%', once:true },
+  scale:.85, opacity:0, duration:.4, stagger:.05, ease:'back.out(1.4)'
+});
+/* Pricing cards */
+revealSection('.price-card', 0.15);
+/* Skills section */
+gsap.from('#skillsTrack', {
+  scrollTrigger:{ trigger:'#skillsTrack', start:'top 85%', once:true },
+  y:32, opacity:0, duration:.7, ease:'power2.out'
+});
+/* Guides banner */
+gsap.from('.guides-banner', {
+  scrollTrigger:{ trigger:'.guides-banner', start:'top 85%', once:true },
+  y:32, opacity:0, duration:.8, ease:'power2.out'
+});
+/* FAQ items */
+revealSection('.faq-item', 0.08);
+/* Final CTA */
+gsap.from('.final-cta h2, .final-cta p, .final-cta .btn', {
+  scrollTrigger:{ trigger:'.final-cta', start:'top 85%', once:true },
+  y:24, opacity:0, duration:.7, stagger:.12, ease:'power2.out'
+});
+
+/* ── Skills slider with GSAP animation ── */
+const skills = [
+  { num:'01', title:'Создавать и использовать AI-агентов', body:'Разберёшься, как создать команду AI-агентов и поймёшь, как с их помощью решать любые свои задачи.' },
+  { num:'02', title:'Создавать проекты с помощью вайбкодинга', body:'Поймёшь, как воплощать свои идеи в реальность: сервисы, платформы, боты, MVP и мини-продукты — без навыков программирования.' },
+  { num:'03', title:'Осваивать новые AI-профессии', body:'Изучишь навыки и решения, которые уже сейчас можно монетизировать: от создания сайтов до разработки AI-агентов.' },
+  { num:'04', title:'Увеличивать свою ценность на рынке', body:'Поймёшь, как с помощью ИИ повышать свою экспертность, увеличивать свой доход и не отставать от тех, кто уже внедряет новые инструменты.' },
+  { num:'05', title:'Собирать сайты и лендинги', body:'Научишься собирать профессиональные сайты и лендинги любой сложности под свои услуги, продукты и проекты.' },
+  { num:'06', title:'Использовать ИИ в жизни, а не только в работе', body:'Применять ИИ для обучения, планирования, путешествий, привычек и повседневных задач.' },
+  { num:'07', title:'Делать контент и продвигать себя', body:'Научишься с помощью ИИ создавать виральные идеи, сценарии, тексты и развивать свои социальные сети.' },
+  { num:'08', title:'Находить и внедрять новые AI-инструменты', body:'Научишься быстро ориентироваться в новых сервисах, понимать, что реально полезно, а что просто шум.' },
+  { num:'09', title:'Автоматизировать рутину и экономить время', body:'Сможешь разгрузить себя от повторяющихся действий и освободить время на более важные задачи.' },
+];
+let skillPage = 0;
+const perPage = 2;
+const totalPages = Math.ceil(skills.length / perPage);
+const track = document.getElementById('skillsTrack');
+const dots = document.getElementById('skillsDots');
+const prevBtn = document.getElementById('skillPrev');
+const nextBtn = document.getElementById('skillNext');
+
+function renderSkills(dir = 0) {
+  const start = skillPage * perPage;
+  const newHtml = skills.slice(start, start + perPage).map(s => `
+    <div class="skill-card">
+      <div class="skill-num">${s.num}</div>
+      <div class="skill-title">${s.title}</div>
+      <div class="skill-body">${s.body}</div>
+    </div>`).join('');
+
+  if (dir === 0) {
+    track.innerHTML = newHtml;
+  } else {
+    const fromX = dir > 0 ? 60 : -60;
+    gsap.to(track, { x: -fromX, opacity:0, duration:.25, ease:'power2.in', onComplete:() => {
+      track.innerHTML = newHtml;
+      gsap.fromTo(track, { x: fromX, opacity:0 }, { x:0, opacity:1, duration:.35, ease:'power2.out' });
+    }});
+  }
+
+  dots.innerHTML = Array.from({length:totalPages}, (_,i) => `
+    <div style="height:4px;border-radius:2px;transition:all .3s;background:${i===skillPage?'var(--cx-ink)':'var(--cx-line)'};width:${i===skillPage?'24px':'8px'};"></div>`).join('');
+  prevBtn.style.opacity = skillPage === 0 ? '0.3' : '1';
+  nextBtn.style.opacity = skillPage === totalPages-1 ? '0.3' : '1';
+}
+
+prevBtn.addEventListener('click', () => { if(skillPage > 0){ skillPage--; renderSkills(-1); } });
+nextBtn.addEventListener('click', () => { if(skillPage < totalPages-1){ skillPage++; renderSkills(1); } });
+renderSkills(0);
+
+/* ── Rotating keywords ── */
+const keywords = ['AI-агенты','AI-аватары','Трендовые решения','Вайбкодинг','AI-инструменты'];
+let kwIdx = 0;
+const wrap = document.getElementById('rotatorWrap');
+function nextKeyword() {
+  const current = wrap.querySelector('.rotating-word');
+  const next = document.createElement('span');
+  next.className = 'rotating-word';
+  next.textContent = keywords[(kwIdx + 1) % keywords.length];
+  wrap.appendChild(next);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    current.classList.add('exit');
+    next.classList.add('visible');
+  }));
+  setTimeout(() => { current.remove(); kwIdx = (kwIdx + 1) % keywords.length; }, 450);
+}
+setInterval(nextKeyword, 2000);
+
+/* ── FAQ ── */
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.closest('.faq-item');
+    document.querySelectorAll('.faq-item').forEach(i => { if(i !== item) i.classList.remove('open'); });
+    item.classList.toggle('open');
+  });
+});
+
+/* ── Usage pills ── */
+const quotes = {
+  'Обучение':'ИИ превращает любую книгу в личного наставника — задавай вопросы, получай объяснения и учись в 10 раз быстрее.',
+  'Контент и блогинг':'С ИИ один человек создаёт контент-план на месяц за один вечер — и это только начало.',
+  'Работа и фриланс':'ИИ — это твой второй мозг на работе: он не устаёт, не отвлекается и всегда готов к задаче.',
+  'Бизнес и команды':'Компания с AI-командой делает за неделю то, что раньше занимало квартал.',
+  'Продажи и лиды':'ИИ анализирует тысячи лидов и находит тех, кто готов купить прямо сейчас.',
+  'Сайты и сервисы':'Сайт мечты создаётся за один день — если рядом есть правильный ИИ-инструмент.',
+  'AI-агенты':'Один AI-агент может заменить целый отдел рутинных задач — и работать 24/7.',
+  'Путешествия':'ИИ спланирует идеальный маршрут, учитывая твои интересы, бюджет и погоду.',
+  'Здоровье':'ИИ помогает отслеживать привычки, анализировать самочувствие и давать персональные рекомендации.',
+  'Финансы':'ИИ видит паттерны в твоих расходах, которые ты никогда не замечал.',
+  'Исследования':'Часы поиска информации превращаются в минуты — ИИ читает за тебя.',
+  'Коммуникация':'ИИ помогает писать письма, которые открывают двери и строят отношения.',
+  'Личный бренд':'Твой личный бренд с ИИ — это контент, который работает даже когда ты спишь.',
+};
+const quoteBox = document.querySelector('.ai-quote');
+document.querySelectorAll('.usage-pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.usage-pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    gsap.fromTo(quoteBox, { y:8, opacity:0 }, { y:0, opacity:1, duration:.35, ease:'power2.out' });
+    quoteBox.querySelector('p').textContent = '«' + (quotes[p.textContent.trim()] || 'ИИ открывает возможности, о которых ты ещё не догадываешься.') + '»';
+    quoteBox.querySelector('.q-label').textContent = 'AI о теме «' + p.textContent.trim() + '»';
+  });
+});
+</script>
+</body>
+</html>

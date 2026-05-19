@@ -183,7 +183,7 @@ git commit -m "feat: make dashboard course cards link to course detail page"
 **Files:**
 - Create: `app/pages/courses/[slug].vue`
 
-- [ ] **Step 1: Faylni yaratish — to'liq kod**
+- [x] **Step 1: Faylni yaratish — to'liq kod**
 
 `app/pages/courses/[slug].vue` faylini quyidagi to'liq kod bilan yarating:
 
@@ -574,7 +574,7 @@ git commit -m "feat: add course detail page with module accordion and subscripti
 
 `hasSubscription = ref(false)` hozir har bir sahifada alohida. Bu task ikki faylda `true` qilib, barcha kutilgan o'zgarishlarni tekshiradi.
 
-- [ ] **Step 1: `dashboard.vue` da vaqtincha `hasSubscription = ref(true)` qilib tekshirish**
+- [x] **Step 1: `dashboard.vue` da vaqtincha `hasSubscription = ref(true)` qilib tekshirish**
 
 `dashboard.vue` script qismida:
 
@@ -589,7 +589,7 @@ const hasSubscription = ref(true)  // vaqtincha test uchun
 - Telegram bo'limida "Obuna bo'lgandan keyin kirish ochiladi." YO'Q — uning o'rnida **"Telegramga kirish"** tugmasi bor
 - Kurs badge'lari: `free: true` → "Bepul", `free: false` → "Mavjud" (yashil)
 
-- [ ] **Step 2: `courses/[slug].vue` da vaqtincha `hasSubscription = ref(true)` qilib tekshirish**
+- [x] **Step 2: `courses/[slug].vue` da vaqtincha `hasSubscription = ref(true)` qilib tekshirish**
 
 `courses/[slug].vue` script qismida:
 
@@ -602,7 +602,7 @@ const hasSubscription = ref(true)  // vaqtincha test uchun
 - O'ng sidebar'da CTA karta YO'Q (`v-if="!hasSubscription"` → `false`)
 - Dars ikonkalari: lock `i-lucide-lock` o'rnida play `i-lucide-play-circle` (ko'k)
 
-- [ ] **Step 3: Har ikkala faylni `ref(false)` ga qaytarish**
+- [x] **Step 3: Har ikkala faylni `ref(false)` ga qaytarish**
 
 ```ts
 // dashboard.vue
@@ -612,7 +612,7 @@ const hasSubscription = ref(false)
 const hasSubscription = ref(false)
 ```
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Commit** *(bajarilmadi: user commit so'ramadi)*
 
 ```bash
 git add app/pages/dashboard.vue app/pages/courses/

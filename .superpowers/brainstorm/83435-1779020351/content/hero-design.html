@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chayroom AI — Hero Design</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #0f172a; }
+
+  /* NAVBAR */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 64px;
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { font-size: 18px; font-weight: 800; color: #4f46e5; letter-spacing: -0.5px; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-link { padding: 6px 14px; border-radius: 8px; font-size: 14px; color: #475569; cursor: pointer; transition: all 0.15s; }
+  .nav-link:hover { background: #f1f5f9; color: #0f172a; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-avatar {
+    display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+    border-radius: 10px; cursor: pointer; transition: background 0.15s;
+  }
+  .nav-avatar:hover { background: #f1f5f9; }
+  .avatar-circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 12px; font-weight: 700;
+  }
+  .avatar-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+  .lang-btn { padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; color: #6366f1; border: 1.5px solid #e0e7ff; cursor: pointer; background: #f5f3ff; }
+
+  /* HERO */
+  .hero {
+    min-height: calc(100vh - 64px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 80px 40px 60px;
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, #ede9fe 0%, transparent 70%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, #e0e7ff 0%, transparent 60%),
+                #f8fafc;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #ede9fe; color: #6d28d9; padding: 6px 14px;
+    border-radius: 20px; font-size: 12px; font-weight: 600;
+    margin-bottom: 24px; border: 1px solid #ddd6fe;
+  }
+  .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #7c3aed; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+
+  .hero-title { font-size: 64px; font-weight: 900; line-height: 1.05; letter-spacing: -2px; margin-bottom: 20px; }
+  .hero-title span { color: #4f46e5; }
+
+  .hero-desc { font-size: 18px; color: #475569; max-width: 560px; line-height: 1.6; margin-bottom: 28px; }
+
+  .hero-rotating {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 36px;
+    font-size: 15px; color: #64748b;
+  }
+  .rotating-pill {
+    background: white; border: 1.5px solid #e0e7ff;
+    color: #4f46e5; padding: 6px 16px; border-radius: 20px;
+    font-weight: 600; font-size: 14px;
+    box-shadow: 0 1px 4px rgba(79,70,229,0.08);
+  }
+
+  .hero-buttons { display: flex; gap: 12px; justify-content: center; margin-bottom: 56px; }
+  .btn-primary {
+    padding: 14px 28px; border-radius: 12px;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: white; font-weight: 700; font-size: 15px;
+    box-shadow: 0 4px 16px rgba(79,70,229,0.35);
+    cursor: pointer; border: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,70,229,0.4); }
+  .btn-secondary {
+    padding: 14px 28px; border-radius: 12px;
+    background: white; color: #374151;
+    font-weight: 600; font-size: 15px;
+    border: 1.5px solid #e2e8f0; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-secondary:hover { background: #f8fafc; border-color: #c7d2fe; }
+
+  /* STATS */
+  .hero-stats {
+    display: flex; gap: 48px; justify-content: center;
+    padding-top: 32px; border-top: 1px solid #e2e8f0;
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 800; color: #0f172a; }
+  .stat-label { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+  /* SECTION 2 — Club for you */
+  .section { padding: 80px 40px; max-width: 1100px; margin: 0 auto; }
+  .section-label { font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #6366f1; margin-bottom: 12px; }
+  .section-title { font-size: 40px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; line-height: 1.15; }
+  .section-desc { font-size: 16px; color: #64748b; max-width: 500px; margin-bottom: 40px; line-height: 1.6; }
+
+  .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .club-card {
+    background: white; border-radius: 16px; padding: 28px;
+    border: 1.5px solid #f1f5f9;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03);
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .club-card:hover { box-shadow: 0 4px 24px rgba(79,70,229,0.1); border-color: #c7d2fe; }
+  .card-num { font-size: 13px; font-weight: 700; color: #a5b4fc; margin-bottom: 12px; }
+  .card-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; color: #0f172a; }
+  .card-text { font-size: 14px; color: #64748b; line-height: 1.6; }
+
+  /* BG decoration */
+  .hero-glow {
+    position: absolute; width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+    top: -100px; left: 50%; transform: translateX(-50%); pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">Chayroom AI</div>
+  <div class="nav-links">
+    <div class="nav-link">Курсы</div>
+    <div class="nav-link">Гайды</div>
+    <div class="nav-link">Панель</div>
+    <div class="nav-link">Тарифы</div>
+    <div class="nav-link">FAQ</div>
+  </div>
+  <div class="nav-right">
+    <div class="lang-btn">RU / UZ</div>
+    <div class="nav-avatar">
+      <div class="avatar-circle">BZ</div>
+      <div class="avatar-name">Behruz Zaripov</div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+
+  <div class="hero-badge">
+    <div class="hero-badge-dot"></div>
+    AI Room Club
+  </div>
+
+  <h1 class="hero-title">Chayroom <span>AI</span></h1>
+  <p class="hero-desc">Внедряй ИИ в работу и жизнь, создавай свои проекты и осваивай новые навыки вместе с сильным окружением.</p>
+
+  <div class="hero-rotating">
+    <span>Сейчас изучают:</span>
+    <div class="rotating-pill">AI-агенты</div>
+    <div class="rotating-pill" style="opacity:0.5;font-size:13px">AI-аватары</div>
+    <div class="rotating-pill" style="opacity:0.3;font-size:12px">Вайбкодинг</div>
+  </div>
+
+  <div class="hero-buttons">
+    <button class="btn-primary">Получить доступ →</button>
+    <button class="btn-secondary">Что меня ждёт?</button>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">2 400+</div>
+      <div class="stat-label">участников</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">120+</div>
+      <div class="stat-label">курсов и гайдов</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4.9★</div>
+      <div class="stat-label">рейтинг</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: Club for you -->
+<div style="background:white; padding: 80px 0; border-top: 1px solid #f1f5f9;">
+<div class="section">
+  <div class="section-label">Для кого</div>
+  <div class="section-title">Наш клуб для тебя, если ты...</div>
+
+  <div class="cards-grid">
+    <div class="club-card">
+      <div class="card-num">01</div>
+      <div class="card-title">Хочешь зарабатывать с помощью ИИ</div>
+      <div class="card-text">Ищешь навык на годы вперёд, который будет приносить тебе стабильный доход. Работая над своими проектами или выполняя заказы для других.</div>
+    </div>
+    <div class="club-card">
+      <div class="card-num">02</div>
+      <div class="card-title">Владеешь бизнесом, но тонешь в операционке</div>
+      <div class="card-text">Хочешь сократить расходы с помощью ИИ, оптимизировать и усилить бизнес-процессы или создать свою команду AI-сотрудников.</div>
+    </div>
+    <div class="club-card">
+      <div class="card-num">03</div>
+      <div class="card-title">Чувствуешь, что теряешь актуальность на рынке</div>
+      <div class="card-text">Видишь, как другие эксперты уже внедряют ИИ и получают преимущество. Хочешь освоить новые инструменты, чтобы усилить себя.</div>
+    </div>
+    <div class="club-card">
+      <div class="card-num">04</div>
+      <div class="card-title">Хочешь идти в ногу со временем</div>
+      <div class="card-text">Чувствуешь, что пора внедрять ИИ в свою жизнь, но пока не понимаешь с чего тебе начать — и как это поможет улучшить себя.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+</body>
+</html>

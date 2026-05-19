@@ -1,24 +1,50 @@
 <script setup lang="ts">
+const authStore = useAuthStore()
 const categories = ['Hammasi', 'Vibe coding', 'AI agentlar', 'Neyrotarmoqlar', 'Kontent']
 const activeCategory = ref('Hammasi')
-const hasSubscription = ref(false)
+const hasSubscription = computed(() => authStore.hasSubscription)
 const isAccessModalOpen = ref(false)
+const categoryFilterRef = ref<HTMLElement | null>(null)
+const categoryRefs = ref<HTMLElement[]>([])
+const categoryIndicatorStyle = ref({ left: '6px', width: '0px', opacity: '0' })
 
-const tabRefs = ref<HTMLElement[]>([])
-const indicatorStyle = ref({ left: '6px', width: '0px' })
+function updateCategoryIndicator() {
+  const index = categories.indexOf(activeCategory.value)
+  const activeButton = categoryRefs.value[index]
+  const filter = categoryFilterRef.value
+  if (!activeButton || !filter) return
 
-function updateIndicator(index: number) {
-  const el = tabRefs.value[index]
-  if (!el) return
-  indicatorStyle.value = { left: el.offsetLeft + 'px', width: el.offsetWidth + 'px' }
+  const activeRect = activeButton.getBoundingClientRect()
+  const filterRect = filter.getBoundingClientRect()
+  categoryIndicatorStyle.value = {
+    left: (activeRect.left - filterRect.left) + 'px',
+    width: activeRect.width + 'px',
+    opacity: '1'
+  }
 }
 
-function selectCategory(cat: string, index: number) {
+function scheduleCategoryIndicatorUpdate() {
+  nextTick(() => {
+    updateCategoryIndicator()
+    requestAnimationFrame(updateCategoryIndicator)
+  })
+}
+
+function selectCategory(cat: string) {
   activeCategory.value = cat
-  updateIndicator(index)
+  scheduleCategoryIndicatorUpdate()
 }
 
-onMounted(() => nextTick(() => updateIndicator(0)))
+let categoryResizeHandler: () => void
+onMounted(() => {
+  categoryResizeHandler = updateCategoryIndicator
+  window.addEventListener('resize', categoryResizeHandler, { passive: true })
+  scheduleCategoryIndicatorUpdate()
+  document.fonts?.ready.then(updateCategoryIndicator)
+})
+onUnmounted(() => {
+  window.removeEventListener('resize', categoryResizeHandler)
+})
 
 const courses = [
   {
@@ -89,20 +115,23 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
       </div>
 
       <!-- Category filter -->
-      <div class="relative inline-flex items-center bg-[#f0f0f0] rounded-2xl p-1.5 mb-8">
-        <div
-          class="absolute top-1.5 bottom-1.5 bg-white rounded-xl shadow-sm pointer-events-none"
-          :style="{ left: indicatorStyle.left, width: indicatorStyle.width, transition: 'left 0.25s cubic-bezier(0.4,0,0.2,1), width 0.25s cubic-bezier(0.4,0,0.2,1)' }"
+      <div
+        ref="categoryFilterRef"
+        class="relative inline-flex items-center bg-[#f0f0f0] rounded-2xl p-1.5 mb-8"
+      >
+        <span
+          class="absolute top-1.5 bottom-1.5 rounded-xl bg-white shadow-sm transition-[left,width,opacity] duration-250 ease-out pointer-events-none"
+          :style="categoryIndicatorStyle"
         />
         <button
           v-for="(cat, i) in categories"
           :key="cat"
-          :ref="el => { if (el) tabRefs[i] = el as HTMLElement }"
+          :ref="el => { if (el) categoryRefs[i] = el as HTMLElement }"
           :class="[
             'relative z-10 px-5 py-2 rounded-xl text-[13px] font-semibold transition-colors duration-200',
             activeCategory === cat ? 'text-[#1a1a1a]' : 'text-cx-muted hover:text-cx-ink'
           ]"
-          @click="selectCategory(cat, i)"
+          @click="selectCategory(cat)"
         >
           {{ cat }}
         </button>

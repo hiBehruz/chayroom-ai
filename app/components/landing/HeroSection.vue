@@ -75,21 +75,21 @@ function resetHeroArtMove() {
 
 <template>
   <section class="hero-section pt-0 pb-6">
-    <div class="relative z-10 max-w-295 mx-auto px-10">
-      <div class="grid min-h-140 grid-cols-[46%_1fr] items-center gap-0">
+    <div class="relative z-10 max-w-295 mx-auto px-10 max-md:px-5">
+      <div class="grid min-h-140 grid-cols-[46%_1fr] items-center gap-0 max-md:flex max-md:flex-col max-md:min-h-0 max-md:gap-6 max-md:pt-6 max-md:pb-4">
         <!-- Left: text -->
         <div ref="heroLeft" class="relative z-20">
         <div
-          class="relative z-20 flex min-w-0 translate-x-22 flex-col items-start justify-center gap-5.5"
+          class="relative z-20 flex min-w-0 translate-x-22 max-md:translate-x-0 flex-col items-start justify-center gap-5.5"
         >
-          <h1 class="text-[72px] font-extrabold leading-[1.05] tracking-[-0.03em]">
+          <h1 class="text-[72px] max-md:text-[42px] font-extrabold leading-[1.05] tracking-[-0.03em]">
             <span class="whitespace-nowrap">
               <span class="hero-title-gradient">Chayroom</span>
               <span class="hero-ai-title brand-ai-gradient"> AI</span>
             </span>
           </h1>
 
-          <p class="hero-desc max-w-105">
+          <p class="hero-desc max-w-105 max-md:max-w-none max-md:text-[15px]">
             AIni ish va hayotingga joriy qil, o‘z loyihalaringni yarat va kuchli muhit bilan yangi ko‘nikmalarni o‘zlashtir.
           </p>
 
@@ -97,7 +97,7 @@ function resetHeroArtMove() {
             <Transition name="keyword" mode="out-in">
               <span
                 :key="currentKeyword"
-                class="text-[20px] font-bold leading-tight text-cx-blue inline-block"
+                class="text-[20px] max-md:text-[17px] font-bold leading-tight text-cx-blue inline-block"
               >
                 {{ keywords[currentKeyword] }}
               </span>
@@ -123,7 +123,7 @@ function resetHeroArtMove() {
           class="relative flex items-center justify-start w-full overflow-visible"
         >
           <div
-            class="hero-art-stage relative w-[112%] translate-x-4"
+            class="hero-art-stage relative w-[112%] translate-x-4 max-md:w-4/5 max-md:translate-x-0 max-md:mx-auto"
             :style="heroArtStyle"
             @mousemove="handleHeroArtMove"
             @mouseleave="resetHeroArtMove"

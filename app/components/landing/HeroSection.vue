@@ -106,7 +106,7 @@ function resetHeroArtMove() {
           </div>
 
           <div
-            class="flex gap-3 mt-1 max-md:flex-col max-md:w-full"
+            class="flex gap-3 mt-1 max-md:flex-col"
           >
             <button class="btn-primary btn-primary-dark max-md:text-[13px]! max-md:py-2.5! max-md:px-4!" @click="scrollToPricing">
               Kirish huquqini olish →

@@ -61,7 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (isRestored.value) return
     isRestored.value = true
 
-    if (subCookie.value) {
+    if (subCookie.value && userCookie.value) {
       hasSubscription.value = true
     }
 

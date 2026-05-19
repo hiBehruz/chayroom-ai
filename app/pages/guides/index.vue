@@ -61,7 +61,7 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
 
 <template>
   <div class="bg-white">
-    <div class="max-w-295 mx-auto px-10 py-8">
+    <div class="max-w-295 mx-auto px-10 py-8 max-md:px-4">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-sm text-cx-muted mb-6">
         <NuxtLink
@@ -73,7 +73,7 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
       </div>
 
       <!-- Header -->
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center justify-between mb-6 max-md:flex-col max-md:items-start max-md:gap-3">
         <div>
           <h1 class="text-[32px] font-extrabold tracking-tight text-[#1a1a1a]">
             Qo'llanmalar
@@ -93,26 +93,28 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
       </div>
 
       <!-- Category filter -->
-      <div
-        ref="categoryFilterRef"
-        class="relative inline-flex items-center bg-[#f0f0f0] rounded-2xl p-1.5 mb-8"
-      >
-        <span
-          class="absolute top-1.5 bottom-1.5 rounded-xl bg-white shadow-sm transition-[left,width,opacity] duration-250 ease-out pointer-events-none"
-          :style="categoryIndicatorStyle"
-        />
-        <button
-          v-for="(cat, i) in categories"
-          :key="cat"
-          :ref="el => { if (el) categoryRefs[i] = el as HTMLElement }"
-          :class="[
-            'relative z-10 px-5 py-2 rounded-xl text-[13px] font-semibold transition-colors duration-200',
-            activeCategory === cat ? 'text-[#1a1a1a]' : 'text-cx-muted hover:text-cx-ink'
-          ]"
-          @click="selectCategory(cat)"
+      <div class="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-8 scrollbar-none">
+        <div
+          ref="categoryFilterRef"
+          class="relative inline-flex items-center bg-[#f0f0f0] rounded-2xl p-1.5 whitespace-nowrap"
         >
-          {{ cat }}
-        </button>
+          <span
+            class="absolute top-1.5 bottom-1.5 rounded-xl bg-white shadow-sm transition-[left,width,opacity] duration-250 ease-out pointer-events-none"
+            :style="categoryIndicatorStyle"
+          />
+          <button
+            v-for="(cat, i) in categories"
+            :key="cat"
+            :ref="el => { if (el) categoryRefs[i] = el as HTMLElement }"
+            :class="[
+              'relative z-10 px-5 py-2 rounded-xl text-[13px] font-semibold transition-colors duration-200',
+              activeCategory === cat ? 'text-[#1a1a1a]' : 'text-cx-muted hover:text-cx-ink'
+            ]"
+            @click="selectCategory(cat)"
+          >
+            {{ cat }}
+          </button>
+        </div>
       </div>
 
       <!-- Guide cards -->
@@ -122,7 +124,7 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
         enter-active-class="transition-[opacity,transform] duration-100 ease-out"
         enter-from-class="opacity-0 translate-y-1"
         leave-active-class="hidden"
-        class="grid grid-cols-3 gap-5"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
       >
         <article
           v-for="guide in filtered"
@@ -260,3 +262,13 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
     </div>
   </div>
 </template>
+
+<style>
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+</style>

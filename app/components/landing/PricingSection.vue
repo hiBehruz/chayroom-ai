@@ -63,18 +63,18 @@ function requestAccess(_planId: string) {
     ref="sectionRef"
     class="py-16 scroll-mt-20"
   >
-    <div class="max-w-295 mx-auto px-10">
+    <div class="max-w-295 mx-auto px-10 max-md:px-5">
       <UiSectionHeader
         eyebrow="Tariflar"
         title="O'zingga mos formatni tanla"
         subtitle="Obuna qulay, tushunarli va foydali. Yashirin shartlarsiz."
         class="[&>div:first-child]:text-[14px] mb-12"
       />
-      <div class="grid grid-cols-3 gap-4 items-end">
+      <div class="grid grid-cols-3 max-md:grid-cols-1 gap-4 max-md:gap-6 items-end">
         <div
           v-for="plan in plans"
           :key="plan.period"
-          class="relative flex justify-center"
+          class="relative flex justify-center max-md:justify-stretch"
           :class="plan.badge ? 'pt-4' : ''"
         >
           <div
@@ -86,7 +86,7 @@ function requestAccess(_planId: string) {
           <div
             v-sparkle
             :class="[
-              'price-card bg-[#f7f7f5] rounded-3xl flex flex-col',
+              'price-card bg-[#f7f7f5] rounded-3xl flex flex-col max-md:w-full max-md:h-auto',
               plan.featured ? 'w-[331.84px] h-[530.4px] p-7 shadow-lift' : 'w-[325.33px] h-130 p-6'
             ]"
           >

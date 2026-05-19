@@ -33,18 +33,18 @@ useSeoMeta({ title: computed(() => `${course.value?.title ?? 'Kurs'} — Chayroo
 
 <template>
   <div class="min-h-screen bg-white">
-    <div class="max-w-295 mx-auto px-10 py-8">
+    <div class="max-w-295 mx-auto px-10 py-8 max-md:px-4">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-sm text-cx-muted mb-6">
         <NuxtLink to="/" class="hover:text-cx-ink transition-colors">Bosh sahifa</NuxtLink>
         <span>/</span>
         <NuxtLink to="/courses" class="hover:text-cx-ink transition-colors">Kurslar</NuxtLink>
         <span>/</span>
-        <span class="text-cx-ink font-medium truncate max-w-80">{{ course.title }}</span>
+        <span class="text-cx-ink font-medium truncate max-w-80 max-md:max-w-[45vw]">{{ course.title }}</span>
       </div>
 
       <!-- Hero card (full width) -->
-      <div class="rounded-2xl border border-cx-line bg-[#f7f7f5] overflow-hidden mb-8 flex">
+      <div class="rounded-2xl border border-cx-line bg-[#f7f7f5] overflow-hidden mb-8 flex max-md:flex-col">
         <!-- Left: info -->
         <div class="flex-1 p-7 flex flex-col justify-center">
           <h1 class="text-[30px] font-extrabold tracking-tight text-[#1a1a1a] leading-tight mb-2">
@@ -79,7 +79,7 @@ useSeoMeta({ title: computed(() => `${course.value?.title ?? 'Kurs'} — Chayroo
         </div>
 
         <!-- Right: preview -->
-        <div class="w-72 shrink-0 relative overflow-hidden" :style="{ backgroundColor: course.bg }">
+        <div class="w-72 shrink-0 relative overflow-hidden max-md:w-full max-md:h-48" :style="{ backgroundColor: course.bg }">
           <div class="absolute top-3 left-4">
             <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-black/20 text-white">{{ course.badge }}</span>
           </div>
@@ -122,7 +122,7 @@ useSeoMeta({ title: computed(() => `${course.value?.title ?? 'Kurs'} — Chayroo
 
       <h2 class="text-[18px] font-extrabold text-[#1a1a1a] mb-4">Kurs tarkibi</h2>
 
-      <div class="grid grid-cols-[1fr_340px] gap-8">
+      <div class="grid grid-cols-[1fr_340px] max-md:grid-cols-1 gap-8">
         <!-- LEFT COLUMN -->
         <div>
           <div class="flex flex-col gap-3">
@@ -186,7 +186,7 @@ useSeoMeta({ title: computed(() => `${course.value?.title ?? 'Kurs'} — Chayroo
         </div>
 
         <!-- RIGHT SIDEBAR -->
-        <div class="sticky top-24 flex flex-col gap-4">
+        <div class="sticky top-24 max-md:static flex flex-col gap-4">
           <!-- Stats card -->
           <div class="rounded-2xl border border-cx-line bg-[#f7f7f5] p-5">
             <div class="grid grid-cols-3 gap-3 text-center divide-x divide-cx-line">

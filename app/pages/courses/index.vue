@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const categories = ['Hammasi', 'Vibe coding', 'AI agentlar', 'Neyrotarmoqlar', 'Kontent']
 const activeCategory = ref('Hammasi')
+const hasSubscription = ref(false)
+const isAccessModalOpen = ref(false)
 
 const tabRefs = ref<HTMLElement[]>([])
 const indicatorStyle = ref({ left: '6px', width: '0px' })
@@ -34,7 +36,8 @@ const courses = [
     dark: false,
     badge: 'kurs',
     accentTitle: ['AI agent', 'Hermes'],
-    accentColor: '#0075DE'
+    accentColor: '#0075DE',
+    progress: 0
   },
   {
     slug: 'vibe-coding',
@@ -51,7 +54,8 @@ const courses = [
     dark: true,
     badge: 'kurs',
     accentTitle: [],
-    accentColor: '#f97316'
+    accentColor: '#f97316',
+    progress: 0
   }
 ]
 
@@ -66,7 +70,7 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 
 <template>
   <div class="min-h-screen bg-white">
-    <div class="max-w-295 mx-auto px-10 py-8">
+    <div class="max-w-295 mx-auto px-5 py-8">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-sm text-cx-muted mb-6">
         <NuxtLink to="/" class="hover:text-cx-ink transition-colors">Bosh sahifa</NuxtLink>
@@ -201,4 +205,3 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
     </div>
   </div>
 </template>
-

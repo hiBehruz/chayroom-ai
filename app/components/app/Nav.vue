@@ -239,10 +239,18 @@ function logout() {
           :aria-label="isMobileMenuOpen ? 'Menyuni yopish' : 'Menyuni ochish'"
           @click="isMobileMenuOpen = !isMobileMenuOpen"
         >
-          <UIcon
-            :name="isMobileMenuOpen ? 'i-lucide-x' : 'i-lucide-menu'"
-            class="size-5 text-[#1a1a1a]"
-          />
+          <svg
+            :class="['hamburger-icon', isMobileMenuOpen && 'is-open']"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+          >
+            <line class="hb-line hb-top" x1="3" y1="6" x2="17" y2="6" stroke="#1a1a1a" stroke-width="1.75" stroke-linecap="round" />
+            <line class="hb-line hb-mid" x1="3" y1="10" x2="17" y2="10" stroke="#1a1a1a" stroke-width="1.75" stroke-linecap="round" />
+            <line class="hb-line hb-bot" x1="3" y1="14" x2="17" y2="14" stroke="#1a1a1a" stroke-width="1.75" stroke-linecap="round" />
+          </svg>
         </button>
       </div>
     </nav>
@@ -461,6 +469,25 @@ function logout() {
     opacity: 0;
     transform: translate(2px, -28px) scale(1.5) rotate(8deg);
   }
+}
+
+.hb-line {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+.hamburger-icon.is-open .hb-top {
+  transform: translateY(4px) rotate(45deg);
+}
+
+.hamburger-icon.is-open .hb-mid {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger-icon.is-open .hb-bot {
+  transform: translateY(-4px) rotate(-45deg);
 }
 
 .mobile-drawer-enter-active {

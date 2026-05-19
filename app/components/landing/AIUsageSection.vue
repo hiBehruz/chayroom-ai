@@ -34,7 +34,7 @@ onUnmounted(() => document.removeEventListener('click', handleDocumentClick))
 
 <template>
   <section class="py-16 bg-cx-surface">
-    <div class="max-w-[1180px] mx-auto px-10">
+    <div class="max-w-[1180px] mx-auto px-10 max-md:px-5">
       <UiSectionDivider class="mb-10" />
       <UiSectionHeader
         title="AIni qayerda va qanday qo‘llash mumkin"

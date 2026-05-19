@@ -23,7 +23,7 @@ function toggle(i: number) {
     id="faq"
     class="py-16 scroll-mt-20"
   >
-    <div class="max-w-295 mx-auto px-10">
+    <div class="max-w-295 mx-auto px-10 max-md:px-5">
       <UiSectionHeader
         eyebrow=""
         title="Ko‘p so‘raladigan savollar"
@@ -37,7 +37,7 @@ function toggle(i: number) {
           class="border-b border-cx-line overflow-hidden"
         >
           <button
-            class="w-full px-6 py-5 font-semibold text-[15px] flex justify-between items-center text-left cursor-pointer"
+            class="w-full px-6 py-5 font-semibold text-[15px] flex justify-between items-center text-left cursor-pointer max-md:px-4 max-md:py-4 max-md:text-[14px]"
             @click="toggle(i)"
           >
             {{ item.q }}

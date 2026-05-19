@@ -43,7 +43,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
 
 <template>
   <div class="min-h-screen bg-white">
-    <div class="max-w-295 mx-auto px-10 py-8">
+    <div class="max-w-295 mx-auto px-10 py-8 max-md:px-4">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-sm text-cx-muted mb-6">
         <NuxtLink to="/" class="hover:text-cx-ink transition-colors">Bosh sahifa</NuxtLink>
@@ -54,7 +54,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
       <!-- Paywall CTA — tepada, obuna yo'q bo'lganda -->
       <div
         v-if="!user"
-        class="mb-8 rounded-2xl bg-[#f7f7f5] px-10 py-8 flex items-center justify-center gap-8 paywall-enter sticky top-20 z-10 mx-32"
+        class="mb-8 rounded-2xl bg-[#f7f7f5] px-10 py-8 flex items-center justify-center gap-8 paywall-enter sticky top-20 z-10 mx-32 max-md:mx-0 max-md:flex-col max-md:px-6 max-md:py-6 max-md:text-center max-md:gap-4"
       >
         <ClientOnly>
           <div class="shrink-0 w-36 h-36">
@@ -75,7 +75,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
           </p>
           <NuxtLink
             to="/login"
-            class="btn-primary btn-primary-dark text-[15px]! py-3! px-6! flex items-center gap-2"
+            class="btn-primary btn-primary-dark text-[15px]! py-3! px-6! flex items-center gap-2 max-md:self-center"
           >
             <UIcon name="i-lucide-sparkles" class="size-4" />
             To'liq kirish huquqini olish →
@@ -100,7 +100,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
       </div>
 
       <!-- Stats -->
-      <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="grid grid-cols-4 max-md:grid-cols-1 gap-4 mb-6">
         <div
           v-for="stat in stats"
           :key="stat.label"
@@ -145,7 +145,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
       </div>
 
       <!-- Main grid -->
-      <div class="grid grid-cols-[1fr_380px] gap-6 mb-8">
+      <div class="grid grid-cols-[1fr_380px] max-md:grid-cols-1 gap-6 mb-8">
         <!-- Courses -->
         <div>
           <div class="flex items-center gap-2 mb-5">

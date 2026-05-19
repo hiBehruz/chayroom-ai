@@ -63,3 +63,47 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+## 5. Tailwind-Only Styling
+
+**No custom CSS in components. Custom utilities belong in the global file.**
+
+- Use only Tailwind CSS v4.x utility classes in component templates.
+- If a utility class doesn't exist in Tailwind (e.g., `scrollbar-none`), add it to `app/assets/css/main.css` under `@layer utilities`.
+- Never add `<style>` blocks to page or component files for utilities — they won't be reusable and will cause inconsistency.
+
+## 6. UI Language
+
+**All new UI text in Uzbek.**
+
+- New strings, labels, buttons, and messages must be written in Uzbek.
+- Pre-existing Russian strings are a known issue — flag them if noticed, but don't change them unless explicitly asked.
+
+## 7. CSS Positioning Contexts
+
+**`sticky` and `fixed` already create positioning contexts.**
+
+- Elements with `position: sticky` or `position: fixed` establish a positioning context for `absolute` children — do not add `relative` to the same element.
+- Adding `relative` alongside `sticky`/`fixed` overrides the positioning behavior and breaks the stacking context.
+
+## 8. Responsive Changes Are Additive
+
+**Never remove desktop classes when adding mobile support.**
+
+- Mobile responsiveness is achieved by adding `max-md:` overrides on top of existing desktop classes.
+- Do not rewrite or replace existing class strings — append mobile overrides.
+- The test: every desktop class present before your edit should still be present after.
+
+---
+
+## Architecture
+See [docs/architecture.md](docs/architecture.md) for full system design.
+
+## Style Guide
+See [docs/style-guide.md](docs/style-guide.md) for coding conventions and component patterns.
+
+## Business Context
+See [docs/business-context.md](docs/business-context.md) for product requirements and user flows.
+
+## API Reference
+See [docs/api-reference.md](docs/api-reference.md) for endpoint documentation.

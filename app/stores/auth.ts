@@ -15,6 +15,11 @@ export const useAuthStore = defineStore('auth', () => {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: 'lax'
   })
+  const hasSubscription = ref(false)
+  const subCookie = useCookie<boolean>('cx-sub', {
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: 'lax'
+  })
 
   const displayName = computed(() => {
     if (!user.value) return ''
@@ -37,9 +42,16 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  function activateSubscription() {
+    hasSubscription.value = true
+    subCookie.value = true
+  }
+
   function logout() {
     user.value = null
     userCookie.value = null
+    hasSubscription.value = false
+    subCookie.value = false
     if (import.meta.client) {
       localStorage.removeItem('cx-user')
     }
@@ -48,6 +60,11 @@ export const useAuthStore = defineStore('auth', () => {
   function restoreFromStorage() {
     if (isRestored.value) return
     isRestored.value = true
+
+    if (subCookie.value) {
+      hasSubscription.value = true
+    }
+
     if (userCookie.value) {
       user.value = {
         ...userCookie.value,
@@ -83,5 +100,5 @@ export const useAuthStore = defineStore('auth', () => {
     })
   }
 
-  return { user, displayName, initials, login, logout, restoreFromStorage, devLogin }
+  return { user, hasSubscription, displayName, initials, login, activateSubscription, logout, restoreFromStorage, devLogin }
 })

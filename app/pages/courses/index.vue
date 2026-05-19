@@ -70,7 +70,7 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 
 <template>
   <div class="min-h-screen bg-white">
-    <div class="max-w-295 mx-auto px-5 py-8">
+    <div class="max-w-295 mx-auto px-10 py-8">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-sm text-cx-muted mb-6">
         <NuxtLink to="/" class="hover:text-cx-ink transition-colors">Bosh sahifa</NuxtLink>
@@ -210,7 +210,7 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
             <div v-else class="mt-auto pt-3 border-t border-cx-line">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-[12px] font-semibold text-cx-muted">Ваш прогресс</span>
-                <span class="text-[12px] font-bold text-[#1a1a1a]">{{ course.progress }}%</span>
+                <span class="text-[12px] font-bold text-cx-ink">{{ course.progress }}%</span>
               </div>
               <div class="h-1.5 bg-[#e5e5e5] rounded-full overflow-hidden mb-2">
                 <div
@@ -235,4 +235,6 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
       </TransitionGroup>
     </div>
   </div>
+
+  <AppAccessModal v-model="isAccessModalOpen" />
 </template>

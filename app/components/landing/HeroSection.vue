@@ -80,7 +80,7 @@ function resetHeroArtMove() {
         <!-- Left: text -->
         <div ref="heroLeft" class="relative z-20 max-md:order-2">
         <div
-          class="relative z-20 flex min-w-0 translate-x-22 max-md:translate-x-0 flex-col items-start justify-center gap-5.5"
+          class="relative z-20 flex min-w-0 translate-x-22 max-md:translate-x-0 flex-col items-start max-md:items-center justify-center gap-5.5"
         >
           <h1 class="text-[72px] max-md:text-[42px] font-extrabold leading-[1.05] tracking-[-0.03em]">
             <span class="whitespace-nowrap">
@@ -89,7 +89,7 @@ function resetHeroArtMove() {
             </span>
           </h1>
 
-          <p class="hero-desc max-w-105 max-md:max-w-none max-md:text-[15px]">
+          <p class="hero-desc max-w-105 max-md:max-w-none max-md:text-[15px] max-md:text-center">
             AIni ish va hayotingga joriy qil, o‘z loyihalaringni yarat va kuchli muhit bilan yangi ko‘nikmalarni o‘zlashtir.
           </p>
 
@@ -107,10 +107,10 @@ function resetHeroArtMove() {
           <div
             class="flex gap-3 mt-1 max-md:flex-col max-md:w-full"
           >
-            <button class="btn-primary btn-primary-dark" @click="scrollToPricing">
+            <button class="btn-primary btn-primary-dark max-md:text-[13px]! max-md:py-2.5! max-md:px-4!" @click="scrollToPricing">
               Kirish huquqini olish →
             </button>
-            <button class="btn-secondary" @click="scrollToFeatures">
+            <button class="btn-secondary max-md:text-[13px]! max-md:py-2.5! max-md:px-4!" @click="scrollToFeatures">
               Meni nima kutadi
             </button>
           </div>

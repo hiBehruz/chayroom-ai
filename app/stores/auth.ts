@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
     sameSite: 'lax'
   })
   const hasSubscription = ref(false)
-  const subCookie = useCookie<boolean>('cx-sub', {
+  const subCookie = useCookie<boolean | null>('cx-sub', {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: 'lax'
   })
@@ -51,7 +51,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     userCookie.value = null
     hasSubscription.value = false
-    subCookie.value = false
+    subCookie.value = null
     if (import.meta.client) {
       localStorage.removeItem('cx-user')
     }
@@ -61,7 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (isRestored.value) return
     isRestored.value = true
 
-    if (subCookie.value && userCookie.value) {
+    if (subCookie.value) {
       hasSubscription.value = true
     }
 

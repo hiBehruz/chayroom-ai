@@ -1,11 +1,14 @@
 <!-- app/pages/dashboard.vue -->
 <script setup lang="ts">
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
+
 const authStore = useAuthStore()
 
 authStore.restoreFromStorage()
 
 const user = computed(() => authStore.user)
 const hasSubscription = computed(() => authStore.hasSubscription)
+const hasCourseAccess = computed(() => Boolean(user.value))
 const isAccessModalOpen = ref(false)
 
 const stats = [
@@ -50,31 +53,41 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
 
       <!-- Paywall CTA — tepada, obuna yo'q bo'lganda -->
       <div
-        v-if="!user || !hasSubscription"
-        class="mb-8 rounded-2xl border border-cx-blue/20 bg-linear-to-r from-[#f0f6ff] to-[#f5f0ff] p-6 flex items-center gap-6"
+        v-if="!user"
+        class="mb-8 rounded-2xl bg-[#f7f7f5] px-10 py-8 flex items-center justify-center gap-8 paywall-enter sticky top-20 z-10 mx-32"
       >
-        <div class="w-11 h-11 rounded-xl bg-linear-to-br from-cx-blue to-[#1A4FE0] flex items-center justify-center shrink-0">
-          <UIcon name="i-lucide-lock" class="size-5 text-white" />
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="text-[15px] font-bold text-[#1a1a1a] mb-0.5">
+        <ClientOnly>
+          <div class="shrink-0 w-36 h-36">
+            <DotLottieVue
+              src="/animations/Door.lottie"
+              :autoplay="true"
+              :loop="true"
+              style="width:100%;height:100%;display:block"
+            />
+          </div>
+        </ClientOnly>
+        <div class="flex flex-col items-start text-left">
+          <h2 class="text-[20px] font-extrabold text-[#1a1a1a] mb-2">
             O'quv dashboardingni och
-          </div>
-          <div class="text-[13px] text-cx-muted">
-            Barcha kurslar, progress kuzatuvi va sertifikatlarga kirish huquqini ol.
-          </div>
+          </h2>
+          <p class="text-[14px] text-cx-muted mb-6 max-w-sm leading-snug">
+            Barcha kurslarga kirish, progress kuzatuvi va sertifikatlarga ega bo'ling.
+          </p>
+          <NuxtLink
+            to="/login"
+            class="btn-primary btn-primary-dark text-[15px]! py-3! px-6! flex items-center gap-2"
+          >
+            <UIcon name="i-lucide-sparkles" class="size-4" />
+            To'liq kirish huquqini olish →
+          </NuxtLink>
+          <p class="mt-3 text-[12px] text-cx-muted">
+            Telegram orqali to'lov. Barcha kurs va materiallarga kirish.
+          </p>
         </div>
-        <button
-          class="btn-primary shrink-0 text-[13px]! px-5! py-2.5!"
-          @click="isAccessModalOpen = true"
-        >
-          <UIcon name="i-lucide-sparkles" class="size-3.5" />
-          To'liq kirish huquqini olish →
-        </button>
       </div>
 
       <!-- Dashboard content — deactive when no subscription -->
-      <div :class="(!user || !hasSubscription) ? 'opacity-40 grayscale pointer-events-none select-none' : ''">
+      <div :class="!hasCourseAccess ? 'opacity-40 grayscale pointer-events-none select-none' : ''">
 
       <!-- Welcome -->
       <div class="mb-7">
@@ -91,7 +104,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
         <div
           v-for="stat in stats"
           :key="stat.label"
-          class="bg-[#f8f8fa] border border-cx-line rounded-2xl p-5 flex flex-col gap-2"
+          class="bg-[#f7f7f5] border border-cx-line rounded-2xl p-5 flex flex-col gap-2"
         >
           <UIcon :name="stat.icon" :class="['size-5', stat.iconColor]" />
           <div class="text-[22px] font-extrabold tracking-tight text-[#1a1a1a]">
@@ -102,7 +115,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
       </div>
 
       <!-- Telegram -->
-      <div class="bg-[#f8f8fa] border border-cx-line rounded-2xl px-6 py-5 mb-8">
+      <div class="bg-[#f7f7f5] border border-cx-line rounded-2xl px-6 py-5 mb-8">
         <div class="flex items-start gap-4">
           <UIcon name="i-lucide-users-round" class="size-5 text-cx-blue mt-0.5 shrink-0" />
           <div class="flex-1 min-w-0">
@@ -113,8 +126,8 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
               Ishtirokchilar bilan muloqot, efirlar va yangiliklar.
             </div>
             <!-- Obuna bor — kirish tugmasi -->
-            <template v-if="hasSubscription">
-              <button class="btn-primary text-[13px]! px-5! py-2!">
+            <template v-if="hasCourseAccess">
+              <button class="btn-primary btn-primary-dark text-[13px]! px-5! py-2!">
                 Telegramga kirish
                 <UIcon name="i-lucide-external-link" class="size-3.5" />
               </button>
@@ -144,37 +157,41 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
               v-for="course in courses"
               :key="course.title"
               :to="`/courses/${course.slug}`"
-              class="group bg-[#f8f8fa] border border-cx-line rounded-2xl p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_24px_rgba(0,0,0,0.07)] block"
+              class="group bg-[#f7f7f5] border border-cx-line rounded-2xl p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_24px_rgba(0,0,0,0.07)] block"
             >
               <div class="flex items-start justify-between gap-3 mb-2">
                 <span class="text-[14px] font-semibold text-[#1a1a1a] leading-[1.4]">
                   {{ course.title }}
                 </span>
-                <!-- Bepul kurs — har doim ochiq -->
+                <!-- Obuna yo'q — qulflangan -->
                 <span
-                  v-if="course.free"
-                  class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-600 text-[11px] font-semibold border border-green-100"
-                >
-                  <UIcon name="i-lucide-lock-keyhole-open" class="size-3" />
-                  Bepul
-                </span>
-
-                <!-- Pullik + obuna bor -->
-                <span
-                  v-else-if="hasSubscription"
-                  class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-600 text-[11px] font-semibold border border-green-100"
-                >
-                  <UIcon name="i-lucide-lock-keyhole-open" class="size-3" />
-                  Mavjud
-                </span>
-
-                <!-- Pullik + obuna yo'q -->
-                <span
-                  v-else
+                  v-if="!hasCourseAccess"
                   class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-500 text-[11px] font-semibold border border-red-100"
                 >
                   <UIcon name="i-lucide-lock-keyhole" class="size-3" />
-                  Obuna orqali
+                  Заблокировано
+                </span>
+
+                <!-- Obuna active — ochiq -->
+                <span
+                  v-else
+                  class="shrink-0 flex items-center gap-1 text-xs font-medium text-green-600"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    class="size-4"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+                    />
+                  </svg>
+                  Доступно
                 </span>
               </div>
               <p class="text-[12px] text-cx-muted leading-[1.6] mb-3">{{ course.desc }}</p>
@@ -182,7 +199,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
                 <span
                   v-for="tag in course.tags"
                   :key="tag"
-                  class="px-2.5 py-0.5 rounded-full bg-white border border-cx-line text-[11px] text-cx-muted font-medium"
+                  class="px-3 py-1 rounded-full bg-[#EAEAE8] border border-[#D4D4D1] text-[12px] text-[#6B6B6B] font-medium"
                 >{{ tag }}</span>
               </div>
             </NuxtLink>
@@ -197,7 +214,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
               <UIcon name="i-lucide-bar-chart-2" class="size-4 text-cx-blue" />
               <h2 class="text-[15px] font-bold text-[#1a1a1a]">O'qish progressi</h2>
             </div>
-            <div class="bg-[#f8f8fa] border border-cx-line rounded-2xl p-5 flex flex-col gap-4">
+            <div class="bg-[#f7f7f5] border border-cx-line rounded-2xl p-5 flex flex-col gap-4">
               <div
                 v-for="course in courses"
                 :key="course.title"
@@ -218,7 +235,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
           </div>
 
           <!-- Instructor -->
-          <div class="bg-[#f8f8fa] border border-cx-line rounded-2xl p-5">
+          <div class="bg-[#f7f7f5] border border-cx-line rounded-2xl p-5">
             <div class="text-[10px] font-bold text-cx-muted uppercase tracking-widest mb-3">
               Instruktor
             </div>
@@ -241,3 +258,19 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
     <AppAccessModal v-model="isAccessModalOpen" />
   </div>
 </template>
+
+<style scoped>
+.paywall-enter {
+  animation:
+    paywall-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both,
+    paywall-float 5s ease-in-out 0.55s infinite;
+}
+@keyframes paywall-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes paywall-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+</style>

@@ -1,13 +1,17 @@
 import gsap from 'gsap'
 
-const STARS = ['✦', '✧', '★', '✶', '✸']
-const COLORS = ['#0075DE', '#3399FF', '#66B2FF', '#0055AA']
+const STARS = ['✦', '✧', '★', '✶', '✸'] as const
+const COLORS = ['#0075DE', '#3399FF', '#66B2FF', '#0055AA'] as const
+
+type SparkleElement = HTMLElement & {
+  _sparkle?: (event: MouseEvent) => void
+}
 
 function spawnStar(el: HTMLElement, x: number, y: number) {
   const span = document.createElement('span')
   const size = 6 + Math.random() * 7
-  const color = COLORS[Math.floor(Math.random() * COLORS.length)]
-  const char = STARS[Math.floor(Math.random() * STARS.length)]
+  const color = COLORS[Math.floor(Math.random() * COLORS.length)] ?? COLORS[0]
+  const char = STARS[Math.floor(Math.random() * STARS.length)] ?? STARS[0]
 
   span.textContent = char
   span.style.cssText = `
@@ -50,10 +54,14 @@ export default defineNuxtPlugin((nuxt) => {
       }
 
       el.addEventListener('mousemove', handler)
-      ;(el as any)._sparkle = handler
+      const sparkleEl = el as SparkleElement
+      sparkleEl._sparkle = handler
     },
     unmounted(el: HTMLElement) {
-      el.removeEventListener('mousemove', (el as any)._sparkle)
-    },
+      const handler = (el as SparkleElement)._sparkle
+      if (handler) {
+        el.removeEventListener('mousemove', handler)
+      }
+    }
   })
 })

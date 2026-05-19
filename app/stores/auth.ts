@@ -8,6 +8,8 @@ export interface TelegramUser {
   hash: string
 }
 
+export type AgentVariant = 'auto' | 'male' | 'female'
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<TelegramUser | null>(null)
   const isRestored = ref(false)
@@ -20,6 +22,22 @@ export const useAuthStore = defineStore('auth', () => {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: 'lax'
   })
+  const agentVariantCookie = useCookie<AgentVariant | null>('cx-agent-variant', {
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: 'lax'
+  })
+  const agentVariant = ref<AgentVariant>(agentVariantCookie.value ?? 'auto')
+  const femaleNameHints = [
+    'aziza', 'madina', 'malika', 'nigora', 'nargiza', 'dilnoza', 'shahnoza',
+    'gulnora', 'guli', 'sevara', 'mohira', 'zebo', 'shahina', 'lola',
+    'munisa', 'farida', 'dilfuza', 'mavluda', 'umida', 'nilufar'
+  ]
+
+  const OWNER_USERNAME = 'behruzzaripov'
+
+  const isOwner = computed(() =>
+    !!user.value && user.value.username === OWNER_USERNAME
+  )
 
   const displayName = computed(() => {
     if (!user.value) return ''
@@ -29,6 +47,13 @@ export const useAuthStore = defineStore('auth', () => {
   const initials = computed(() => {
     if (!user.value) return ''
     return `${user.value.first_name[0] ?? ''}${user.value.last_name?.[0] ?? ''}`.toUpperCase()
+  })
+
+  const resolvedAgentVariant = computed<'male' | 'female'>(() => {
+    if (agentVariant.value !== 'auto') return agentVariant.value
+
+    const name = user.value?.first_name?.toLowerCase() ?? ''
+    return femaleNameHints.some(hint => name.includes(hint)) ? 'female' : 'male'
   })
 
   function login(telegramUser: TelegramUser) {
@@ -45,6 +70,11 @@ export const useAuthStore = defineStore('auth', () => {
   function activateSubscription() {
     hasSubscription.value = true
     subCookie.value = true
+  }
+
+  function setAgentVariant(variant: AgentVariant) {
+    agentVariant.value = variant
+    agentVariantCookie.value = variant
   }
 
   function logout() {
@@ -94,11 +124,25 @@ export const useAuthStore = defineStore('auth', () => {
       id: 123456789,
       first_name: 'Behruz',
       last_name: 'Zaripov',
-      username: 'behruzz',
+      username: 'behruzzaripov',
       photo_url: '',
       hash: 'dev'
     })
   }
 
-  return { user, hasSubscription, displayName, initials, login, activateSubscription, logout, restoreFromStorage, devLogin }
+  return {
+    user,
+    hasSubscription,
+    isOwner,
+    agentVariant,
+    resolvedAgentVariant,
+    displayName,
+    initials,
+    login,
+    activateSubscription,
+    setAgentVariant,
+    logout,
+    restoreFromStorage,
+    devLogin
+  }
 })

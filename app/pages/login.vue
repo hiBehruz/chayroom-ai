@@ -20,19 +20,21 @@ const isDev = import.meta.dev
 const telegramBotUsername = computed(() => config.public.telegramBotUsername)
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app'>('loading')
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
+const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
 
 if (authStore.user) {
-  await navigateTo('/dashboard')
+  await navigateTo(redirectPath.value || '/dashboard')
 }
 
-function goToDashboard() {
+function goAfterLogin() {
+  if (redirectPath.value) return navigateTo(redirectPath.value)
   const query = selectedPlan.value ? { plan: selectedPlan.value } : undefined
   return navigateTo({ path: '/dashboard', query })
 }
 
 function loginWithTelegram(user: TelegramUser) {
   authStore.login(user)
-  goToDashboard()
+  goAfterLogin()
 }
 
 function mountTelegramWidget() {
@@ -63,7 +65,7 @@ onMounted(() => {
   authStore.restoreFromStorage()
 
   if (authStore.user) {
-    goToDashboard()
+    goAfterLogin()
     return
   }
 
@@ -83,85 +85,89 @@ onUnmounted(() => {
   delete window.onTelegramAuth
 })
 
-useSeoMeta({ title: 'Войти — Chayroom AI' })
+useSeoMeta({ title: 'Kirish — Chayroom AI' })
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-[#F8F8FA] px-4 py-10">
-    <div class="w-full max-w-[420px] rounded-[28px] border border-cx-line bg-white px-7 py-8 shadow-card">
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center gap-2.5 mb-4">
-          <div class="w-10 h-10 bg-cx-ink rounded-[10px] flex items-center justify-center">
-            <svg
-              class="w-6 h-6 fill-white"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                cx="12"
-                cy="8"
-                r="4"
-              />
-              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-            </svg>
-          </div>
-          <span class="font-extrabold text-xl tracking-tight">Chayroom <span class="text-cx-blue">AI</span></span>
+  <div class="min-h-screen bg-white px-4 py-10">
+    <div class="mx-auto flex min-h-[calc(100vh-80px)] w-full max-w-[440px] flex-col items-center justify-center">
+      <NuxtLink
+        to="/"
+        class="mb-14 inline-flex items-center gap-3 text-[#1f1f22] transition-opacity duration-200 hover:opacity-75"
+      >
+        <div class="grid size-7 place-items-center border border-[#c9c9ce] bg-white text-[15px] font-extrabold leading-none text-[#1f1f22]">
+          [
         </div>
-        <h1 class="text-2xl font-extrabold tracking-tight mb-2">
+        <span class="text-[22px] font-extrabold tracking-tight">AI Room Club</span>
+      </NuxtLink>
+
+      <div class="w-full rounded-[26px] border border-[#dedee2] bg-white px-10 py-11 text-center">
+        <h1 class="mb-8 text-[25px] font-extrabold tracking-tight text-[#242428]">
           Войди через Telegram
         </h1>
-        <p class="text-sm text-cx-muted max-w-[300px] mx-auto leading-relaxed">
-          Мы получаем только имя, аватар и Telegram ID для входа на сайт.
-        </p>
-      </div>
 
-      <div class="flex flex-col items-center gap-5">
         <div
           id="telegram-widget-container"
           class="flex min-h-[48px] items-center justify-center"
         >
           <p
             v-if="widgetState === 'loading'"
-            class="text-xs text-cx-faint"
+            class="text-sm text-cx-faint"
           >
-            Telegram виджет загружается...
+            Telegram загружается...
           </p>
           <div
             v-else-if="widgetState === 'missing-bot'"
-            class="rounded-2xl bg-cx-blue-soft px-4 py-3 text-center text-sm text-cx-blue"
+            class="rounded-2xl bg-cx-blue-soft px-4 py-3 text-sm leading-relaxed text-cx-blue"
           >
             Укажите <span class="font-semibold">NUXT_PUBLIC_TELEGRAM_BOT_USERNAME</span>, чтобы включить Telegram Login Widget.
           </div>
           <div
             v-else-if="widgetState === 'mini-app'"
-            class="rounded-2xl bg-cx-blue-soft px-4 py-3 text-center text-sm text-cx-blue"
+            class="rounded-2xl bg-cx-blue-soft px-4 py-3 text-sm leading-relaxed text-cx-blue"
           >
-            Telegram Mini App обнаружен. Подключение к backend-авторизации будет использовать signed init data.
+            Telegram Mini App обнаружен. Для входа используется signed init data.
           </div>
         </div>
 
         <div
           v-if="isDev"
-          class="text-center"
+          class="mt-5 text-center"
         >
-          <div class="text-xs text-cx-faint mb-2">
+          <div class="mb-2 text-xs text-cx-faint">
             — dev only —
           </div>
           <button
-            class="px-5 py-2 rounded-full bg-cx-blue text-white text-sm font-semibold hover:opacity-90 transition-opacity"
-            @click="authStore.devLogin(); goToDashboard()"
+            class="btn-primary btn-primary-dark px-5! py-2! text-sm"
+            @click="authStore.devLogin(); goAfterLogin()"
           >
             Dev login (mock)
           </button>
         </div>
 
-        <p class="text-xs text-cx-faint text-center mt-2">
-          Не приходит подтверждение?
-          <a
-            href="https://t.me/"
-            target="_blank"
-            class="text-cx-blue hover:underline"
-          >Написать в поддержку</a>
+        <button
+          class="mt-7 text-[14px] font-medium text-[#707078] transition-colors duration-200 hover:text-cx-ink"
+          type="button"
+          @click="mountTelegramWidget"
+        >
+          Войти через другой аккаунт
+        </button>
+
+        <p class="mx-auto mt-8 max-w-[330px] text-[15px] leading-7 text-[#707078]">
+          Мы получаем только имя, аватар и Telegram ID
+          <br>
+          для входа на сайт.
         </p>
+
+        <div class="mt-8 border-t border-[#e8e8eb] pt-8">
+          <a
+            href="https://t.me/hellobehruz"
+            target="_blank"
+            class="text-[15px] font-medium text-[#707078] transition-colors duration-200 hover:text-cx-blue"
+          >
+            Не приходит подтверждение?
+          </a>
+        </div>
       </div>
     </div>
   </div>

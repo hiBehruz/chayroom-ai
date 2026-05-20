@@ -66,7 +66,7 @@ const freshItems = [
     >
       <!-- Header -->
       <div class="px-4 pt-7 pb-6">
-        <p class="text-[13px] font-medium" style="color:#708499">{{ new Date().getHours() < 12 ? 'Доброе утро' : new Date().getHours() < 18 ? 'Добрый день' : 'Добрый вечер' }}</p>
+        <p class="text-[13px] font-medium" style="color:#708499">Salom,</p>
         <h1 class="text-[26px] font-black tracking-tight leading-tight text-white mt-0.5">
           {{ user?.first_name }} 👋🏻
         </h1>

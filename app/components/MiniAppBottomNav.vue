@@ -29,9 +29,9 @@ const tabs = [
       v-for="tab in tabs"
       :key="tab.to"
       :to="tab.to"
-      class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-opacity active:opacity-60"
+      class="flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-2xl transition-opacity active:opacity-70"
       :style="route.path === tab.to
-        ? 'color:#5288c1; background:rgba(82,136,193,0.12)'
+        ? 'color:#ffffff; background:#5288c1'
         : 'color:#708499'"
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" v-html="tab.svg" />

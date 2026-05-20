@@ -29,13 +29,17 @@ const tabs = [
       v-for="tab in tabs"
       :key="tab.to"
       :to="tab.to"
-      class="flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-2xl transition-opacity active:opacity-70"
-      :style="route.path === tab.to
-        ? 'color:#ffffff; background:#5288c1'
-        : 'color:#708499'"
+      class="flex-1 flex justify-center items-center active:opacity-70 transition-opacity"
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" v-html="tab.svg" />
-      <span class="text-[10px] font-bold">{{ tab.label }}</span>
+      <span
+        class="flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-2xl"
+        :style="route.path === tab.to
+          ? 'color:#ffffff; background:#5288c1'
+          : 'color:#708499'"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" v-html="tab.svg" />
+        <span class="text-[10px] font-bold">{{ tab.label }}</span>
+      </span>
     </NuxtLink>
   </div>
 </template>

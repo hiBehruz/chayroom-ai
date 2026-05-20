@@ -69,8 +69,8 @@ const categories = [
           <NuxtLink
             v-if="cat.to"
             :to="cat.to"
-            class="relative flex flex-col justify-between rounded-[20px] p-4 active:opacity-75 transition-opacity"
-            style="background:#232e3c; border:1px solid #2b3a4a; min-height:148px"
+            class="relative flex flex-col gap-3 rounded-[20px] p-4 active:opacity-75 transition-opacity"
+            style="background:#232e3c; border:1px solid #2b3a4a; min-height:120px"
           >
             <span
               v-if="cat.soon"
@@ -90,8 +90,8 @@ const categories = [
           </NuxtLink>
           <div
             v-else
-            class="relative flex flex-col justify-between rounded-[20px] p-4"
-            style="background:#232e3c; border:1px solid #2b3a4a; min-height:148px"
+            class="relative flex flex-col gap-3 rounded-[20px] p-4"
+            style="background:#232e3c; border:1px solid #2b3a4a; min-height:120px"
           >
             <span
               v-if="cat.soon"

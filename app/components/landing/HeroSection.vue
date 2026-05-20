@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import teapotHero from '~/assets/images/herochoynak.png'
+import heroBlobBg from '~/assets/images/hero-blob-bg.svg'
 
 const keywords = ['AI vositalar', 'AI agentlar', 'Trend yechimlar', 'Vibe coding', 'AI Choyxona']
 const currentKeyword = ref(0)
@@ -76,6 +77,13 @@ function resetHeroArtMove() {
 
 <template>
   <section class="hero-section pt-0 pb-6">
+    <!-- top.co blob background -->
+    <img
+      :src="heroBlobBg"
+      alt=""
+      aria-hidden="true"
+      class="hero-blob-bg"
+    >
     <div class="relative z-10 max-w-295 mx-auto px-10 max-md:px-5">
       <div class="grid min-h-140 grid-cols-[46%_1fr] items-center gap-0 max-md:flex max-md:flex-col max-md:min-h-0 max-md:gap-6 max-md:pt-6 max-md:pb-4">
         <!-- Left: text -->
@@ -219,6 +227,17 @@ function resetHeroArtMove() {
   position: relative;
   overflow: hidden;
   background: linear-gradient(180deg, #fff 0%, #fff 64%, #f7fbff 100%);
+}
+
+.hero-blob-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.9;
 }
 
 .hero-section::after {

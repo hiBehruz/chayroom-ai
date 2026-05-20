@@ -33,12 +33,11 @@ const freshItems = [
   <!-- Phone frame wrapper for desktop preview; fills screen on real mobile -->
   <div class="flex justify-center items-start" style="background:#17212b; min-height:100vh">
     <div
-      class="w-full overflow-y-auto overflow-x-hidden pb-8 text-white"
+      class="w-full overflow-y-auto overflow-x-hidden pb-24 text-white"
       style="background:#17212b; max-width:390px; min-height:100vh"
     >
       <!-- Header -->
       <div class="px-4 pt-6 pb-5">
-        <p class="text-[13px] font-medium mb-0.5 tracking-wide uppercase" style="color:#708499">Личный кабинет</p>
         <h1 class="text-[22px] font-bold tracking-tight leading-tight text-white">
           Привет, {{ user?.first_name }} 👋🏻
         </h1>
@@ -145,6 +144,44 @@ const freshItems = [
             <span class="text-[16px] flex-none" style="color:#708499">›</span>
           </NuxtLink>
         </div>
+      </div>
+      <!-- Bottom Nav -->
+      <div
+        class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full flex items-center justify-around px-2 py-2 z-50"
+        style="max-width:390px; background:#17212b; border-top:1px solid #2b3a4a"
+      >
+        <NuxtLink
+          to="/dashboard"
+          class="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-opacity active:opacity-60"
+          style="color:#5288c1"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span class="text-[10px] font-semibold">Главная</span>
+        </NuxtLink>
+
+        <NuxtLink
+          to="/courses"
+          class="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-opacity active:opacity-60"
+          style="color:#708499"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+          </svg>
+          <span class="text-[10px] font-semibold">Каталог</span>
+        </NuxtLink>
+
+        <NuxtLink
+          to="/profile"
+          class="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-opacity active:opacity-60"
+          style="color:#708499"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          <span class="text-[10px] font-semibold">Профиль</span>
+        </NuxtLink>
       </div>
     </div>
   </div>

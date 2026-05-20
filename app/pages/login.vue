@@ -3,22 +3,16 @@
 declare global {
   interface Window {
     onTelegramAuth?: (user: TelegramUser) => void
-    Telegram?: {
-      WebApp?: {
-        initData?: string
-        ready?: () => void
-        expand?: () => void
-      }
-    }
   }
 }
 
 const authStore = useAuthStore()
 const route = useRoute()
 const config = useRuntimeConfig()
+const { isMiniApp } = useTelegramApp()
 const isDev = import.meta.dev
 const telegramBotUsername = computed(() => config.public.telegramBotUsername)
-const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app'>('loading')
+const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
 
@@ -69,11 +63,15 @@ onMounted(() => {
     return
   }
 
-  const initData = window.Telegram?.WebApp?.initData
-  if (initData) {
-    window.Telegram?.WebApp?.ready?.()
-    window.Telegram?.WebApp?.expand?.()
+  if (isMiniApp.value) {
     widgetState.value = 'mini-app'
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user
+    if (tgUser) {
+      authStore.loginFromMiniApp(tgUser)
+      goAfterLogin()
+    } else {
+      widgetState.value = 'mini-app-error'
+    }
     return
   }
 
@@ -126,7 +124,13 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
             v-else-if="widgetState === 'mini-app'"
             class="rounded-2xl bg-cx-blue-soft px-4 py-3 text-sm leading-relaxed text-cx-blue"
           >
-            Telegram Mini App обнаружен. Для входа используется signed init data.
+            Kirilmoqda...
+          </div>
+          <div
+            v-else-if="widgetState === 'mini-app-error'"
+            class="rounded-2xl bg-red-50 px-4 py-3 text-sm leading-relaxed text-red-600"
+          >
+            Telegramni yangilang
           </div>
         </div>
 

@@ -26,6 +26,12 @@ export default defineNuxtConfig({
     '/': { prerender: true }
   },
 
+  vite: {
+    optimizeDeps: {
+      include: ['@twa-dev/sdk']
+    }
+  },
+
   compatibilityDate: '2025-01-15',
 
   eslint: {

@@ -7,7 +7,12 @@ declare global {
 }
 
 export function useTelegramApp() {
-  const isMiniApp = useState<boolean>('isMiniApp', () => false)
+  const devCookie = useCookie('miniapp_dev')
+  const isMiniApp = useState<boolean>('isMiniApp', () => {
+    if (import.meta.dev && devCookie.value === '1') return true
+    if (import.meta.client) return Boolean(window.Telegram?.WebApp?.initData)
+    return false
+  })
 
   function wa() {
     return import.meta.client ? window.Telegram?.WebApp : undefined

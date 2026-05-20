@@ -12,18 +12,18 @@ const DEV_MOCK: typeof window.Telegram = {
 }
 
 export default defineNuxtPlugin(() => {
-  const isMiniApp = useState<boolean>('isMiniApp', () => false)
-
   if (import.meta.dev) {
+    const devCookie = useCookie('miniapp_dev', { path: '/', maxAge: 86400 })
     if (new URLSearchParams(window.location.search).get('miniapp') === '1') {
-      sessionStorage.setItem('miniapp_dev', '1')
+      devCookie.value = '1'
     }
-    if (sessionStorage.getItem('miniapp_dev') === '1') {
+    if (devCookie.value === '1') {
       window.Telegram = DEV_MOCK
     }
   }
 
   const webApp = window.Telegram?.WebApp
+  const isMiniApp = useState<boolean>('isMiniApp')
   if (webApp?.initData) {
     isMiniApp.value = true
     webApp.ready()

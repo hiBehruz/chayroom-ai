@@ -201,12 +201,15 @@ const freshItems = [
         </NuxtLink>
 
         <NuxtLink
-          to="/courses"
+          to="/catalog"
           class="flex flex-col items-center gap-0.5 px-5 py-2 rounded-xl active:opacity-60 transition-opacity"
           style="color:#708499"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
           </svg>
           <span class="text-[10px] font-bold">Каталог</span>
         </NuxtLink>

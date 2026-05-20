@@ -20,6 +20,14 @@
   --shadow-blue: 0 2px 4px rgba(41,98,255,.07), 0 10px 24px rgba(41,98,255,.07);
 
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --color-tg-bg: #17212b;
+  --color-tg-card: #232e3c;
+  --color-tg-card-2: #1e2c3a;
+  --color-tg-blue: #5288c1;
+  --color-tg-green: #4caf82;
+  --color-tg-muted: #708499;
+  --color-tg-border: #2b3a4a;
 }
 
 @layer base {

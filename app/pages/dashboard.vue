@@ -3,6 +3,7 @@
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 
 const authStore = useAuthStore()
+const { isMiniApp } = useTelegramApp()
 
 authStore.restoreFromStorage()
 
@@ -42,7 +43,8 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
+  <MiniAppDashboard v-if="isMiniApp" />
+  <div v-else class="min-h-screen bg-white">
     <div class="max-w-295 mx-auto px-10 py-8 max-md:px-4">
       <!-- Breadcrumb -->
       <div class="flex items-center gap-2 text-sm text-cx-muted mb-6">

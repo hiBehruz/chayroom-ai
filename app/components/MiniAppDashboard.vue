@@ -83,7 +83,7 @@ const freshItems = [
           <!-- Overview card -->
           <div
             class="flex-none rounded-2xl p-4 flex flex-col justify-between"
-            style="background:linear-gradient(135deg,#2d6a4f,#1b4332); width:140px; min-height:130px; box-shadow:0 8px 32px rgba(29,99,66,0.4)"
+            style="background:linear-gradient(135deg,#2d6a4f,#1b4332); width:120px; min-height:130px; box-shadow:0 8px 32px rgba(29,99,66,0.4)"
           >
             <div>
               <p class="text-[9px] font-black tracking-widest uppercase mb-2" style="color:#95d5b2">ПРОГРЕСС</p>
@@ -99,7 +99,7 @@ const freshItems = [
             v-for="task in tasks"
             :key="task.id"
             class="flex-none rounded-2xl p-4 flex flex-col justify-between"
-            :style="`background:${task.gradient}; width:116px; min-height:130px; box-shadow:0 8px 24px rgba(0,0,0,0.3)`"
+            :style="`background:${task.gradient}; width:120px; min-height:130px; box-shadow:0 8px 24px rgba(0,0,0,0.3)`"
           >
             <div class="text-[32px]">{{ task.icon }}</div>
             <div>

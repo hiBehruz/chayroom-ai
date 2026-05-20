@@ -8,7 +8,7 @@ onMounted(() => {
   gsap.registerPlugin(ScrollTrigger)
   gsap.from(bannerRef.value!, {
     scrollTrigger: { trigger: bannerRef.value, start: 'top 85%', once: true },
-    y: 32, opacity: 0, duration: 0.7, ease: 'power2.out'
+    y: 32, opacity: 0, duration: 0.7, ease: 'power2.out', clearProps: 'all'
   })
 })
 </script>
@@ -24,7 +24,7 @@ onMounted(() => {
         class="bg-[#f5e6c8] rounded-3xl flex items-center gap-14 w-209.25 h-73.75 px-14 mx-auto max-md:w-full max-md:h-auto max-md:flex-col max-md:px-6 max-md:py-8 max-md:gap-6 max-md:text-center"
       >
         <!-- Book Lottie + sparkles -->
-        <div class="relative shrink-0 w-56 h-56 flex items-center justify-center max-md:w-52 max-md:h-52">
+        <div class="relative shrink-0 w-56 h-56 flex items-center justify-center max-md:w-40 max-md:h-40">
           <!-- Sparkles -->
           <span class="sparkle sparkle-1 absolute top-2 left-6 text-[#3b82f6] text-[18px]">✦</span>
           <span class="sparkle sparkle-2 absolute top-6 right-4 text-[#94a3b8] text-[12px]">✦</span>
@@ -52,9 +52,9 @@ onMounted(() => {
           <p class="text-[15px] text-cx-muted leading-[1.6] max-w-105">
             AIni hayot, ish va biznesingning bir qismiga aylantirish bo‘yicha amaliy qo‘llanmalar.
           </p>
-          <button class="btn-primary btn-primary-dark self-start text-[13px]! px-5! py-2.5! max-md:self-center">
+          <NuxtLink to="/guides" class="btn-primary btn-primary-dark self-start text-[13px]! px-5! py-2.5! max-md:self-center">
             Ochish
-          </button>
+          </NuxtLink>
         </div>
       </div>
     </div>

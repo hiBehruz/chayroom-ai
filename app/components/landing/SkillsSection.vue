@@ -19,6 +19,17 @@ const currentPage = ref(0)
 const activeNum = computed(() => skills[currentPage.value * itemsPerPage.value]?.num ?? '')
 const trackRef = ref<HTMLElement>()
 
+let touchStartX = 0
+function onTouchStart(e: TouchEvent) {
+  touchStartX = e.touches[0].clientX
+}
+function onTouchEnd(e: TouchEvent) {
+  const delta = touchStartX - e.changedTouches[0].clientX
+  if (Math.abs(delta) < 40) return
+  if (delta > 0) next()
+  else prev()
+}
+
 function goToPage(page: number) {
   if (!trackRef.value) return
   const containerWidth = trackRef.value.parentElement!.offsetWidth
@@ -73,7 +84,7 @@ onMounted(() => {
           ←
         </button>
 
-        <div class="flex-1 overflow-hidden">
+        <div class="flex-1 overflow-hidden" @touchstart="onTouchStart" @touchend="onTouchEnd">
           <div
             ref="trackRef"
             class="flex"

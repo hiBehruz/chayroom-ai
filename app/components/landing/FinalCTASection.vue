@@ -13,7 +13,7 @@ onMounted(() => {
   gsap.registerPlugin(ScrollTrigger)
   gsap.from(bannerRef.value!, {
     scrollTrigger: { trigger: bannerRef.value, start: 'top 85%', once: true },
-    y: 32, opacity: 0, duration: 0.7, ease: 'power2.out'
+    y: 32, opacity: 0, duration: 0.7, ease: 'power2.out', clearProps: 'all'
   })
 })
 </script>
@@ -27,7 +27,7 @@ onMounted(() => {
       >
         <!-- Door Lottie animation -->
         <ClientOnly>
-          <div class="shrink-0 w-56 h-56 max-md:w-52 max-md:h-52">
+          <div class="shrink-0 w-56 h-56 max-md:w-40 max-md:h-40">
             <DotLottieVue
               src="/animations/Door.lottie?v=2"
               :autoplay="true"

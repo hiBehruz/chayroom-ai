@@ -25,3 +25,6 @@ logs
 
 # Git worktrees
 .worktrees
+
+# Claude Code / Superpowers temp files
+.superpowers/

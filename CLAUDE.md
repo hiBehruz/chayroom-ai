@@ -95,15 +95,3 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - The test: every desktop class present before your edit should still be present after.
 
 ---
-
-## Architecture
-See [docs/architecture.md](docs/architecture.md) for full system design.
-
-## Style Guide
-See [docs/style-guide.md](docs/style-guide.md) for coding conventions and component patterns.
-
-## Business Context
-See [docs/business-context.md](docs/business-context.md) for product requirements and user flows.
-
-## API Reference
-See [docs/api-reference.md](docs/api-reference.md) for endpoint documentation.

@@ -1,3 +1,5 @@
+import type { WebAppUser } from '@twa-dev/sdk'
+
 export interface TelegramUser {
   id: number
   telegramId?: number
@@ -130,6 +132,18 @@ export const useAuthStore = defineStore('auth', () => {
     })
   }
 
+  function loginFromMiniApp(tgUser: WebAppUser) {
+    login({
+      id: tgUser.id,
+      telegramId: tgUser.id,
+      first_name: tgUser.first_name,
+      last_name: tgUser.last_name,
+      username: tgUser.username,
+      photo_url: tgUser.photo_url,
+      hash: 'twa'
+    })
+  }
+
   return {
     user,
     hasSubscription,
@@ -139,6 +153,7 @@ export const useAuthStore = defineStore('auth', () => {
     displayName,
     initials,
     login,
+    loginFromMiniApp,
     activateSubscription,
     setAgentVariant,
     logout,

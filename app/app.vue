@@ -3,13 +3,40 @@ import gsap from 'gsap'
 
 const authStore = useAuthStore()
 const route = useRoute()
+const router = useRouter()
+const { isMiniApp, backButton } = useTelegramApp()
 const showNav = computed(() =>
-  ['/', '/dashboard', '/profile'].includes(route.path) || route.path.startsWith('/courses') || route.path.startsWith('/guides') || route.path.startsWith('/login')
+  !isMiniApp.value && (
+    ['/', '/dashboard', '/profile'].includes(route.path) ||
+    route.path.startsWith('/courses') ||
+    route.path.startsWith('/guides') ||
+    route.path.startsWith('/login')
+  )
 )
 const contentReady = ref(false)
 const contentRef = ref<HTMLElement>()
 
 authStore.restoreFromStorage()
+
+const handleBack = () => router.back()
+
+onMounted(() => {
+  if (!isMiniApp.value) return
+  backButton.onClick(handleBack)
+})
+
+onUnmounted(() => {
+  backButton.offClick(handleBack)
+})
+
+watch(() => route.path, () => {
+  if (!isMiniApp.value) return
+  if (route.path === '/dashboard') {
+    backButton.hide()
+  } else {
+    backButton.show()
+  }
+}, { immediate: true })
 
 function onPageEnter(el: Element, done: () => void) {
   const targets = getStaggerTargets(el)
@@ -94,7 +121,7 @@ useSeoMeta({
     >
       <AppNav v-if="showNav" />
       <NuxtPage :transition="{ css: false, onEnter: onPageEnter, onLeave: onPageLeave }" />
-      <AppFooter />
+      <AppFooter v-if="!isMiniApp" />
     </div>
   </UApp>
 </template>

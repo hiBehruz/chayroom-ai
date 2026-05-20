@@ -18,6 +18,13 @@ const contentRef = ref<HTMLElement>()
 
 authStore.restoreFromStorage()
 
+watch(isMiniApp, (val) => {
+  if (import.meta.client) {
+    document.documentElement.style.background = val ? '#17212b' : ''
+    document.body.style.background = val ? '#17212b' : ''
+  }
+}, { immediate: true })
+
 const handleBack = () => router.back()
 
 onMounted(() => {

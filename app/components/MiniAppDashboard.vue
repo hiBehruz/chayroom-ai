@@ -92,17 +92,6 @@ const freshItems = [
               </p>
               <p class="text-[10px] font-semibold mt-1.5" style="color:#95d5b2">Завершённые</p>
             </div>
-            <ul class="space-y-1 mt-3">
-              <li
-                v-for="item in taskOverview.items"
-                :key="item"
-                class="flex items-start gap-1.5 leading-tight"
-                style="font-size:9px; color:rgba(255,255,255,0.65)"
-              >
-                <span style="color:#95d5b2; font-size:9px; margin-top:1px; flex-shrink:0">✓</span>
-                {{ item }}
-              </li>
-            </ul>
           </div>
 
           <!-- Task cards -->

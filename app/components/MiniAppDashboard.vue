@@ -185,8 +185,8 @@ const freshItems = [
 
       <!-- Bottom Nav -->
       <div
-        class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full flex items-center justify-around py-2 z-50"
-        style="max-width:390px; background:rgba(23,33,43,0.96); border-top:1px solid #2b3a4a; backdrop-filter:blur(12px)"
+        class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full flex items-center justify-around py-2 z-50 backdrop-blur-md"
+        style="max-width:390px; background:rgba(23,33,43,0.96); border-top:1px solid #2b3a4a"
       >
         <NuxtLink
           to="/dashboard"

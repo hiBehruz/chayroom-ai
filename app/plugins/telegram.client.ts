@@ -13,7 +13,8 @@ const DEV_MOCK: typeof window.Telegram = {
 
 export default defineNuxtPlugin(() => {
   if (import.meta.dev) {
-    const devCookie = useCookie('miniapp_dev', { path: '/', maxAge: 86400 })
+    const port = window.location.port
+    const devCookie = useCookie(`miniapp_dev_${port}`, { path: '/', maxAge: 86400 })
     if (new URLSearchParams(window.location.search).get('miniapp') === '1') {
       devCookie.value = '1'
     }

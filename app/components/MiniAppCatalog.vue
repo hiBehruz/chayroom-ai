@@ -65,42 +65,57 @@ const categories = [
 
       <!-- Category grid -->
       <div class="grid grid-cols-2 gap-3 px-4">
-        <component
-          :is="cat.to ? 'NuxtLink' : 'div'"
-          v-for="cat in categories"
-          :key="cat.id"
-          v-bind="cat.to ? { to: cat.to } : {}"
-          class="relative flex flex-col justify-between rounded-[20px] p-4"
-          :class="cat.to ? 'active:opacity-75 transition-opacity' : ''"
-          style="background:#232e3c; border:1px solid #2b3a4a; min-height:148px"
-        >
-          <!-- СКОРО badge -->
-          <span
-            v-if="cat.soon"
-            class="absolute top-3 right-3 text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full"
-            style="color:#f0b429; background:rgba(240,180,41,0.15)"
-          >СКОРО</span>
-
-          <!-- Icon -->
-          <div
-            class="flex items-center justify-center rounded-[14px]"
-            style="width:48px; height:48px; background:#1e2d3d"
+        <template v-for="cat in categories" :key="cat.id">
+          <NuxtLink
+            v-if="cat.to"
+            :to="cat.to"
+            class="relative flex flex-col justify-between rounded-[20px] p-4 active:opacity-75 transition-opacity"
+            style="background:#232e3c; border:1px solid #2b3a4a; min-height:148px"
           >
-            <UIcon :name="cat.icon" class="size-[22px]" style="color:#5288c1" />
+            <span
+              v-if="cat.soon"
+              class="absolute top-3 right-3 text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full"
+              style="color:#f0b429; background:rgba(240,180,41,0.15)"
+            >СКОРО</span>
+            <div
+              class="flex items-center justify-center rounded-[14px]"
+              style="width:48px; height:48px; background:#1e2d3d"
+            >
+              <UIcon :name="cat.icon" class="size-[22px]" style="color:#5288c1" />
+            </div>
+            <div>
+              <p class="text-[15px] font-bold text-white leading-snug">{{ cat.name }}</p>
+              <p v-if="cat.count" class="text-[12px] font-medium mt-0.5" style="color:#708499">{{ cat.count }}</p>
+            </div>
+          </NuxtLink>
+          <div
+            v-else
+            class="relative flex flex-col justify-between rounded-[20px] p-4"
+            style="background:#232e3c; border:1px solid #2b3a4a; min-height:148px"
+          >
+            <span
+              v-if="cat.soon"
+              class="absolute top-3 right-3 text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full"
+              style="color:#f0b429; background:rgba(240,180,41,0.15)"
+            >СКОРО</span>
+            <div
+              class="flex items-center justify-center rounded-[14px]"
+              style="width:48px; height:48px; background:#1e2d3d"
+            >
+              <UIcon :name="cat.icon" class="size-[22px]" style="color:#5288c1" />
+            </div>
+            <div>
+              <p class="text-[15px] font-bold text-white leading-snug">{{ cat.name }}</p>
+              <p v-if="cat.count" class="text-[12px] font-medium mt-0.5" style="color:#708499">{{ cat.count }}</p>
+            </div>
           </div>
-
-          <!-- Label -->
-          <div>
-            <p class="text-[15px] font-bold text-white leading-snug">{{ cat.name }}</p>
-            <p v-if="cat.count" class="text-[12px] font-medium mt-0.5" style="color:#708499">{{ cat.count }}</p>
-          </div>
-        </component>
+        </template>
       </div>
 
       <!-- Bottom Nav -->
       <div
-        class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full flex items-center justify-around py-2 z-50"
-        style="max-width:390px; background:rgba(23,33,43,0.96); border-top:1px solid #2b3a4a; backdrop-filter:blur(12px)"
+        class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full flex items-center justify-around py-2 z-50 backdrop-blur-md"
+        style="max-width:390px; background:rgba(23,33,43,0.96); border-top:1px solid #2b3a4a"
       >
         <NuxtLink
           to="/dashboard"

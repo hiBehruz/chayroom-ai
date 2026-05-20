@@ -223,6 +223,23 @@
   }
 }
 
+@keyframes tg-float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  40%       { transform: translateY(-7px) rotate(-4deg); }
+  70%       { transform: translateY(-4px) rotate(3deg); }
+}
+
+@keyframes tg-nav-pop {
+  0%   { transform: scale(0.7); opacity: 0.5; }
+  65%  { transform: scale(1.2); }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes tg-shine {
+  0%   { transform: translateX(-180%) skewX(-18deg); }
+  100% { transform: translateX(280%)  skewX(-18deg); }
+}
+
 @layer utilities {
   .scrollbar-none {
     -ms-overflow-style: none;
@@ -230,5 +247,25 @@
   }
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+
+  .tg-float   { animation: tg-float 2.6s 0.0s ease-in-out infinite; }
+  .tg-float-2 { animation: tg-float 2.6s 0.5s ease-in-out infinite; }
+  .tg-float-3 { animation: tg-float 2.6s 1.0s ease-in-out infinite; }
+  .tg-float-4 { animation: tg-float 2.6s 1.5s ease-in-out infinite; }
+  .tg-nav-pop { animation: tg-nav-pop 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+  .tg-card-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .tg-card-shine::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 50%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+    transform: skewX(-18deg);
+    animation: tg-shine 4s ease-in-out infinite;
   }
 }

@@ -37,7 +37,12 @@ const tabs = [
           ? 'color:#ffffff; background:#5288c1'
           : 'color:#708499'"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" v-html="tab.svg" />
+        <svg
+        :key="route.path === tab.to ? 'on' : 'off'"
+        :class="route.path === tab.to ? 'tg-nav-pop' : ''"
+        width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+        v-html="tab.svg"
+      />
         <span class="text-[10px] font-bold">{{ tab.label }}</span>
       </span>
     </NuxtLink>

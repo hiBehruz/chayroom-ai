@@ -13,33 +13,37 @@ const tasks = [
     id: 'about',
     label: 'Про наше сообщество',
     icon: '📖',
+    floatClass: 'tg-float',
     done: true,
-    gradient: 'linear-gradient(135deg,#1d3557,#457b9d)',
-    accent: '#90e0ef',
+    gradient: 'linear-gradient(145deg,#1565c0,#42a5f5)',
+    accent: '#90caf9',
   },
   {
     id: 'rules',
     label: 'Наши правила',
     icon: '📋',
+    floatClass: 'tg-float-2',
     done: true,
-    gradient: 'linear-gradient(135deg,#7b2d8b,#a855f7)',
-    accent: '#e9d5ff',
+    gradient: 'linear-gradient(145deg,#6a1b9a,#ce93d8)',
+    accent: '#e1bee7',
   },
   {
     id: 'intro',
     label: 'Расскажите о себе',
     icon: '🙋',
+    floatClass: 'tg-float-3',
     done: true,
-    gradient: 'linear-gradient(135deg,#c2410c,#f97316)',
-    accent: '#fed7aa',
+    gradient: 'linear-gradient(145deg,#bf360c,#ff7043)',
+    accent: '#ffccbc',
   },
   {
     id: 'first',
     label: 'Первый материал',
     icon: '🎯',
+    floatClass: 'tg-float-4',
     done: true,
-    gradient: 'linear-gradient(135deg,#0f766e,#2dd4bf)',
-    accent: '#99f6e4',
+    gradient: 'linear-gradient(145deg,#00695c,#26c6da)',
+    accent: '#b2dfdb',
   },
 ]
 
@@ -97,15 +101,15 @@ const freshItems = [
           <div
             v-for="task in tasks"
             :key="task.id"
-            class="flex-none rounded-2xl p-4 flex flex-col justify-between"
-            :style="`background:${task.gradient}; width:120px; min-height:130px; box-shadow:0 8px 24px rgba(0,0,0,0.3)`"
+            class="tg-card-shine flex-none rounded-2xl p-4 flex flex-col justify-between"
+            :style="`background:${task.gradient}; width:120px; min-height:130px; box-shadow:0 10px 28px rgba(0,0,0,0.35)`"
           >
-            <div class="text-[32px]">{{ task.icon }}</div>
+            <div :class="['text-[32px] select-none', task.floatClass]">{{ task.icon }}</div>
             <div>
               <div
                 v-if="task.done"
                 class="inline-flex items-center gap-1 text-[9px] font-black px-2 py-0.5 rounded-full mb-2"
-                :style="`background:rgba(255,255,255,0.15); color:${task.accent}`"
+                :style="`background:rgba(255,255,255,0.18); color:${task.accent}`"
               >
                 ✓ Готово
               </div>

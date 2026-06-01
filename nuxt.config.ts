@@ -3,8 +3,17 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    '@sentry/nuxt/module'
   ],
+
+  sentry: {
+    dsn: process.env.NUXT_PUBLIC_SENTRY_DSN,
+    sourceMapsUploadOptions: {
+      org: 'chayroom-ai',
+      project: 'chayroom-nuxt',
+    },
+  },
 
   devtools: { enabled: true },
 
@@ -24,7 +33,8 @@ export default defineNuxtConfig({
     r2BucketName: '',
     r2PublicUrl: '',
     public: {
-      telegramBotUsername: ''
+      telegramBotUsername: '',
+      sentryDsn: ''
     }
   },
 

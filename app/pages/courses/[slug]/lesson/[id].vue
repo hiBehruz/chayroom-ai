@@ -162,6 +162,22 @@ const currentMod = course.modulesList[lesson.modIndex]
 
 const progress = computed(() => Math.round((lessonId - 1) / course.lessons * 100))
 
+const contentRef = ref<HTMLElement | null>(null)
+
+onMounted(async () => {
+  const videos = contentRef.value?.querySelectorAll('video')
+  if (!videos?.length) return
+  const [{ default: Plyr }] = await Promise.all([
+    import('plyr'),
+    import('plyr/dist/plyr.css'),
+  ])
+  videos.forEach(video => new Plyr(video, {
+    controls: ['play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
+    settings: ['speed'],
+    speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
+  }))
+})
+
 useSeoMeta({ title: `${lesson.flatIndex}. ${lesson.title} — ${course.title}` })
 </script>
 
@@ -243,12 +259,14 @@ useSeoMeta({ title: `${lesson.flatIndex}. ${lesson.title} — ${course.title}` }
             [&_strong]:font-bold [&_strong]:text-[#1a1a1a]
             [&_mark]:bg-[#fff3b0] [&_mark]:px-0.5 [&_mark]:rounded
             [&_blockquote]:rounded-xl [&_blockquote]:px-5 [&_blockquote]:py-4 [&_blockquote]:my-5 [&_blockquote]:text-cx-muted [&_blockquote]:italic
+            [&_[data-video-block]]:my-6 [&_video]:w-full [&_video]:rounded-xl [&_video]:block
             [&_code]:bg-[#f0ede8] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[13px] [&_code]:font-mono
             [&_pre]:bg-[#1a1a1a] [&_pre]:text-white [&_pre]:p-4 [&_pre]:rounded-xl [&_pre]:overflow-x-auto [&_pre]:mb-4 [&_pre]:text-[13px]
             [&_ul]:pl-5 [&_ul]:mb-4 [&_ol]:pl-5 [&_ol]:mb-4 [&_ol_li]:list-decimal"
           :class="isMiniApp
             ? '[&_h2]:text-[18px] [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:mt-6 [&_h2]:tracking-tight [&_h3]:text-[15px] [&_h3]:font-bold [&_h3]:mb-2 [&_h3]:mt-4 [&_p]:text-[14px] [&_p]:leading-[1.7] [&_p]:mb-3 [&_p]:text-[#2a2c35] [&_li]:text-[14px] [&_li]:leading-[1.7] [&_li]:mb-1 [&_li]:list-disc [&_li]:text-[#2a2c35] [&_blockquote]:bg-[#f0ede8] [&_blockquote]:text-[13px]'
             : '[&_h2]:text-[22px] [&_h2]:font-extrabold [&_h2]:mb-4 [&_h2]:mt-8 [&_h2]:tracking-tight [&_h3]:text-[17px] [&_h3]:font-bold [&_h3]:mb-3 [&_h3]:mt-6 [&_p]:text-[16px] [&_p]:leading-[1.75] [&_p]:mb-4 [&_p]:text-[#2a2c35] [&_li]:text-[16px] [&_li]:leading-[1.75] [&_li]:mb-1.5 [&_li]:list-disc [&_li]:text-[#2a2c35] [&_blockquote]:bg-[#f7f5ef] [&_blockquote]:text-[15px]'"
+          ref="contentRef"
           v-html="lesson.content"
         />
 
@@ -327,6 +345,13 @@ useSeoMeta({ title: `${lesson.flatIndex}. ${lesson.title} — ${course.title}` }
   color: #ffffff;
 }
 .nav-btn-next:active { opacity: 0.7; transform: scale(0.98); }
+
+/* ── Plyr theme for content-embedded videos ─────────────── */
+.lesson-content :deep(.plyr) {
+  --plyr-color-main: #3480f1;
+  --plyr-border-radius: 12px;
+  border-radius: 12px;
+}
 
 /* ── Accessibility ──────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

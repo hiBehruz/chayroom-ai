@@ -11,8 +11,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'filename va contentType majburiy' })
   }
 
-  if (!contentType.startsWith('video/')) {
-    throw createError({ statusCode: 400, statusMessage: 'Faqat video fayl yuklanadi' })
+  if (!contentType.startsWith('video/') && !contentType.startsWith('image/')) {
+    throw createError({ statusCode: 400, statusMessage: 'Faqat video yoki rasm yuklanadi' })
   }
 
   const config = useRuntimeConfig()
@@ -26,7 +26,8 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  const key = `lessons/${Date.now()}-${filename.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+  const folder = contentType.startsWith('image/') ? 'images' : 'lessons'
+  const key = `${folder}/${Date.now()}-${filename.replace(/[^a-zA-Z0-9._-]/g, '_')}`
 
   const command = new PutObjectCommand({
     Bucket: config.r2BucketName,

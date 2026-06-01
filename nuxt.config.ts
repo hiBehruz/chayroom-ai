@@ -17,6 +17,12 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    openaiApiKey: '',
+    r2AccountId: '',
+    r2AccessKeyId: '',
+    r2SecretAccessKey: '',
+    r2BucketName: '',
+    r2PublicUrl: '',
     public: {
       telegramBotUsername: ''
     }
@@ -26,9 +32,10 @@ export default defineNuxtConfig({
     '/': { prerender: true }
   },
 
+
   vite: {
-    optimizeDeps: {
-      include: ['@twa-dev/sdk']
+    server: {
+      allowedHosts: ['handcart-garage-creatable.ngrok-free.dev']
     }
   },
 

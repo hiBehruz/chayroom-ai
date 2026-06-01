@@ -53,7 +53,7 @@ function removeTag(i: number) {
 
 // ── Visual ────────────────────────────────────────────────
 const dark = ref(false)
-const accentColor = ref('#0075DE')
+const accentColor = ref('#3480f1')
 const previewImage = ref<string>('')
 const imageInputRef = ref<HTMLInputElement | null>(null)
 
@@ -70,7 +70,7 @@ function removeImage() {
   if (imageInputRef.value) imageInputRef.value.value = ''
 }
 const bgPresets = [
-  { label: 'Moviy', value: '#f0f4ff', dark: false },
+  { label: 'Moviy', value: '#3480f1', dark: false },
   { label: 'Sariq', value: '#fffbeb', dark: false },
   { label: 'Yashil', value: '#f0fdf4', dark: false },
   { label: 'Qora', value: '#0d1117', dark: true },
@@ -82,6 +82,83 @@ const bg = ref(bgPresets[0].value)
 function selectBg(preset: typeof bgPresets[0]) {
   bg.value = preset.value
   dark.value = preset.dark
+}
+
+// ── Content ───────────────────────────────────────────────
+const content = ref('')
+const contentTab = ref<'editor' | 'notion'>('editor')
+const notionPasted = ref(false)
+const notionZoneRef = ref<HTMLDivElement | null>(null)
+
+function cleanNotionHtml(html: string): string {
+  if (!import.meta.client) return html
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(html, 'text/html')
+
+  function processNode(node: Node): string {
+    if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? ''
+    if (node.nodeType !== Node.ELEMENT_NODE) return ''
+    const el = node as Element
+    const tag = el.tagName.toLowerCase()
+    const inner = Array.from(el.childNodes).map(processNode).join('')
+
+    const keep: Record<string, (i: string, e: Element) => string> = {
+      h1: i => `<h1>${i}</h1>\n`,
+      h2: i => `<h2>${i}</h2>\n`,
+      h3: i => `<h3>${i}</h3>\n`,
+      h4: i => `<h4>${i}</h4>\n`,
+      p:  i => i.trim() ? `<p>${i}</p>\n` : '',
+      ul: i => `<ul>\n${i}</ul>\n`,
+      ol: i => `<ol>\n${i}</ol>\n`,
+      li: i => `  <li>${i}</li>\n`,
+      strong: i => `<strong>${i}</strong>`,
+      b:      i => `<strong>${i}</strong>`,
+      em: i => `<em>${i}</em>`,
+      i:  i => `<em>${i}</em>`,
+      code: i => `<code>${i}</code>`,
+      pre:  i => `<pre><code>${i.replace(/<[^>]+>/g, '')}</code></pre>\n`,
+      blockquote: i => `<blockquote>${i}</blockquote>\n`,
+      br: () => `<br>`,
+      a:  (i, e) => `<a href="${e.getAttribute('href') ?? ''}">${i}</a>`,
+    }
+
+    if (keep[tag]) return keep[tag](inner, el)
+
+    if (tag === 'span') {
+      const style = (el as HTMLElement).style
+      const parts: string[] = []
+      if (style.color) parts.push(`color:${style.color}`)
+      if (style.backgroundColor) parts.push(`background-color:${style.backgroundColor}`)
+      if (parts.length) return `<span style="${parts.join(';')}">${inner}</span>`
+      return inner
+    }
+
+    return inner
+  }
+
+  return Array.from(doc.body.childNodes)
+    .map(processNode)
+    .join('')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
+function onNotionPaste(e: ClipboardEvent) {
+  e.preventDefault()
+  const html = e.clipboardData?.getData('text/html')
+  const text = e.clipboardData?.getData('text/plain') ?? ''
+
+  if (html && html.trim()) {
+    content.value = cleanNotionHtml(html)
+  } else {
+    content.value = text
+  }
+
+  notionPasted.value = true
+  setTimeout(() => {
+    contentTab.value = 'html'
+    notionPasted.value = false
+  }, 1800)
 }
 
 // ── Modules ───────────────────────────────────────────────
@@ -98,7 +175,48 @@ function removeModule(mi: number) {
 }
 
 function addLesson(mi: number) {
-  modulesList.value[mi].lessons.push({ title: '', type: 'Nazariy', duration: '', free: false })
+  modulesList.value[mi].lessons.push({
+    title: '',
+    type: 'Nazariy',
+    duration: '',
+    free: false,
+    videoUrl: undefined,
+  })
+}
+
+const uploadingLesson = ref<string | null>(null)
+const uploadError = ref<string | null>(null)
+
+async function uploadVideo(mi: number, li: number, file: File) {
+  const key = `${mi}-${li}`
+  uploadingLesson.value = key
+  uploadError.value = null
+  try {
+    const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string; publicUrl: string }>(
+      '/api/upload/presign',
+      { method: 'POST', body: { filename: file.name, contentType: file.type } }
+    )
+    await fetch(uploadUrl, {
+      method: 'PUT',
+      body: file,
+      headers: { 'Content-Type': file.type },
+    })
+    modulesList.value[mi].lessons[li].videoUrl = publicUrl
+  } catch (e: any) {
+    uploadError.value = e?.message ?? 'Yuklashda xato'
+  } finally {
+    uploadingLesson.value = null
+  }
+}
+
+function onVideoFileChange(mi: number, li: number, e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  uploadVideo(mi, li, file)
+}
+
+function removeVideo(mi: number, li: number) {
+  modulesList.value[mi].lessons[li].videoUrl = undefined
 }
 
 function removeLesson(mi: number, li: number) {
@@ -159,6 +277,7 @@ function save() {
     accentTitle: [],
     accentColor: accentColor.value,
     image: previewImage.value || undefined,
+    content: content.value || undefined,
   }
 
   coursesStore.addCourse(course)
@@ -177,7 +296,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
 
     <!-- Top bar -->
     <div class="sticky top-0 z-30 bg-white border-b border-cx-line">
-      <div class="max-w-295 mx-auto px-10 h-14 flex items-center justify-between">
+      <div class="w-310 max-w-[calc(100vw-40px)] mx-auto px-0 h-14 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <NuxtLink
             to="/courses"
@@ -213,7 +332,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
       </div>
     </div>
 
-    <div class="max-w-295 mx-auto px-10 py-8">
+    <div class="w-310 max-w-[calc(100vw-40px)] mx-auto px-0 py-8">
 
       <!-- Page heading -->
       <div class="mb-7">
@@ -242,7 +361,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
           <!-- 01 · Basic info -->
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-6 py-4 border-b border-cx-line flex items-center gap-3">
-              <span class="text-[11px] font-bold text-cx-blue bg-[#eef5ff] px-2 py-0.5 rounded-md tracking-widest">01</span>
+              <span class="text-[11px] font-bold text-cx-blue bg-cx-blue/10 px-2 py-0.5 rounded-md tracking-widest">01</span>
               <span class="text-[14px] font-bold text-[#1a1a1a]">Asosiy ma'lumotlar</span>
             </div>
 
@@ -333,7 +452,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
           <!-- 02 · Tags -->
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-6 py-4 border-b border-cx-line flex items-center gap-3">
-              <span class="text-[11px] font-bold text-cx-blue bg-[#eef5ff] px-2 py-0.5 rounded-md tracking-widest">02</span>
+              <span class="text-[11px] font-bold text-cx-blue bg-cx-blue/10 px-2 py-0.5 rounded-md tracking-widest">02</span>
               <span class="text-[14px] font-bold text-[#1a1a1a]">Teglar va kategoriya</span>
             </div>
 
@@ -359,7 +478,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                 <span
                   v-for="(tag, i) in tags"
                   :key="tag"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#eef5ff] border border-[#c7deff] text-[12px] font-semibold text-cx-blue"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cx-blue/10 border border-cx-blue/25 text-[12px] font-semibold text-cx-blue"
                 >
                   {{ tag }}
                   <button
@@ -381,7 +500,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-6 py-4 border-b border-cx-line flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <span class="text-[11px] font-bold text-cx-blue bg-[#eef5ff] px-2 py-0.5 rounded-md tracking-widest">03</span>
+                <span class="text-[11px] font-bold text-cx-blue bg-cx-blue/10 px-2 py-0.5 rounded-md tracking-widest">03</span>
                 <span class="text-[14px] font-bold text-[#1a1a1a]">Modullar va darslar</span>
               </div>
               <div class="flex items-center gap-3">
@@ -469,6 +588,39 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                       </div>
                       <span class="text-[11px] text-cx-muted select-none">Bepul</span>
                     </label>
+                    <!-- Video upload -->
+                    <div class="shrink-0 flex items-center gap-1">
+                      <template v-if="lesson.videoUrl">
+                        <span class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                          <UIcon name="i-lucide-video" class="size-3" />
+                          Video
+                        </span>
+                        <button
+                          class="grid size-5 place-items-center rounded text-red-400 hover:bg-red-50 transition-colors"
+                          @click="removeVideo(mi, li)"
+                        >
+                          <UIcon name="i-lucide-x" class="size-3" />
+                        </button>
+                      </template>
+                      <template v-else>
+                        <label
+                          class="grid size-6 place-items-center rounded-lg text-cx-line hover:text-cx-blue hover:bg-blue-50 transition-colors cursor-pointer"
+                          :class="{ 'animate-pulse text-cx-blue': uploadingLesson === `${mi}-${li}` }"
+                        >
+                          <UIcon
+                            :name="uploadingLesson === `${mi}-${li}` ? 'i-lucide-loader' : 'i-lucide-video'"
+                            class="size-3.5"
+                          />
+                          <input
+                            type="file"
+                            accept="video/*"
+                            class="hidden"
+                            :disabled="!!uploadingLesson"
+                            @change="onVideoFileChange(mi, li, $event)"
+                          />
+                        </label>
+                      </template>
+                    </div>
                     <button
                       class="shrink-0 grid size-6 place-items-center rounded-lg text-cx-line hover:text-red-400 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
                       @click="removeLesson(mi, li)"
@@ -487,12 +639,13 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                     <UIcon name="i-lucide-plus" class="size-3.5" />
                     Dars qo'shish
                   </button>
+                  <p v-if="uploadError" class="px-4 py-2 text-[12px] text-red-500">{{ uploadError }}</p>
                 </div>
               </div>
 
               <!-- Add module -->
               <button
-                class="flex items-center justify-center gap-2.5 py-3.5 rounded-xl border-2 border-dashed border-cx-line text-[13px] font-semibold text-cx-muted hover:border-cx-blue hover:text-cx-blue hover:bg-[#f5f9ff] transition-all duration-200"
+                class="flex items-center justify-center gap-2.5 py-3.5 rounded-xl border-2 border-dashed border-cx-line text-[13px] font-semibold text-cx-muted hover:border-cx-blue hover:text-cx-blue hover:bg-cx-blue/10 transition-all duration-200"
                 @click="addModule"
               >
                 <div class="size-5 rounded border-2 border-current flex items-center justify-center">
@@ -500,6 +653,92 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                 </div>
                 Yangi modul qo'shish
               </button>
+            </div>
+          </div>
+
+          <!-- 04 · Content -->
+          <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
+            <div class="px-6 py-4 border-b border-cx-line flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-[11px] font-bold text-cx-blue bg-cx-blue/10 px-2 py-0.5 rounded-md tracking-widest">04</span>
+                <span class="text-[14px] font-bold text-[#1a1a1a]">Kontent</span>
+              </div>
+              <div class="flex items-center gap-1 bg-[#ebebea] rounded-xl p-1">
+                <button
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
+                  :class="contentTab === 'editor' ? 'bg-white text-cx-ink shadow-sm' : 'text-cx-muted hover:text-cx-ink'"
+                  @click="contentTab = 'editor'"
+                >
+                  <UIcon name="i-lucide-pencil-line" class="size-3.5" />
+                  Vizual
+                </button>
+                <button
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
+                  :class="contentTab === 'notion' ? 'bg-white text-cx-ink shadow-sm' : 'text-cx-muted hover:text-cx-ink'"
+                  @click="contentTab = 'notion'; notionPasted = false"
+                >
+                  <UIcon name="i-lucide-clipboard-paste" class="size-3.5" />
+                  Notion paste
+                </button>
+              </div>
+            </div>
+
+            <div class="p-5">
+              <ClientOnly v-if="contentTab === 'editor'">
+                <GuideEditor v-model="content" />
+              </ClientOnly>
+
+              <div v-else-if="contentTab === 'notion'">
+                <div
+                  v-if="notionPasted"
+                  class="flex flex-col items-center justify-center gap-3 py-16 rounded-xl border-2 border-green-300 bg-green-50"
+                >
+                  <div class="grid size-12 place-items-center rounded-full bg-green-100">
+                    <UIcon name="i-lucide-check" class="size-6 text-green-600" />
+                  </div>
+                  <p class="text-[14px] font-bold text-green-700">Muvaffaqiyatli import qilindi!</p>
+                </div>
+
+                <div v-else class="rounded-xl border-2 border-dashed border-cx-line overflow-hidden">
+                  <div class="px-4 py-3 bg-[#fafafa] border-b border-cx-line flex items-center gap-2">
+                    <div class="size-5 rounded flex items-center justify-center bg-[#1a1a1a]">
+                      <span class="text-white font-bold text-[10px]">N</span>
+                    </div>
+                    <span class="text-[12px] font-bold text-cx-ink">Notion'dan paste qilish</span>
+                  </div>
+                  <div class="px-5 py-4 bg-[#fafafa] border-b border-cx-line">
+                    <ol class="flex flex-col gap-1.5">
+                      <li class="flex items-start gap-2 text-[12px] text-cx-muted">
+                        <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                        Notion sahifangizni oching
+                      </li>
+                      <li class="flex items-start gap-2 text-[12px] text-cx-muted">
+                        <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                        Kerakli matnni tanlang va nusxa oling (Ctrl+C)
+                      </li>
+                      <li class="flex items-start gap-2 text-[12px] text-cx-muted">
+                        <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                        Quyidagi maydonni bosing va Ctrl+V bosing
+                      </li>
+                    </ol>
+                  </div>
+                  <div
+                    ref="notionZoneRef"
+                    contenteditable="true"
+                    class="min-h-48 px-5 py-4 bg-white text-[13px] text-cx-muted outline-none cursor-text focus:bg-[#fafeff]"
+                    @paste="onNotionPaste"
+                  >
+                    <span class="select-none text-cx-faint pointer-events-none">
+                      Bu yerga Notion kontentini paste qiling (Ctrl+V)...
+                    </span>
+                  </div>
+                </div>
+
+                <p class="mt-3 text-[11px] text-cx-muted flex items-center gap-1.5">
+                  <UIcon name="i-lucide-info" class="size-3 shrink-0" />
+                  H1–H3, paragraf, ro'yxat, kod bloklari, qalin va kursiv matn avtomatik HTML ga aylanadi.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -511,7 +750,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
           <!-- Visual settings -->
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-5 py-3.5 border-b border-cx-line flex items-center gap-3">
-              <span class="text-[11px] font-bold text-cx-blue bg-[#eef5ff] px-2 py-0.5 rounded-md tracking-widest">04</span>
+              <span class="text-[11px] font-bold text-cx-blue bg-cx-blue/10 px-2 py-0.5 rounded-md tracking-widest">05</span>
               <span class="text-[14px] font-bold text-[#1a1a1a]">Ko'rinish</span>
             </div>
 
@@ -582,7 +821,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                 <!-- Upload zone -->
                 <label
                   v-else
-                  class="flex flex-col items-center justify-center gap-2.5 h-36 rounded-xl border-2 border-dashed border-cx-line bg-[#fafafa] hover:border-cx-blue hover:bg-[#f5f9ff] transition-all cursor-pointer"
+                  class="flex flex-col items-center justify-center gap-2.5 h-36 rounded-xl border-2 border-dashed border-cx-line bg-[#fafafa] hover:border-cx-blue hover:bg-cx-blue/10 transition-all cursor-pointer"
                 >
                   <input
                     ref="imageInputRef"
@@ -591,7 +830,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                     class="sr-only"
                     @change="onImagePick"
                   />
-                  <div class="grid size-10 place-items-center rounded-xl bg-[#eef5ff]">
+                  <div class="grid size-10 place-items-center rounded-xl bg-cx-blue/10">
                     <UIcon name="i-lucide-image-plus" class="size-5 text-cx-blue" />
                   </div>
                   <div class="text-center">

@@ -1,22 +1,26 @@
 <script setup lang="ts">
-import type { Guide } from '~/stores/guides'
 import JSZip from 'jszip'
 
 const authStore = useAuthStore()
 const guidesStore = useGuidesStore()
 
-onMounted(() => {
-  guidesStore.load()
-  if (!authStore.isOwner) navigateTo('/guides')
-})
+const DRAFT_KEY = 'guide-draft-new'
 
 const title = ref('')
 const desc = ref('')
 const badge = ref("qo'llanma")
 const category = ref('Neyrotarmoqlar')
 const free = ref(false)
+const level = ref('Yangi boshlagan')
+const levelOptions = [
+  { label: 'Yangi boshlagan', color: '#22c55e', icon: 'i-lucide-leaf',       desc: 'Faqat tanishishni boshlamoqda' },
+  { label: "O'rta",           color: '#3480f1', icon: 'i-lucide-bar-chart-2', desc: 'Vositalarni biladi, vaqti-vaqti bilan ishlatadi' },
+  { label: 'Tajribali',       color: '#14161f', icon: 'i-lucide-flame',       desc: 'Muntazam ishlaydi, loyihalarga tatbiq etadi' },
+  { label: 'Professional',    color: '#8b5cf6', icon: 'i-lucide-rocket',      desc: "O'z yechimlarini yaratadi va avtomatlashtiradi" },
+]
 const content = ref('')
-const contentTab = ref<'html' | 'notion' | 'zip'>('html')
+const contentTab = ref<'editor' | 'notion'>('editor')
+
 const notionPasted = ref(false)
 const notionZoneRef = ref<HTMLDivElement | null>(null)
 
@@ -124,7 +128,16 @@ function cleanNotionHtml(html: string): string {
     }
 
     if (keep[tag]) return keep[tag](inner, el)
-    // div, span and other wrappers — just return children
+
+    if (tag === 'span') {
+      const style = (el as HTMLElement).style
+      const parts: string[] = []
+      if (style.color) parts.push(`color:${style.color}`)
+      if (style.backgroundColor) parts.push(`background-color:${style.backgroundColor}`)
+      if (parts.length) return `<span style="${parts.join(';')}">${inner}</span>`
+      return inner
+    }
+
     return inner
   }
 
@@ -162,19 +175,11 @@ const slugError = computed(() =>
   slug.value && guidesStore.slugExists(slug.value) ? 'Bu slug allaqachon mavjud' : ''
 )
 
-const tagInput = ref('')
-const tags = ref<string[]>([])
-function addTag() {
-  const t = tagInput.value.trim()
-  if (t && !tags.value.includes(t)) tags.value.push(t)
-  tagInput.value = ''
-}
-function removeTag(i: number) { tags.value.splice(i, 1) }
 
 const accent = ref('#e8b97a')
 const bgPresets = [
   { label: 'Sariq', value: '#f5ede0', dark: false },
-  { label: 'Moviy', value: '#f0f4ff', dark: false },
+  { label: 'Moviy', value: '#3480f1', dark: false },
   { label: 'Yashil', value: '#f0fdf4', dark: false },
   { label: 'Qora', value: '#111111', dark: true },
   { label: "To'q ko'k", value: '#0d1117', dark: true },
@@ -188,17 +193,155 @@ function selectBg(preset: typeof bgPresets[0]) {
 }
 
 const previewImage = ref('')
+
+onMounted(() => {
+  guidesStore.fetch()
+  if (!authStore.isOwner) navigateTo('/guides')
+
+  try {
+    const saved = localStorage.getItem(DRAFT_KEY)
+    if (saved) {
+      const d = JSON.parse(saved)
+      if (d.title) title.value = d.title
+      if (d.desc) desc.value = d.desc
+      if (d.badge) badge.value = d.badge
+      if (d.category) category.value = d.category
+      if (typeof d.free === 'boolean') free.value = d.free
+      if (d.content) content.value = d.content
+      if (d.level) level.value = d.level
+      if (d.accent) accent.value = d.accent
+      if (d.bg) bg.value = d.bg
+      if (typeof d.bgDark === 'boolean') bgDark.value = d.bgDark
+      if (d.previewImage) previewImage.value = d.previewImage
+    }
+  } catch {}
+})
+
+watch(
+  [title, desc, badge, category, free, level, content, accent, bg, bgDark, previewImage],
+  () => {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({
+        title: title.value, desc: desc.value, badge: badge.value,
+        category: category.value, free: free.value, level: level.value, content: content.value,
+        accent: accent.value, bg: bg.value,
+        bgDark: bgDark.value, previewImage: previewImage.value
+      }))
+    } catch {}
+  },
+  { deep: true }
+)
+
 const imageInputRef = ref<HTMLInputElement | null>(null)
-function onImagePick(e: Event) {
+const imageUploading = ref(false)
+
+async function onImagePick(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
-  const reader = new FileReader()
-  reader.onload = () => { previewImage.value = reader.result as string }
-  reader.readAsDataURL(file)
+  imageUploading.value = true
+  try {
+    const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string; publicUrl: string }>(
+      '/api/upload/presign',
+      { method: 'POST', body: { filename: file.name, contentType: file.type } }
+    )
+    await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
+    previewImage.value = publicUrl
+  } finally {
+    imageUploading.value = false
+    if (imageInputRef.value) imageInputRef.value.value = ''
+  }
 }
+
 function removeImage() {
   previewImage.value = ''
   if (imageInputRef.value) imageInputRef.value.value = ''
+}
+
+const CROP_W = 480
+const CROP_H = 270
+const cropModalOpen = ref(false)
+const cropOffsetX = ref(0)
+const cropOffsetY = ref(0)
+const cropScale = ref(1)
+const cropNatW = ref(0)
+const cropNatH = ref(0)
+let _cropDragging = false
+let _cropLastX = 0
+let _cropLastY = 0
+
+const cropImgStyle = computed(() => ({
+  position: 'absolute' as const,
+  width: `${cropNatW.value * cropScale.value}px`,
+  height: `${cropNatH.value * cropScale.value}px`,
+  left: `${cropOffsetX.value}px`,
+  top: `${cropOffsetY.value}px`,
+  userSelect: 'none' as const,
+  pointerEvents: 'none' as const,
+}))
+
+function openCropModal() {
+  const img = new Image()
+  img.onload = () => {
+    cropNatW.value = img.naturalWidth
+    cropNatH.value = img.naturalHeight
+    const s = Math.max(CROP_W / img.naturalWidth, CROP_H / img.naturalHeight)
+    cropScale.value = s
+    cropOffsetX.value = (CROP_W - img.naturalWidth * s) / 2
+    cropOffsetY.value = (CROP_H - img.naturalHeight * s) / 2
+    cropModalOpen.value = true
+  }
+  img.src = previewImage.value
+}
+
+function onCropPointerDown(e: PointerEvent) {
+  _cropDragging = true
+  _cropLastX = e.clientX
+  _cropLastY = e.clientY
+  ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+}
+
+function onCropPointerMove(e: PointerEvent) {
+  if (!_cropDragging) return
+  const scaledW = cropNatW.value * cropScale.value
+  const scaledH = cropNatH.value * cropScale.value
+  cropOffsetX.value = Math.min(0, Math.max(CROP_W - scaledW, cropOffsetX.value + e.clientX - _cropLastX))
+  cropOffsetY.value = Math.min(0, Math.max(CROP_H - scaledH, cropOffsetY.value + e.clientY - _cropLastY))
+  _cropLastX = e.clientX
+  _cropLastY = e.clientY
+}
+
+function onCropPointerUp() { _cropDragging = false }
+
+function applyCrop() {
+  const img = new Image()
+  img.onload = async () => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 800
+    canvas.height = 450
+    const ctx = canvas.getContext('2d')!
+    ctx.drawImage(
+      img,
+      -cropOffsetX.value / cropScale.value,
+      -cropOffsetY.value / cropScale.value,
+      CROP_W / cropScale.value,
+      CROP_H / cropScale.value,
+      0, 0, 800, 450
+    )
+    cropModalOpen.value = false
+    imageUploading.value = true
+    try {
+      const blob = await new Promise<Blob>(res => canvas.toBlob(b => res(b!), 'image/jpeg', 0.92))
+      const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string; publicUrl: string }>(
+        '/api/upload/presign',
+        { method: 'POST', body: { filename: `cover-${Date.now()}.jpg`, contentType: 'image/jpeg' } }
+      )
+      await fetch(uploadUrl, { method: 'PUT', body: blob, headers: { 'Content-Type': 'image/jpeg' } })
+      previewImage.value = publicUrl
+    } finally {
+      imageUploading.value = false
+    }
+  }
+  img.src = previewImage.value
 }
 
 const errors = ref<string[]>([])
@@ -209,30 +352,43 @@ function validate() {
   if (!title.value.trim()) e.push('Sarlavha kiritilmagan')
   if (!desc.value.trim()) e.push('Tavsif kiritilmagan')
   if (!content.value.trim()) e.push('Kontent kiritilmagan')
-  if (tags.value.length === 0) e.push("Kamida bitta tag qo'shing")
   if (slugError.value) e.push(slugError.value)
   errors.value = e
   return e.length === 0
 }
 
-function save() {
+async function save() {
   if (!validate()) return
   saving.value = true
-  const guide: Guide = {
-    slug: slug.value,
-    title: title.value.trim(),
-    desc: desc.value.trim(),
-    tags: tags.value,
-    category: category.value,
-    free: free.value,
-    bg: bg.value,
-    accent: accent.value,
-    badge: badge.value,
-    content: content.value,
-    image: previewImage.value || undefined,
+  try {
+    const result = await $fetch('/api/guides', {
+      method: 'POST',
+      body: {
+        slug: slug.value,
+        title: title.value.trim(),
+        description: desc.value.trim(),
+        isFree: free.value,
+        level: level.value,
+        bg: bg.value,
+        accent: accent.value,
+        badge: badge.value,
+        category: category.value,
+        content: content.value,
+        coverUrl: previewImage.value || null
+      }
+    })
+    localStorage.removeItem(DRAFT_KEY)
+    await guidesStore.fetch(true)
+    navigateTo(`/guides/${(result as { slug: string }).slug}`)
+  } catch (e: unknown) {
+    const msg = (e as { data?: { message?: string }; message?: string })?.data?.message
+      ?? (e as { message?: string })?.message
+      ?? 'Saqlashda xatolik yuz berdi'
+    errors.value = [msg]
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  } finally {
+    saving.value = false
   }
-  guidesStore.addGuide(guide)
-  setTimeout(() => { saving.value = false; navigateTo(`/guides/${guide.slug}`) }, 500)
 }
 
 useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
@@ -243,7 +399,7 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
 
     <!-- Top bar -->
     <div class="sticky top-0 z-30 bg-white border-b border-cx-line">
-      <div class="max-w-295 mx-auto px-10 h-14 flex items-center justify-between">
+      <div class="w-310 max-w-[calc(100vw-40px)] mx-auto px-0 h-14 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <NuxtLink
             to="/guides"
@@ -278,11 +434,11 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
       </div>
     </div>
 
-    <div class="max-w-295 mx-auto px-10 py-8">
+    <div class="w-310 max-w-[calc(100vw-40px)] mx-auto px-0 py-8">
 
       <!-- Page heading -->
       <div class="mb-7">
-        <h1 class="text-[26px] font-extrabold tracking-tight text-[#1a1a1a]">Yangi qo'llanma qo'shish</h1>
+        <h1 class="text-[50px] font-extrabold tracking-tight text-[#1a1a1a]">Yangi qo'llanma qo'shish</h1>
         <p class="text-cx-muted text-[13px] mt-1">Barcha maydonlarni to'ldiring — qo'llanma darhol saytda ko'rinadi.</p>
       </div>
 
@@ -301,13 +457,12 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
 
       <div class="grid grid-cols-[1fr_320px] gap-6 items-start">
 
-        <!-- ── LEFT ──────────────────────────────────────── -->
         <div class="flex flex-col gap-4">
 
           <!-- 01 · Basic info -->
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-6 py-4 border-b border-cx-line flex items-center gap-3">
-              <span class="text-[11px] font-bold text-cx-blue bg-[#eef5ff] px-2 py-0.5 rounded-md tracking-widest">01</span>
+              <span class="text-[11px] font-bold text-cx-blue bg-cx-blue/10 px-2 py-0.5 rounded-md tracking-widest">01</span>
               <span class="text-[14px] font-bold text-[#1a1a1a]">Asosiy ma'lumotlar</span>
             </div>
             <div class="p-6 flex flex-col gap-5">
@@ -357,7 +512,7 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                       :key="cat.label"
                       class="flex items-center gap-2 px-3.5 py-2 rounded-xl border-2 text-[12px] font-semibold transition-all duration-150 whitespace-nowrap"
                       :class="category === cat.label
-                        ? 'border-cx-blue bg-[#eef5ff] text-cx-blue'
+                        ? 'border-cx-blue bg-cx-blue/10 text-cx-blue'
                         : 'border-cx-line bg-white text-cx-muted hover:border-[#c0c0bc] hover:text-cx-ink'"
                       @click="category = cat.label"
                     >
@@ -411,47 +566,33 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
             </div>
           </div>
 
-          <!-- 02 · Tags -->
+          <!-- 02 · Daraja -->
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-6 py-4 border-b border-cx-line flex items-center gap-3">
-              <span class="text-[11px] font-bold text-cx-blue bg-[#eef5ff] px-2 py-0.5 rounded-md tracking-widest">02</span>
-              <span class="text-[14px] font-bold text-[#1a1a1a]">Teglar</span>
+              <span class="text-[11px] font-bold text-cx-blue bg-cx-blue/10 px-2 py-0.5 rounded-md tracking-widest">02</span>
+              <span class="text-[14px] font-bold text-[#1a1a1a]">Daraja</span>
             </div>
-            <div class="p-6">
-              <div class="flex gap-2 mb-4">
-                <input
-                  v-model="tagInput"
-                  type="text"
-                  placeholder="Enter yoki vergul bosib tag qo'shing..."
-                  class="flex-1 px-4 py-2.5 rounded-xl border border-cx-line bg-white text-[14px] text-[#1a1a1a] placeholder:text-cx-faint focus:outline-none focus:border-cx-blue transition-colors"
-                  @keydown.enter.prevent="addTag"
-                  @keydown.comma.prevent="addTag"
-                />
-                <button
-                  class="shrink-0 px-4 py-2.5 rounded-xl bg-[#1a1a1a] text-white text-[13px] font-semibold hover:bg-[#333] transition-colors"
-                  @click="addTag"
+            <div class="p-6 flex flex-col gap-2">
+              <button
+                v-for="opt in levelOptions"
+                :key="opt.label"
+                class="flex items-center gap-4 px-5 py-4 rounded-2xl border-2 text-left transition-all duration-150"
+                :class="level === opt.label ? 'border-current' : 'border-cx-line bg-white hover:border-[#c0c0bc]'"
+                :style="level === opt.label ? { borderColor: opt.color, background: opt.color + '10' } : {}"
+                @click="level = opt.label"
+              >
+                <div
+                  class="size-11 rounded-2xl flex items-center justify-center shrink-0"
+                  :style="{ background: opt.color + (level === opt.label ? '20' : '12') }"
                 >
-                  + Qo'shish
-                </button>
-              </div>
-              <div v-if="tags.length" class="flex flex-wrap gap-2">
-                <span
-                  v-for="(tag, i) in tags"
-                  :key="tag"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#eef5ff] border border-[#c7deff] text-[12px] font-semibold text-cx-blue"
-                >
-                  {{ tag }}
-                  <button
-                    class="grid size-4 place-items-center rounded-full hover:bg-cx-blue hover:text-white transition-colors text-cx-blue/60"
-                    @click="removeTag(i)"
-                  >
-                    <UIcon name="i-lucide-x" class="size-2.5" />
-                  </button>
-                </span>
-              </div>
-              <p v-else class="text-[12px] text-cx-faint">
-                Teglar qo'llanma kategoriya filtriga ta'sir qiladi.
-              </p>
+                  <UIcon :name="opt.icon" class="size-5" :style="{ color: opt.color }" />
+                </div>
+                <div>
+                  <div class="text-[15px] font-bold" :style="level === opt.label ? { color: opt.color } : { color: '#14161f' }">{{ opt.label }}</div>
+                  <div class="text-[12px] text-cx-muted mt-0.5">{{ opt.desc }}</div>
+                </div>
+                <UIcon v-if="level === opt.label" name="i-lucide-check-circle-2" class="ml-auto size-5 shrink-0" :style="{ color: opt.color }" />
+              </button>
             </div>
           </div>
 
@@ -459,18 +600,18 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-6 py-4 border-b border-cx-line flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <span class="text-[11px] font-bold text-cx-blue bg-[#eef5ff] px-2 py-0.5 rounded-md tracking-widest">03</span>
+                <span class="text-[11px] font-bold text-cx-blue bg-cx-blue/10 px-2 py-0.5 rounded-md tracking-widest">03</span>
                 <span class="text-[14px] font-bold text-[#1a1a1a]">Kontent</span>
               </div>
               <!-- Tabs -->
               <div class="flex items-center gap-1 bg-[#ebebea] rounded-xl p-1">
                 <button
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
-                  :class="contentTab === 'html' ? 'bg-white text-cx-ink shadow-sm' : 'text-cx-muted hover:text-cx-ink'"
-                  @click="contentTab = 'html'"
+                  :class="contentTab === 'editor' ? 'bg-white text-cx-ink shadow-sm' : 'text-cx-muted hover:text-cx-ink'"
+                  @click="contentTab = 'editor'"
                 >
-                  <UIcon name="i-lucide-code-2" class="size-3.5" />
-                  HTML
+                  <UIcon name="i-lucide-pencil-line" class="size-3.5" />
+                  Vizual
                 </button>
                 <button
                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
@@ -480,37 +621,15 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                   <UIcon name="i-lucide-clipboard-paste" class="size-3.5" />
                   Notion paste
                 </button>
-                <button
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
-                  :class="contentTab === 'zip' ? 'bg-white text-cx-ink shadow-sm' : 'text-cx-muted hover:text-cx-ink'"
-                  @click="contentTab = 'zip'; zipStatus = 'idle'"
-                >
-                  <UIcon name="i-lucide-file-archive" class="size-3.5" />
-                  ZIP fayl
-                </button>
               </div>
             </div>
 
             <div class="p-5">
 
-              <!-- HTML tab -->
-              <div v-if="contentTab === 'html'" class="rounded-xl border border-cx-line overflow-hidden">
-                <div class="px-4 py-2.5 bg-white border-b border-cx-line flex items-center gap-1.5">
-                  <UIcon name="i-lucide-code-2" class="size-3.5 text-cx-muted" />
-                  <span class="text-[11px] font-bold text-cx-muted uppercase tracking-wider">HTML kontent</span>
-                </div>
-                <textarea
-                  v-model="content"
-                  rows="16"
-                  placeholder="<h2>Sarlavha</h2>
-<p>Matn bu yerga...</p>
-<h3>Bo'lim</h3>
-<ul>
-  <li>Element</li>
-</ul>"
-                  class="w-full px-4 py-3.5 text-[13px] font-mono text-[#1a1a1a] placeholder:text-[#c8c8c4] bg-white outline-none resize-none leading-relaxed"
-                />
-              </div>
+              <!-- Visual editor tab -->
+              <ClientOnly v-if="contentTab === 'editor'">
+                <GuideEditor v-model="content" />
+              </ClientOnly>
 
               <!-- Notion tab -->
               <div v-else-if="contentTab === 'notion'">
@@ -539,19 +658,19 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                   <div class="px-5 py-4 bg-[#fafafa] border-b border-cx-line">
                     <ol class="flex flex-col gap-1.5">
                       <li class="flex items-start gap-2 text-[12px] text-cx-muted">
-                        <span class="size-4 rounded-full bg-[#eef5ff] text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                        <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
                         Notion sahifangizni oching
                       </li>
                       <li class="flex items-start gap-2 text-[12px] text-cx-muted">
-                        <span class="size-4 rounded-full bg-[#eef5ff] text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                        <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
                         Kerakli matnni tanlang (Ctrl+A yoki qo'lda)
                       </li>
                       <li class="flex items-start gap-2 text-[12px] text-cx-muted">
-                        <span class="size-4 rounded-full bg-[#eef5ff] text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                        <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
                         Nusxa oling (Ctrl+C)
                       </li>
                       <li class="flex items-start gap-2 text-[12px] text-cx-muted">
-                        <span class="size-4 rounded-full bg-[#eef5ff] text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+                        <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
                         Quyidagi maydonni bosing va Ctrl+V bosing
                       </li>
                     </ol>
@@ -573,45 +692,11 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
 
                 <p class="mt-3 text-[11px] text-cx-muted flex items-center gap-1.5">
                   <UIcon name="i-lucide-info" class="size-3 shrink-0" />
-                  H1–H3, paragraf, ro'yxat, kod bloklari, qalin va kursiv matn avtomatik HTML ga aylanadi. Rasmlar uchun ZIP tab dan foydalaning.
+                  H1–H3, paragraf, ro'yxat, kod bloklari, qalin va kursiv matn avtomatik HTML ga aylanadi.
                 </p>
               </div>
 
-              <!-- ZIP tab -->
-              <div v-else-if="contentTab === 'zip'">
-
-                <!-- Loading -->
-                <div v-if="zipLoading" class="flex flex-col items-center justify-center gap-3 py-16 rounded-xl border border-cx-line bg-[#fafafa]">
-                  <UIcon name="i-lucide-loader-circle" class="size-10 text-cx-blue animate-spin" />
-                  <p class="text-[13px] font-semibold text-cx-ink">ZIP fayl o'qilmoqda...</p>
-                  <p class="text-[12px] text-cx-muted">Rasmlar base64 ga aylantirilmoqda</p>
-                </div>
-
-                <!-- Success -->
-                <div v-else-if="zipStatus === 'success'" class="flex flex-col items-center justify-center gap-3 py-16 rounded-xl border-2 border-green-300 bg-green-50">
-                  <div class="grid size-12 place-items-center rounded-full bg-green-100">
-                    <UIcon name="i-lucide-check" class="size-6 text-green-600" />
-                  </div>
-                  <p class="text-[14px] font-bold text-green-700">Muvaffaqiyatli import qilindi!</p>
-                  <p class="text-[12px] text-green-600">{{ zipMessage }}</p>
-                </div>
-
-                <!-- Error -->
-                <div v-else-if="zipStatus === 'error'" class="rounded-xl border-2 border-red-200 bg-red-50 p-5">
-                  <div class="flex items-start gap-3">
-                    <UIcon name="i-lucide-circle-alert" class="size-5 text-red-500 shrink-0 mt-0.5" />
-                    <div>
-                      <p class="text-[13px] font-bold text-red-600 mb-1">Xatolik</p>
-                      <p class="text-[12px] text-red-500">{{ zipMessage }}</p>
-                    </div>
-                  </div>
-                  <button class="mt-4 text-[12px] font-semibold text-red-500 hover:text-red-700 transition-colors" @click="zipStatus = 'idle'">
-                    Qayta urinish →
-                  </button>
-                </div>
-
-                <!-- Upload zone -->
-                <div v-else>
+              <div v-if="false">
                   <div class="rounded-xl border border-cx-line overflow-hidden mb-4">
                     <div class="px-4 py-3 bg-[#fafafa] border-b border-cx-line flex items-center gap-2">
                       <div class="size-5 rounded flex items-center justify-center bg-[#1a1a1a]">
@@ -622,24 +707,24 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                     <div class="px-5 py-4 bg-[#fafafa]">
                       <ol class="flex flex-col gap-1.5">
                         <li class="flex items-start gap-2 text-[12px] text-cx-muted">
-                          <span class="size-4 rounded-full bg-[#eef5ff] text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                          <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
                           Notion sahifasini oching → <strong class="text-cx-ink">···</strong> → <strong class="text-cx-ink">Export</strong>
                         </li>
                         <li class="flex items-start gap-2 text-[12px] text-cx-muted">
-                          <span class="size-4 rounded-full bg-[#eef5ff] text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                          <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
                           Format: <strong class="text-cx-ink">HTML</strong> tanlang
                         </li>
                         <li class="flex items-start gap-2 text-[12px] text-cx-muted">
-                          <span class="size-4 rounded-full bg-[#eef5ff] text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                          <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
                           Yuklab olingan <strong class="text-cx-ink">.zip</strong> faylni quyida tanlang
                         </li>
                       </ol>
                     </div>
                   </div>
 
-                  <label class="flex flex-col items-center justify-center gap-3 h-40 rounded-xl border-2 border-dashed border-cx-line bg-white hover:border-cx-blue hover:bg-[#f5f9ff] transition-all cursor-pointer">
+                  <label class="flex flex-col items-center justify-center gap-3 h-40 rounded-xl border-2 border-dashed border-cx-line bg-white hover:border-cx-blue hover:bg-cx-blue/10 transition-all cursor-pointer">
                     <input ref="zipInputRef" type="file" accept=".zip" class="sr-only" @change="onZipPick" />
-                    <div class="grid size-12 place-items-center rounded-xl bg-[#eef5ff]">
+                    <div class="grid size-12 place-items-center rounded-xl bg-cx-blue/10">
                       <UIcon name="i-lucide-file-archive" class="size-6 text-cx-blue" />
                     </div>
                     <div class="text-center">
@@ -647,22 +732,21 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                       <p class="text-[12px] text-cx-muted mt-0.5">Notion eksport ZIP — rasmlar avtomatik saqlanadi</p>
                     </div>
                   </label>
-                </div>
 
               </div>
 
             </div>
           </div>
 
-        </div>
+        </div><!-- end left column -->
 
-        <!-- ── RIGHT ─────────────────────────────────────── -->
+        <!-- ── RIGHT COLUMN ────────────────────────────── -->
         <div class="sticky top-20 flex flex-col gap-4 max-h-[calc(100vh-5.5rem)] overflow-y-auto pb-2 pr-0.5">
 
           <!-- 04 · Visual -->
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-5 py-3.5 border-b border-cx-line flex items-center gap-3">
-              <span class="text-[11px] font-bold text-cx-blue bg-[#eef5ff] px-2 py-0.5 rounded-md tracking-widest">04</span>
+              <span class="text-[11px] font-bold text-cx-blue bg-cx-blue/10 px-2 py-0.5 rounded-md tracking-widest">04</span>
               <span class="text-[14px] font-bold text-[#1a1a1a]">Ko'rinish</span>
             </div>
             <div class="p-5 flex flex-col gap-5">
@@ -706,25 +790,34 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
               <!-- Image -->
               <div>
                 <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2.5">Muqova rasmi</label>
-                <div v-if="previewImage" class="relative rounded-xl overflow-hidden border border-cx-line">
-                  <img :src="previewImage" alt="cover" class="w-full h-40 object-cover" />
-                  <button
-                    class="absolute top-2 right-2 grid size-7 place-items-center rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
-                    @click="removeImage"
-                  >
-                    <UIcon name="i-lucide-x" class="size-3.5" />
-                  </button>
+                <div v-if="previewImage" class="relative rounded-xl overflow-hidden border border-cx-line bg-[#f7f7f5]" style="aspect-ratio:397/264">
+                  <img :src="previewImage" alt="cover" class="absolute inset-0 w-full h-full object-contain" />
+                  <div class="absolute top-2 right-2 flex gap-1.5">
+                    <button
+                      class="grid size-7 place-items-center rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
+                      @click="openCropModal"
+                    >
+                      <UIcon name="i-lucide-crop" class="size-3.5" />
+                    </button>
+                    <button
+                      class="grid size-7 place-items-center rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
+                      @click="removeImage"
+                    >
+                      <UIcon name="i-lucide-x" class="size-3.5" />
+                    </button>
+                  </div>
                 </div>
                 <label
                   v-else
-                  class="flex flex-col items-center justify-center gap-2.5 h-36 rounded-xl border-2 border-dashed border-cx-line bg-white hover:border-cx-blue hover:bg-[#f5f9ff] transition-all cursor-pointer"
+                  class="flex flex-col items-center justify-center gap-2.5 h-36 rounded-xl border-2 border-dashed border-cx-line bg-white hover:border-cx-blue hover:bg-cx-blue/10 transition-all cursor-pointer"
+                  :class="{ 'opacity-60 pointer-events-none': imageUploading }"
                 >
-                  <input ref="imageInputRef" type="file" accept="image/*" class="sr-only" @change="onImagePick" />
-                  <div class="grid size-10 place-items-center rounded-xl bg-[#eef5ff]">
-                    <UIcon name="i-lucide-image-plus" class="size-5 text-cx-blue" />
+                  <input ref="imageInputRef" type="file" accept="image/*" class="sr-only" :disabled="imageUploading" @change="onImagePick" />
+                  <div class="grid size-10 place-items-center rounded-xl bg-cx-blue/10">
+                    <UIcon :name="imageUploading ? 'i-lucide-loader-2' : 'i-lucide-image-plus'" class="size-5 text-cx-blue" :class="{ 'animate-spin': imageUploading }" />
                   </div>
                   <div class="text-center">
-                    <p class="text-[13px] font-semibold text-cx-ink">Rasm yuklash</p>
+                    <p class="text-[13px] font-semibold text-cx-ink">{{ imageUploading ? 'Yuklanmoqda...' : 'Rasm yuklash' }}</p>
                     <p class="text-[11px] text-cx-muted mt-0.5">PNG, JPG — karta muqovasi</p>
                   </div>
                 </label>
@@ -742,8 +835,8 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
             <div class="p-4">
               <div class="rounded-xl overflow-hidden border border-cx-line">
                 <!-- Preview header -->
-                <div class="relative h-32 overflow-hidden" :style="{ backgroundColor: bg }">
-                  <img v-if="previewImage" :src="previewImage" alt="" class="absolute inset-0 w-full h-full object-cover" />
+                <div class="relative overflow-hidden" style="aspect-ratio:397/264" :style="{ backgroundColor: bg }">
+                  <img v-if="previewImage" :src="previewImage" alt="" class="absolute inset-0 w-full h-full object-contain" />
                   <div
                     class="absolute inset-0 opacity-35"
                     :style="{ background: `radial-gradient(ellipse at 95% 105%, ${accent} 0%, transparent 60%)` }"
@@ -761,22 +854,18 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                 </div>
                 <!-- Preview body -->
                 <div class="p-3 bg-[#fafafa]">
-                  <div class="flex flex-wrap gap-1 mb-2">
-                    <span v-if="!tags.length" class="px-2 py-0.5 rounded-full bg-[#eaeae8] text-[10px] text-cx-faint">tag</span>
-                    <span
-                      v-for="tag in tags"
-                      :key="tag"
-                      class="px-2 py-0.5 rounded-full bg-[#eaeae8] text-[10px] font-medium text-cx-muted"
-                    >{{ tag }}</span>
-                  </div>
                   <p class="text-[11px] text-cx-muted line-clamp-2 mb-2.5 leading-relaxed">
                     {{ desc || "Tavsif bu yerda ko'rinadi..." }}
                   </p>
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-2 flex-wrap">
                     <span
                       class="text-[10px] font-semibold px-2 py-0.5 rounded-md"
                       :style="{ backgroundColor: accent + '22', color: accent }"
                     >{{ category }}</span>
+                    <span
+                      class="text-[10px] font-semibold px-2 py-0.5 rounded-md"
+                      :style="{ backgroundColor: (levelOptions.find(o => o.label === level)?.color ?? '#22c55e') + '20', color: levelOptions.find(o => o.label === level)?.color ?? '#22c55e' }"
+                    >{{ level }}</span>
                     <span class="text-[10px] font-medium" :class="free ? 'text-green-600' : 'text-amber-500'">
                       {{ free ? '✓ Bepul' : '🔒 Obuna' }}
                     </span>
@@ -787,7 +876,48 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
           </div>
 
         </div>
+
+
       </div>
     </div>
   </div>
+
+  <!-- Crop modal -->
+  <Teleport to="body">
+    <div
+      v-if="cropModalOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      @click.self="cropModalOpen = false"
+    >
+      <div class="bg-white rounded-2xl p-6 shadow-2xl">
+        <h3 class="text-[15px] font-bold text-cx-ink mb-4">Rasmni moslashtirish</h3>
+
+        <div
+          class="relative overflow-hidden rounded-xl border border-cx-line cursor-grab active:cursor-grabbing select-none"
+          style="width: 480px; height: 270px;"
+          @pointerdown="onCropPointerDown"
+          @pointermove="onCropPointerMove"
+          @pointerup="onCropPointerUp"
+          @pointercancel="onCropPointerUp"
+        >
+          <img :src="previewImage" alt="" :style="cropImgStyle" @dragstart.prevent />
+        </div>
+
+        <p class="text-[12px] text-cx-muted mt-2 mb-5">Rasmni suring va kerakli qismni tanlang</p>
+
+        <div class="flex justify-end gap-2.5">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-xl border border-cx-line text-[13px] font-semibold text-cx-muted hover:text-cx-ink hover:border-[#c0c0bc] transition-colors"
+            @click="cropModalOpen = false"
+          >
+            Bekor qilish
+          </button>
+          <button type="button" class="btn-primary px-5! py-2! text-[13px]!" @click="applyCrop">
+            Saqlash
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>

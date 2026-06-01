@@ -1,12 +1,15 @@
 export interface Lesson {
+  id?: number
   title: string
   type: 'Nazariy' | 'Amaliy'
   duration: string
   free: boolean
   videoUrl?: string
+  content?: string
 }
 
 export interface CourseModule {
+  id?: number
   title: string
   subtitle: string
   duration: string
@@ -14,9 +17,11 @@ export interface CourseModule {
 }
 
 export interface Course {
+  id?: number
   slug: string
   title: string
   desc: string
+  description?: string
   tags: string[]
   level: string
   levelColor: string
@@ -32,128 +37,78 @@ export interface Course {
   accentTitle: string[]
   accentColor: string
   image?: string
+  coverUrl?: string
   content?: string
 }
 
-const STORAGE_KEY = 'cx-courses-extra'
-
-const BASE_COURSES: Course[] = [
-  {
-    slug: 'hermes-ai-agent',
-    title: 'Hermes asosida AI agent yaratish va sozlash',
-    desc: "Bu kursda biz noldan agent yaratamiz, unga ko'nikmalar va yaxshilanishlar qo'shamiz.",
-    tags: ['AI', 'AI agent', 'Hermes'],
-    level: "Boshlang'ich",
-    levelColor: '#22c55e',
-    rating: 0,
-    participants: 0,
-    duration: '~2h',
-    modules: 3,
-    lessons: 7,
-    bg: '#3480f1',
-    dark: false,
-    badge: 'kurs',
-    accentTitle: ['AI agent', 'Hermes'],
-    accentColor: '#3480f1',
-    modulesList: [
-      {
-        title: 'Agent yaratish',
-        subtitle: 'Baza',
-        duration: '~15m',
-        lessons: [
-          { title: 'Hermes asosida agent yaratish: tayyor assistant', type: 'Amaliy', duration: '15 min', free: false },
-        ]
-      },
-      {
-        title: 'Agentni yaxshilash va sozlash',
-        subtitle: "Ko'nikmalar qo'shish",
-        duration: '~40m',
-        lessons: [
-          { title: "Agentga yangi ko'nikma qo'shish", type: 'Amaliy', duration: '10 min', free: false },
-          { title: 'Agentlar orasida muloqot', type: 'Nazariy', duration: '8 min', free: false },
-          { title: "Ikkinchi agent qo'shish", type: 'Amaliy', duration: '12 min', free: false },
-          { title: 'Agent xotirasini sozlash', type: 'Amaliy', duration: '10 min', free: false },
-        ]
-      },
-      {
-        title: 'AI Office',
-        subtitle: 'Agentlar ofisi',
-        duration: '~20m',
-        lessons: [
-          { title: 'Agentlar tizimini loyihalash', type: 'Nazariy', duration: '10 min', free: false },
-          { title: 'AI Office yaratish', type: 'Amaliy', duration: '10 min', free: false },
-        ]
-      }
-    ]
-  },
-  {
-    slug: 'vibe-coding',
-    title: 'Vibe coding noldan',
-    desc: "Kod bilmasdan kerakli digital yechimlar: saytlar, vositalar va ilovalarni yaratish.",
-    tags: ['Vibe coding'],
-    level: "Boshlang'ich",
-    levelColor: '#22c55e',
-    rating: 0,
-    participants: 0,
-    duration: '~8h',
-    modules: 5,
-    lessons: 31,
-    bg: '#0d1117',
-    dark: true,
-    badge: 'kurs',
-    accentTitle: [],
-    accentColor: '#f97316',
-    modulesList: [
-      {
-        title: 'Kirish va asoslar',
-        subtitle: 'Baza',
-        duration: '~45m',
-        lessons: [
-          { title: 'Vibe coding nima va u qanday ishlaydi', type: 'Nazariy', duration: '10 min', free: false },
-          { title: "AI vositalarini tanlash va sozlash", type: 'Amaliy', duration: '15 min', free: false },
-          { title: 'Birinchi loyihangizni boshlash', type: 'Amaliy', duration: '20 min', free: false },
-        ]
-      },
-      {
-        title: 'Sayt yaratish',
-        subtitle: 'Landing page',
-        duration: '~1h20m',
-        lessons: [
-          { title: 'Landing page strukturasi', type: 'Nazariy', duration: '10 min', free: false },
-          { title: "AI yordamida dizayn yaratish", type: 'Amaliy', duration: '15 min', free: false },
-          { title: "Saytga kontent qo'shish", type: 'Amaliy', duration: '12 min', free: false },
-          { title: 'Mobilga moslash', type: 'Amaliy', duration: '10 min', free: false },
-          { title: 'Saytni deploy qilish', type: 'Amaliy', duration: '15 min', free: false },
-          { title: "Domain ulash", type: 'Amaliy', duration: '10 min', free: false },
-        ]
-      },
-    ]
-  }
-]
-
 export const useCoursesStore = defineStore('courses', () => {
-  const extraCourses = ref<Course[]>([])
+  const courses = ref<Course[]>([])
+  const pending = ref(false)
 
-  function load() {
-    if (!import.meta.client) return
+  async function load(force = false) {
+    if (courses.value.length && !force) return
+    pending.value = true
     try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) extraCourses.value = JSON.parse(raw) as Course[]
-    } catch { localStorage.removeItem(STORAGE_KEY) }
-  }
-
-  const all = computed<Course[]>(() => [...BASE_COURSES, ...extraCourses.value])
-
-  function addCourse(course: Course) {
-    extraCourses.value.push(course)
-    if (import.meta.client) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(extraCourses.value))
+      const rows = await $fetch<any[]>('/api/courses')
+      courses.value = rows.map(normalizeFromApi)
+    } finally {
+      pending.value = false
     }
   }
 
-  function slugExists(slug: string) {
-    return all.value.some(c => c.slug === slug)
+  async function addCourse(course: Course) {
+    const result = await $fetch<{ slug: string }>('/api/courses', {
+      method: 'POST',
+      body: course,
+    })
+    await load(true)
+    return result
   }
 
-  return { all, extraCourses, load, addCourse, slugExists }
+  function slugExists(slug: string) {
+    return courses.value.some(c => c.slug === slug)
+  }
+
+  const all = computed(() => courses.value)
+
+  return { all, courses, pending, load, addCourse, slugExists }
 })
+
+function normalizeFromApi(row: any): Course {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    desc: row.description ?? '',
+    tags: row.tags ?? [],
+    level: row.level ?? '',
+    levelColor: row.levelColor ?? '#22c55e',
+    rating: row.rating ?? 0,
+    participants: row.participants ?? 0,
+    duration: row.duration ?? '',
+    modules: row.modulesList?.length ?? 0,
+    lessons: row.modulesList?.reduce((s: number, m: any) => s + (m.lessons?.length ?? 0), 0) ?? 0,
+    modulesList: (row.modulesList ?? []).map((m: any) => ({
+      id: m.id,
+      title: m.title,
+      subtitle: m.subtitle ?? '',
+      duration: m.duration ?? '',
+      lessons: (m.lessons ?? []).map((l: any) => ({
+        id: l.id,
+        title: l.title,
+        type: l.type ?? 'Nazariy',
+        duration: l.duration ?? '',
+        free: l.free ?? false,
+        videoUrl: l.videoUrl ?? undefined,
+        content: l.content ?? undefined,
+      })),
+    })),
+    bg: row.bg ?? '#3480f1',
+    dark: row.dark ?? false,
+    badge: row.badge ?? 'kurs',
+    accentTitle: row.accentTitle ?? [],
+    accentColor: row.accentColor ?? '#3480f1',
+    image: row.coverUrl ?? undefined,
+    content: row.content ?? undefined,
+  }
+}

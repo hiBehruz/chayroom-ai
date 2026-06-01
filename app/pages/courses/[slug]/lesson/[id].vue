@@ -14,15 +14,17 @@ function goBack() {
 }
 
 interface Lesson {
+  id: number
   title: string
   type: string
   duration: string
   free: boolean
-  content: string
-  videoUrl?: string
+  content: string | null
+  videoUrl?: string | null
 }
 
 interface CourseModule {
+  id: number
   title: string
   subtitle: string
   duration: string
@@ -36,119 +38,28 @@ interface CourseDetail {
   modulesList: CourseModule[]
 }
 
-const allCourses: CourseDetail[] = [
-  {
-    slug: 'hermes-ai-agent',
-    title: 'Hermes asosida AI agent yaratish va sozlash',
-    lessons: 7,
-    modulesList: [
-      {
-        title: 'Agent yaratish',
-        subtitle: 'Baza',
-        duration: '~15m',
-        lessons: [
-          {
-            title: 'Hermes asosida agent yaratish: tayyor assistant',
-            type: 'Amaliy',
-            duration: '15 min',
-            free: false,
-            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-            content: `
-<p>В этом гайде, мы расскажем, как создать AI-агента на базе Hermes, который сможет выполнять задачи ассистента, проджекта.</p>
-
-<h2>Что получится в итоге</h2>
-<p>У вас будет личный ИИ-ассистент, который сможет:</p>
-<ul>
-  <li>работает на отдельном сервере 24/7;</li>
-  <li>отвечает вам в Telegram;</li>
-  <li>использует Hermes как агентную систему;</li>
-  <li>подключается к модели через OpenAI Codex / ChatGPT OAuth;</li>
-  <li>имеет рабочую папку для файлов, планов и заметок;</li>
-  <li>хранит базовую память о вас и своих правилах работы;</li>
-  <li>ограничен по доступу: писать боту смогут только разрешённые Telegram user ID;</li>
-  <li>может дальше расширяться под ваши задачи, проекты, интеграции и роли.</li>
-</ul>
-
-<blockquote>Этот агент по факту костяк, который затем вы сможете кастомизировать под любые задачи и давать те роли, которые вам нужно под ваши личные/рабочие процессы.</blockquote>
-
-<h2>Зачем вообще нужен Hermes</h2>
-<p>Обычный чат с ИИ хорошо отвечает на вопросы, <mark>но плохо подходит для роли постоянного помощника:</mark></p>
-<ul>
-  <li>он не живёт у вас на сервере;</li>
-  <li>не принимает задачи из Telegram 24/7;</li>
-  <li>не имеет нормального рабочего пространства;</li>
-  <li>не всегда помнит ваши правила и контекст;</li>
-  <li>не работает как отдельный агент с файлами, инструментами и gateway.</li>
-</ul>
-<p><strong>Hermes</strong> нужен как «операционная система» для AI-агента — это слой, который связывает между собой модель, Telegram, память, рабочую папку, инструменты и правила безопасности. В гайде эту связку часто называют словом <strong>gateway</strong> — это просто <strong>внутренняя «прослойка» Hermes</strong>, которая принимает ваши сообщения из Telegram, передаёт их модели и возвращает ответ.</p>
-<p><mark>Основная идея:</mark> вы не просто открываете очередной чат, а ставите себе <strong>личного помощника на сервер</strong>, который <strong>можно улучшать и подключать к процессам</strong>.</p>
-`
-          }
-        ]
-      },
-      {
-        title: 'Agentni yaxshilash va sozlash',
-        subtitle: "Ko'nikmalar qo'shish",
-        duration: '~40m',
-        lessons: [
-          { title: "Agentga yangi ko'nikma qo'shish", type: 'Amaliy', duration: '10 min', free: false, content: '<p>Bu dars tez orada qo\'shiladi.</p>' },
-          { title: 'Agentlar orasida muloqot', type: 'Nazariy', duration: '8 min', free: false, content: '<p>Bu dars tez orada qo\'shiladi.</p>' },
-          { title: "Ikkinchi agent qo'shish", type: 'Amaliy', duration: '12 min', free: false, content: '<p>Bu dars tez orada qo\'shiladi.</p>' },
-          { title: 'Agent xotirasini sozlash', type: 'Amaliy', duration: '10 min', free: false, content: '<p>Bu dars tez orada qo\'shiladi.</p>' }
-        ]
-      },
-      {
-        title: 'AI Office',
-        subtitle: 'Agentlar ofisi',
-        duration: '~20m',
-        lessons: [
-          { title: 'Agentlar tizimini loyihalash', type: 'Nazariy', duration: '10 min', free: false, content: '<p>Bu dars tez orada qo\'shiladi.</p>' },
-          { title: 'AI Office yaratish', type: 'Amaliy', duration: '10 min', free: false, content: '<p>Bu dars tez orada qo\'shiladi.</p>' }
-        ]
-      }
-    ]
-  },
-  {
-    slug: 'vibe-coding',
-    title: 'Vibe coding noldan',
-    lessons: 31,
-    modulesList: [
-      {
-        title: 'Kirish va asoslar',
-        subtitle: 'Baza',
-        duration: '~45m',
-        lessons: [
-          { title: 'Vibe coding nima va u qanday ishlaydi', type: 'Nazariy', duration: '10 min', free: false, content: '<p>Bu dars tez orada qo\'shiladi.</p>' },
-          { title: "AI vositalarini tanlash va sozlash", type: 'Amaliy', duration: '15 min', free: false, content: '<p>Bu dars tez orada qo\'shiladi.</p>' },
-          { title: 'Birinchi loyihangizni boshlash', type: 'Amaliy', duration: '20 min', free: false, content: '<p>Bu dars tez orada qo\'shiladi.</p>' }
-        ]
-      }
-    ]
-  }
-]
-
 interface FlatLesson extends Lesson {
   flatIndex: number
   modIndex: number
-  lessonIndexInMod: number
   modTitle: string
 }
 
-const course = allCourses.find(c => c.slug === slug)
-if (!course) throw createError({ statusCode: 404, statusMessage: 'Kurs topilmadi' })
+const courseData = await $fetch<any>(`/api/courses/${slug}`).catch(() => null)
+if (!courseData) throw createError({ statusCode: 404, statusMessage: 'Kurs topilmadi' })
+
+const course: CourseDetail = {
+  slug: courseData.slug,
+  title: courseData.title,
+  lessons: courseData.modulesList?.reduce((s: number, m: any) => s + m.lessons.length, 0) ?? 0,
+  modulesList: courseData.modulesList ?? [],
+}
 
 const flatLessons: FlatLesson[] = []
 let idx = 1
 for (let mi = 0; mi < course.modulesList.length; mi++) {
   const mod = course.modulesList[mi]
-  for (let li = 0; li < mod.lessons.length; li++) {
-    flatLessons.push({
-      ...mod.lessons[li],
-      flatIndex: idx,
-      modIndex: mi,
-      lessonIndexInMod: li,
-      modTitle: mod.title
-    })
+  for (const l of mod.lessons) {
+    flatLessons.push({ ...l, flatIndex: idx, modIndex: mi, modTitle: mod.title })
     idx++
   }
 }

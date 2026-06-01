@@ -254,38 +254,41 @@ function validate() {
 // ── Save ──────────────────────────────────────────────────
 const saving = ref(false)
 
-function save() {
+async function save() {
   if (!validate()) return
   saving.value = true
 
-  const course: Course = {
-    slug: slug.value,
-    title: title.value.trim(),
-    desc: desc.value.trim(),
-    tags: tags.value,
-    level: level.value,
-    levelColor: levelColor.value,
-    rating: 0,
-    participants: 0,
-    duration: duration.value.trim(),
-    modules: totalModules.value,
-    lessons: totalLessons.value,
-    modulesList: modulesList.value,
-    bg: bg.value,
-    dark: dark.value,
-    badge: badge.value,
-    accentTitle: [],
-    accentColor: accentColor.value,
-    image: previewImage.value || undefined,
-    content: content.value || undefined,
-  }
+  try {
+    const course: Course = {
+      slug: slug.value,
+      title: title.value.trim(),
+      desc: desc.value.trim(),
+      tags: tags.value,
+      level: level.value,
+      levelColor: levelColor.value,
+      rating: 0,
+      participants: 0,
+      duration: duration.value.trim(),
+      modules: totalModules.value,
+      lessons: totalLessons.value,
+      modulesList: modulesList.value,
+      bg: bg.value,
+      dark: dark.value,
+      badge: badge.value,
+      accentTitle: [],
+      accentColor: accentColor.value,
+      image: previewImage.value || undefined,
+      content: content.value || undefined,
+    }
 
-  coursesStore.addCourse(course)
-
-  setTimeout(() => {
+    const result = await coursesStore.addCourse(course)
+    navigateTo(`/courses/${result.slug}`)
+  } catch (e: any) {
+    errors.value = [e?.data?.message ?? e?.message ?? 'Saqlashda xatolik yuz berdi']
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  } finally {
     saving.value = false
-    navigateTo(`/courses/${course.slug}`)
-  }, 600)
+  }
 }
 
 useSeoMeta({ title: "Kurs qo'shish — Admin" })
@@ -604,7 +607,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                       </template>
                       <template v-else>
                         <label
-                          class="grid size-6 place-items-center rounded-lg text-cx-line hover:text-cx-blue hover:bg-blue-50 transition-colors cursor-pointer"
+                          class="grid size-6 place-items-center rounded-lg text-cx-muted hover:text-cx-blue hover:bg-blue-50 transition-colors cursor-pointer"
                           :class="{ 'animate-pulse text-cx-blue': uploadingLesson === `${mi}-${li}` }"
                         >
                           <UIcon

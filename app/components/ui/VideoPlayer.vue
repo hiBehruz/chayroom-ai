@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import Plyr from 'plyr'
-import 'plyr/dist/plyr.css'
-
-const props = defineProps<{ src: string }>()
+defineProps<{ src: string }>()
 
 const videoRef = ref<HTMLVideoElement | null>(null)
-let player: Plyr | null = null
+let player: import('plyr').default | null = null
 
-onMounted(() => {
+onMounted(async () => {
   if (!videoRef.value) return
+  const [{ default: Plyr }] = await Promise.all([
+    import('plyr'),
+    import('plyr/dist/plyr.css'),
+  ])
   player = new Plyr(videoRef.value, {
     controls: ['play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
     settings: ['speed'],

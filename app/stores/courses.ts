@@ -3,6 +3,7 @@ export interface Lesson {
   type: 'Nazariy' | 'Amaliy'
   duration: string
   free: boolean
+  videoUrl?: string
 }
 
 export interface CourseModule {
@@ -31,6 +32,7 @@ export interface Course {
   accentTitle: string[]
   accentColor: string
   image?: string
+  content?: string
 }
 
 const STORAGE_KEY = 'cx-courses-extra'
@@ -48,11 +50,11 @@ const BASE_COURSES: Course[] = [
     duration: '~2h',
     modules: 3,
     lessons: 7,
-    bg: '#f0f4ff',
+    bg: '#3480f1',
     dark: false,
     badge: 'kurs',
     accentTitle: ['AI agent', 'Hermes'],
-    accentColor: '#0075DE',
+    accentColor: '#3480f1',
     modulesList: [
       {
         title: 'Agent yaratish',

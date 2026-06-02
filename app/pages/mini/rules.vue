@@ -59,34 +59,34 @@ useSeoMeta({ title: 'Jamiyat qoidalari' })
 </script>
 
 <template>
-  <div style="background:#efefef; min-height:100vh">
+  <div style="background:#fffdf9; min-height:100vh">
     <div class="w-full">
 
       <!-- Header -->
       <div class="flex items-center gap-3 px-4 pt-5 pb-4">
         <button
-          class="inline-flex items-center justify-center flex-none transition-all duration-200 ease active:scale-[1.03] active:text-[#3480f1]"
-          style="width:44px;height:44px;border-radius:999px;background:#f7f5ef;color:#14161f"
+          class="inline-flex items-center justify-center flex-none transition-all duration-200 ease active:scale-[1.03]"
+          style="width:44px;height:44px;border-radius:999px;background:#f7f5ef;color:#0f1115"
           @click="router.back()"
         >
           <UIcon name="i-lucide-arrow-left" class="size-4.5" />
         </button>
-        <h1 class="text-[26px] font-black tracking-tight leading-tight" style="color:#14161f">Qoidalar</h1>
+        <h1 class="text-[26px] font-black tracking-tight leading-tight" style="color:#0f1115">Qoidalar</h1>
       </div>
 
       <!-- Hero -->
       <div class="px-4 mb-6">
-        <div class="rounded-[20px] overflow-hidden" style="background:#ffffff;border:1px solid #e8e6e0;box-shadow:0 2px 12px rgba(20,22,31,0.06)">
+        <div class="rounded-[20px] overflow-hidden" style="background:#f7f5ef;border:1px solid #e8e4da">
           <div style="height:3px;background:linear-gradient(90deg,#3480f1,#26c6da)" />
           <div class="p-5">
             <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full mb-4" style="background:rgba(52,128,241,0.1);border:1px solid rgba(52,128,241,0.18)">
               <UIcon name="solar:users-group-rounded-bold" class="size-3" style="color:#3480f1" />
               <span class="text-[11px] font-bold tracking-widest uppercase" style="color:#3480f1">Hamjamiyat</span>
             </div>
-            <h1 class="text-[26px] font-black tracking-tight leading-tight mb-2" style="color:#14161f">
+            <h1 class="text-[26px] font-black tracking-tight leading-tight mb-2" style="color:#0f1115">
               Bir necha oddiy tamoyil
             </h1>
-            <p class="text-[14px] leading-relaxed" style="color:#70707a">
+            <p class="text-[14px] leading-relaxed" style="color:#6b7280">
               Ular klubni qaytgisi keladigan joyga aylantirib turishga yordam beradi.
             </p>
           </div>
@@ -99,52 +99,47 @@ useSeoMeta({ title: 'Jamiyat qoidalari' })
           v-for="(section, i) in sections"
           :key="i"
           class="rounded-[18px] overflow-hidden"
-          style="background:#ffffff;border:1px solid #e8e6e0"
+          style="background:#f7f5ef;border:1px solid #e8e4da"
         >
-          <!-- Section header -->
           <div class="flex items-center gap-3 px-4 pt-4 pb-3">
-            <div class="size-8 rounded-xl flex-none flex items-center justify-center" style="background:#f0f5ff">
+            <div class="size-8 rounded-xl flex-none flex items-center justify-center" style="background:rgba(52,128,241,0.12)">
               <UIcon :name="section.icon" class="size-4" style="color:#3480f1" />
             </div>
-            <p class="text-[14px] font-bold leading-snug" style="color:#14161f">{{ section.title }}</p>
+            <p class="text-[14px] font-bold leading-snug" style="color:#0f1115">{{ section.title }}</p>
           </div>
 
           <div class="px-4 pb-4">
-            <!-- Main body -->
-            <p class="text-[13px] leading-relaxed mb-3" style="color:#30313a">{{ section.body }}</p>
+            <p class="text-[13px] leading-relaxed mb-3" style="color:#374151">{{ section.body }}</p>
 
-            <!-- Bullets -->
             <div v-if="section.bullets.length" class="space-y-2 mb-3">
               <div v-for="(bullet, bi) in section.bullets" :key="bi" class="flex items-start gap-2.5">
                 <div class="size-1.5 rounded-full flex-none mt-1.5" style="background:#3480f1" />
-                <p class="text-[13px] leading-relaxed" style="color:#30313a">{{ bullet }}</p>
+                <p class="text-[13px] leading-relaxed" style="color:#374151">{{ bullet }}</p>
               </div>
             </div>
 
-            <!-- Note (muted callout) -->
             <div
               v-if="section.note"
               class="rounded-xl px-3 py-2.5 mb-3"
-              style="background:#f7f5f0;border-left:3px solid #e8e6e0"
+              style="background:rgba(52,128,241,0.07);border-left:3px solid rgba(52,128,241,0.3)"
             >
-              <p class="text-[12px] leading-relaxed" style="color:#70707a">{{ section.note }}</p>
+              <p class="text-[12px] leading-relaxed" style="color:#6b7280">{{ section.note }}</p>
             </div>
 
-            <!-- Footer text -->
-            <p v-if="section.footer" class="text-[12px] leading-relaxed" style="color:#70707a">{{ section.footer }}</p>
+            <p v-if="section.footer" class="text-[12px] leading-relaxed" style="color:#9aa0a8">{{ section.footer }}</p>
           </div>
         </div>
       </div>
 
-      <!-- What we support -->
+      <!-- Nima qo'llaymiz -->
       <div class="px-4 mb-6">
         <div class="flex items-center gap-2.5 mb-3">
           <div class="size-8 rounded-xl flex items-center justify-center" style="background:rgba(76,175,130,0.12)">
             <UIcon name="solar:like-bold" class="size-4" style="color:#4caf82" />
           </div>
-          <h2 class="text-[17px] font-bold" style="color:#14161f">Nima qo'llaymiz</h2>
+          <h2 class="text-[17px] font-bold" style="color:#0f1115">Nima qo'llaymiz</h2>
         </div>
-        <p class="text-[13px] leading-relaxed mb-4 px-1" style="color:#70707a">
+        <p class="text-[13px] leading-relaxed mb-4 px-1" style="color:#6b7280">
           Buning uchun ayniqsa minnatdormiz:
         </p>
 
@@ -153,19 +148,19 @@ useSeoMeta({ title: 'Jamiyat qoidalari' })
             v-for="item in support"
             :key="item.title"
             class="flex items-start gap-3 p-4 rounded-2xl"
-            style="background:#ffffff;border:1px solid #e8e6e0"
+            style="background:#f7f5ef;border:1px solid #e8e4da"
           >
             <div class="size-9 rounded-xl flex-none flex items-center justify-center mt-0.5" style="background:rgba(76,175,130,0.1)">
               <UIcon :name="item.icon" class="size-[18px]" style="color:#4caf82" />
             </div>
             <div>
-              <p class="text-[14px] font-bold mb-1" style="color:#14161f">{{ item.title }}</p>
-              <p class="text-[12px] leading-relaxed" style="color:#70707a">{{ item.desc }}</p>
+              <p class="text-[14px] font-bold mb-1" style="color:#0f1115">{{ item.title }}</p>
+              <p class="text-[12px] leading-relaxed" style="color:#6b7280">{{ item.desc }}</p>
             </div>
           </div>
         </div>
 
-        <p class="text-[12px] text-center mt-4 leading-relaxed" style="color:#a0a0a8">
+        <p class="text-[12px] text-center mt-4 leading-relaxed" style="color:#9aa0a8">
           Ana shu materiallar to'plamini tirik hamjamiyatga aylantiradi.
         </p>
       </div>

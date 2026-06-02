@@ -75,7 +75,7 @@ withDefaults(defineProps<{
         width="10"
         height="4"
         rx="1"
-        fill="#0a64d8"
+        fill="#3480f1"
       />
       <rect x="6" y="13" width="3" height="5" rx="1" fill="#f2c59f" />
       <rect x="23" y="13" width="3" height="5" rx="1" fill="#f2c59f" />
@@ -90,11 +90,11 @@ withDefaults(defineProps<{
   place-items: center;
   border-radius: 9999px;
   background:
-    radial-gradient(circle at 32% 24%, rgba(255,255,255,0.9), transparent 28%),
-    linear-gradient(135deg, #eaf6ff 0%, #a8d6ff 42%, #0a64d8 100%);
+    radial-gradient(circle at 32% 24%, rgba(255,255,255,0.12), transparent 28%),
+    linear-gradient(135deg, #2e3248 0%, #1a1d2e 100%);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.75) inset,
-    0 6px 16px rgba(0, 117, 222, 0.24);
+    0 1px 0 rgba(255,255,255,0.12) inset,
+    0 4px 12px rgba(0, 0, 0, 0.4);
   overflow: hidden;
 }
 
@@ -113,7 +113,7 @@ withDefaults(defineProps<{
   position: absolute;
   inset: 3px;
   border-radius: inherit;
-  border: 1px solid rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.14);
   pointer-events: none;
 }
 
@@ -127,11 +127,11 @@ withDefaults(defineProps<{
 
 .profile-agent-avatar[data-variant='female'] {
   background:
-    radial-gradient(circle at 32% 24%, rgba(255,255,255,0.9), transparent 28%),
-    linear-gradient(135deg, #fff1f7 0%, #f9a8d4 42%, #be185d 100%);
+    radial-gradient(circle at 32% 24%, rgba(255,255,255,0.12), transparent 28%),
+    linear-gradient(135deg, #2e3248 0%, #1a1d2e 100%);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.75) inset,
-    0 6px 16px rgba(190, 24, 93, 0.22);
+    0 1px 0 rgba(255,255,255,0.12) inset,
+    0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .profile-agent-svg {

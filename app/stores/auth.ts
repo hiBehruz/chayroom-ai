@@ -72,6 +72,18 @@ export const useAuthStore = defineStore('auth', () => {
     userCookie.value = user.value
     if (import.meta.client) {
       localStorage.setItem('cx-user', JSON.stringify(user.value))
+      $fetch('/api/auth/login', {
+        method: 'POST',
+        body: {
+          id: telegramUser.id,
+          first_name: telegramUser.first_name,
+          last_name: telegramUser.last_name,
+          username: telegramUser.username,
+          photo_url: telegramUser.photo_url,
+        }
+      }).then((res: any) => {
+        if (res?.hasSubscription) activateSubscription()
+      }).catch(() => {})
     }
   }
 

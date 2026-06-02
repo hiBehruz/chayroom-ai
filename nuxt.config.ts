@@ -19,6 +19,12 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  app: {
+    head: {
+      link: []
+    }
+  },
+
   colorMode: {
     preference: 'light',
     fallback: 'light',
@@ -32,8 +38,11 @@ export default defineNuxtConfig({
     r2SecretAccessKey: '',
     r2BucketName: '',
     r2PublicUrl: '',
+    telegramBotToken: '',
     public: {
       telegramBotUsername: '',
+      appUrl: 'https://chayroom.uz',
+      supportUsername: 'hellobehruz',
       sentryDsn: ''
     }
   },

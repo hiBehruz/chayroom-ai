@@ -28,3 +28,12 @@ logs
 
 # Claude Code / Superpowers temp files
 .superpowers/
+
+# Codex local overrides / secrets
+.codex/local.toml
+.codex/secrets.toml
+.codex/*.local.toml
+.codex/.env
+.codex/.env.*
+.agents/**/.env
+.agents/**/.env.*

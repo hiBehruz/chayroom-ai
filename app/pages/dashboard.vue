@@ -25,7 +25,9 @@ const courses = [
     desc: "Bu kursda biz noldan agent yaratamiz, unga ko'nikmalar va yaxshilanishlar qo'shamiz.",
     tags: ['AI', 'AI agent', 'Hermes'],
     slug: 'hermes-ai-agent',
-    free: true,
+    bg: '#3480f1',
+    dark: false,
+    accentColor: '#3480f1',
     progress: 0,
   },
   {
@@ -33,7 +35,9 @@ const courses = [
     desc: "Kod bilmasdan kerakli digital yechimlar: saytlar, vositalar va ilovalarni yaratish.",
     tags: ['Vibe coding'],
     slug: 'vibe-coding',
-    free: true,
+    bg: '#0d1117',
+    dark: true,
+    accentColor: '#f97316',
     progress: 100,
   },
 ]
@@ -44,22 +48,16 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
 
 <template>
   <MiniAppDashboard v-if="isMiniApp" />
-  <div v-else class="min-h-screen bg-white">
-    <div class="max-w-295 mx-auto px-10 py-8 max-md:px-4">
-      <!-- Breadcrumb -->
-      <div class="flex items-center gap-2 text-sm text-cx-muted mb-6">
-        <NuxtLink to="/" class="hover:text-cx-ink transition-colors">Bosh sahifa</NuxtLink>
-        <span>/</span>
-        <span class="text-cx-ink font-medium">Panel</span>
-      </div>
+  <div v-else class="min-h-screen bg-cx-surface">
+    <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 py-8 max-md:px-4">
 
       <!-- Paywall CTA — tepada, obuna yo'q bo'lganda -->
       <div
         v-if="!user"
-        class="mb-8 rounded-2xl bg-[#f7f7f5] px-10 py-8 flex items-center justify-center gap-8 paywall-enter sticky top-20 z-10 mx-32 max-md:mx-0 max-md:flex-col max-md:px-6 max-md:py-6 max-md:text-center max-md:gap-4"
+        class="mb-8 rounded-2xl bg-[#f7f7f5ef] px-10 py-8 flex items-center justify-center gap-8 paywall-enter sticky top-20 z-10 w-220.5 max-w-full mx-auto max-md:flex-col max-md:px-6 max-md:py-6 max-md:text-center max-md:gap-4"
       >
         <ClientOnly>
-          <div class="shrink-0 w-36 h-36 max-md:w-52 max-md:h-52">
+          <div class="shrink-0 w-52 h-52 max-md:w-64 max-md:h-64">
             <DotLottieVue
               src="/animations/Door.lottie"
               :autoplay="true"
@@ -69,20 +67,20 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
           </div>
         </ClientOnly>
         <div class="flex flex-col items-start text-left max-md:items-center max-md:text-center">
-          <h2 class="text-[20px] font-extrabold text-[#1a1a1a] mb-2">
+          <h2 class="text-[40px] font-extrabold text-[#1a1a1a] mb-3 leading-tight">
             O'quv dashboardingni och
           </h2>
-          <p class="text-[14px] text-cx-muted mb-6 max-w-sm leading-snug">
+          <p class="text-[22px] text-cx-muted mb-6 max-w-md leading-snug">
             Barcha kurslarga kirish, progress kuzatuvi va sertifikatlarga ega bo'ling.
           </p>
           <NuxtLink
             to="/login"
-            class="btn-primary btn-primary-dark text-[15px]! py-3! px-6! flex items-center gap-2 max-md:self-center"
+            class="hero-link-btn hero-link-btn--blue paywall-btn max-md:self-center"
           >
-            <UIcon name="i-lucide-sparkles" class="size-4" />
-            To'liq kirish huquqini olish →
+            <UIcon name="i-lucide-sparkles" class="size-4.5 shrink-0" />
+            To'liq kirish huquqini olish
           </NuxtLink>
-          <p class="mt-3 text-[12px] text-cx-muted">
+          <p class="mt-3 text-[13px] text-cx-muted">
             Telegram orqali to'lov. Barcha kurs va materiallarga kirish.
           </p>
         </div>
@@ -92,166 +90,82 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
       <div :class="!hasCourseAccess ? 'opacity-40 grayscale pointer-events-none select-none' : ''">
 
       <!-- Welcome -->
-      <div class="mb-7">
-        <h1 class="text-[28px] font-extrabold tracking-tight text-[#1a1a1a]">
-          Qaytganing bilan!
+      <div class="mb-7 text-center">
+        <h1 class="font-inter-display text-[60px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#1a1a1a] max-md:text-[36px]">
+          <span class="relative inline-block">Привет,<svg class="absolute -bottom-1 left-[-1%] w-[102%] overflow-visible" viewBox="0 0 600 18" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M10,12 C150,2 450,2 590,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="vector-effect:non-scaling-stroke"/></svg></span> {{ user?.first_name }} 👋🏻
         </h1>
-        <p class="text-cx-muted mt-1 text-[14px]">
-          O'qishni davom ettir. Juda yaxshi harakat qilyapsan.
-        </p>
+        <p class="text-[15px] text-cx-muted mt-3">Bu yerda kurslar, qo'llanmalar va hamjamiyatingiz — barchasi bir joyda.</p>
       </div>
 
-      <!-- Stats -->
-      <div class="grid grid-cols-4 max-md:grid-cols-1 gap-4 mb-6">
-        <div
-          v-for="stat in stats"
-          :key="stat.label"
-          class="bg-[#f7f7f5] border border-cx-line rounded-2xl p-5 flex flex-col gap-2"
-        >
-          <UIcon :name="stat.icon" :class="['size-5', stat.iconColor]" />
-          <div class="text-[22px] font-extrabold tracking-tight text-[#1a1a1a]">
-            {{ stat.value }}
+      <div class="h-px bg-[#e8e6e1] mb-10 max-md:mb-8" />
+
+      <!-- Main grid: Telegram + Courses + Progress -->
+      <div class="grid grid-cols-4 gap-5 mb-8 max-md:grid-cols-1">
+
+        <!-- Про наше сообщество -->
+        <NuxtLink to="/community" class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer">
+          <div class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl" style="background:rgba(52,128,241,0.15)">
+            <UIcon name="i-solar-users-group-rounded-bold" class="icon-bounce size-8" style="color:#3480f1" />
           </div>
-          <div class="text-[13px] text-cx-muted">{{ stat.label }}</div>
-        </div>
-      </div>
-
-      <!-- Telegram -->
-      <div class="bg-[#f7f7f5] border border-cx-line rounded-2xl px-6 py-5 mb-8">
-        <div class="flex items-start gap-4">
-          <UIcon name="i-lucide-users-round" class="size-5 text-cx-blue mt-0.5 shrink-0" />
-          <div class="flex-1 min-w-0">
-            <div class="text-[15px] font-bold text-[#1a1a1a] mb-1">
-              Telegram yopiq kanal
-            </div>
-            <div class="text-[13px] text-cx-muted mb-4">
-              Ishtirokchilar bilan muloqot, efirlar va yangiliklar.
-            </div>
-            <!-- Obuna bor — kirish tugmasi -->
-            <template v-if="hasCourseAccess">
-              <button class="btn-primary btn-primary-dark text-[13px]! px-5! py-2!">
-                Telegramga kirish
-                <UIcon name="i-lucide-external-link" class="size-3.5" />
-              </button>
-            </template>
-
-            <!-- Obuna yo'q — qulflangan matn -->
-            <template v-else>
-              <p class="flex items-center gap-1.5 text-[13px] text-cx-muted">
-                <UIcon name="i-lucide-lock" class="size-4 shrink-0" />
-                Obuna bo'lgandan keyin kirish ochiladi.
-              </p>
-            </template>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main grid -->
-      <div class="grid grid-cols-[1fr_380px] max-md:grid-cols-1 gap-6 mb-8">
-        <!-- Courses -->
-        <div>
-          <div class="flex items-center gap-2 mb-5">
-            <UIcon name="i-lucide-graduation-cap" class="size-4 text-cx-blue" />
-            <h2 class="text-[15px] font-bold text-[#1a1a1a]">Mening kurslarim</h2>
-          </div>
-          <div class="flex flex-col gap-3">
-            <NuxtLink
-              v-for="course in courses"
-              :key="course.title"
-              :to="`/courses/${course.slug}`"
-              class="group bg-[#f7f7f5] border border-cx-line rounded-2xl p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_24px_rgba(0,0,0,0.07)] block"
-            >
-              <div class="flex items-start justify-between gap-3 mb-2">
-                <span class="text-[14px] font-semibold text-[#1a1a1a] leading-[1.4]">
-                  {{ course.title }}
-                </span>
-                <!-- Obuna yo'q — qulflangan -->
-                <span
-                  v-if="!hasCourseAccess"
-                  class="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-500 text-[11px] font-semibold border border-red-100"
-                >
-                  <UIcon name="i-lucide-lock-keyhole" class="size-3" />
-                  Заблокировано
-                </span>
-
-                <!-- Obuna active — ochiq -->
-                <span
-                  v-else
-                  class="shrink-0 flex items-center gap-1 text-xs font-medium text-green-600"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    class="size-4"
-                    aria-hidden="true"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-                    />
-                  </svg>
-                  Доступно
-                </span>
-              </div>
-              <p class="text-[12px] text-cx-muted leading-[1.6] mb-3">{{ course.desc }}</p>
-              <div class="flex flex-wrap gap-1.5">
-                <span
-                  v-for="tag in course.tags"
-                  :key="tag"
-                  class="px-3 py-1 rounded-full bg-[#EAEAE8] border border-[#D4D4D1] text-[12px] text-[#6B6B6B] font-medium"
-                >{{ tag }}</span>
-              </div>
-            </NuxtLink>
-          </div>
-        </div>
-
-        <!-- Right column -->
-        <div class="flex flex-col gap-6">
-          <!-- Progress -->
           <div>
-            <div class="flex items-center gap-2 mb-5">
-              <UIcon name="i-lucide-bar-chart-2" class="size-4 text-cx-blue" />
-              <h2 class="text-[15px] font-bold text-[#1a1a1a]">O'qish progressi</h2>
+            <div class="flex items-start justify-between gap-2 mb-1">
+              <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
+                Bizning club
+              </h2>
+              <UIcon name="i-lucide-arrow-right" class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200" />
             </div>
-            <div class="bg-[#f7f7f5] border border-cx-line rounded-2xl p-5 flex flex-col gap-4">
-              <div
-                v-for="course in courses"
-                :key="course.title"
-                class="flex flex-col gap-2"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="text-[12px] text-cx-muted truncate max-w-55">{{ course.title }}</span>
-                  <span class="text-[12px] font-semibold text-cx-muted shrink-0 ml-2">{{ course.progress }}%</span>
-                </div>
-                <div class="h-1.5 bg-[#e5e5e5] rounded-full overflow-hidden">
-                  <div
-                    class="h-full bg-cx-blue rounded-full transition-all duration-500"
-                    :style="{ width: `${course.progress}%` }"
-                  />
-                </div>
-              </div>
-            </div>
+            <p class="text-[13px] text-cx-muted leading-snug">Klub qanday ishlashi va nimalar borligini bilib oling.</p>
           </div>
+        </NuxtLink>
 
-          <!-- Instructor -->
-          <div class="bg-[#f7f7f5] border border-cx-line rounded-2xl p-5">
-            <div class="text-[10px] font-bold text-cx-muted uppercase tracking-widest mb-3">
-              Instruktor
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-linear-to-br from-cx-blue to-[#1A4FE0] flex items-center justify-center text-white font-bold text-[14px] shrink-0">
-                AI
-              </div>
-              <div>
-                <div class="text-[14px] font-bold text-[#1a1a1a]">Chayroom AI Club</div>
-                <div class="text-[12px] text-cx-muted">Ekspertlar jamoasi</div>
-              </div>
-            </div>
+        <!-- Наши правила -->
+        <NuxtLink to="/rules" class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer">
+          <div class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl" style="background:rgba(34,197,94,0.15)">
+            <UIcon name="i-solar-shield-bold" class="icon-bounce size-8" style="color:#22c55e" />
           </div>
-        </div>
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-1">
+              <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
+                Qoidalar
+              </h2>
+              <UIcon name="i-lucide-arrow-right" class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200" />
+            </div>
+            <p class="text-[13px] text-cx-muted leading-snug">Jamoatchilik qoidalari, ikki daqiqada o'qiladi.</p>
+          </div>
+        </NuxtLink>
+
+        <!-- Расскажите о себе -->
+        <NuxtLink to="/about-me" class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer">
+          <div class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl" style="background:rgba(20,184,166,0.12)">
+            <UIcon name="i-solar-user-speak-bold" class="icon-bounce size-8" style="color:#14b8a6" />
+          </div>
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-1">
+              <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
+                O'zingiz haqingizda
+              </h2>
+              <UIcon name="i-lucide-arrow-right" class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200" />
+            </div>
+            <p class="text-[13px] text-cx-muted leading-snug">Maqsadlaringizni ko'rsating, mos materiallar topamiz.</p>
+          </div>
+        </NuxtLink>
+
+        <!-- Первый материал -->
+        <NuxtLink to="/materials" class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer">
+          <div class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl" style="background:rgba(245,158,11,0.12)">
+            <UIcon name="i-solar-notes-minimalistic-bold" class="icon-bounce size-8" style="color:#f59e0b" />
+          </div>
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-1">
+              <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
+                Birinchi material
+              </h2>
+              <UIcon name="i-lucide-arrow-right" class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200" />
+            </div>
+            <p class="text-[13px] text-cx-muted leading-snug">Boshlash uchun tavsiya etilgan qo'llanma.</p>
+          </div>
+        </NuxtLink>
+
       </div>
 
       </div><!-- end dashboard content -->
@@ -262,6 +176,54 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
 </template>
 
 <style scoped>
+/* Paywall CTA button */
+.paywall-btn {
+  gap: 8px;
+  padding: 12px 20px;
+  font-size: 16px;
+  text-decoration: none;
+}
+.paywall-btn:hover  { gap: 14px; }
+
+/* Dashboard card button */
+.db-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0a0a0a;
+  border: 1px solid #0a0a0a;
+  border-radius: 999px;
+  padding: 12px 20px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(10, 10, 10, 0.12);
+  transition: gap 0.2s ease, opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+.db-card-btn:hover  { gap: 14px; opacity: 0.9; transform: scale(1.04); background: #1a1a1a; }
+.db-card-btn:active { opacity: 0.7; transform: scale(0.98); }
+
+/* Mini course card art */
+.mini-art-star {
+  position: absolute;
+  display: block;
+  background: currentColor;
+  clip-path: polygon(50% 0, 62% 36%, 100% 50%, 62% 64%, 50% 100%, 38% 64%, 0 50%, 38% 36%);
+}
+.mini-art-star-1 { width: 22px; aspect-ratio: 1; left: 14px; bottom: 20px; }
+.mini-art-star-2 { width: 14px; aspect-ratio: 1; right: 18px; top: 14px; }
+.mini-art-obj {
+  position: absolute;
+  right: 16px;
+  bottom: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  transform: rotate(45deg);
+  box-shadow: inset 0 0 0 4px rgba(255,253,249,0.7);
+}
+
 .paywall-enter {
   animation:
     paywall-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both,

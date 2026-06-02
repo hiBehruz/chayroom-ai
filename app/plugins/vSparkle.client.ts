@@ -1,7 +1,7 @@
 import gsap from 'gsap'
 
 const STARS = ['✦', '✧', '★', '✶', '✸'] as const
-const COLORS = ['#0075DE', '#3399FF', '#66B2FF', '#0055AA'] as const
+const COLORS = ['#3480f1', '#3480f1', '#3480f1', '#3480f1'] as const
 
 type SparkleElement = HTMLElement & {
   _sparkle?: (event: MouseEvent) => void

@@ -94,4 +94,14 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Do not rewrite or replace existing class strings — append mobile overrides.
 - The test: every desktop class present before your edit should still be present after.
 
+## 9. Cross-Tool Instructions
+
+**Keep shared guidance tool-neutral and avoid duplicate sources of truth.**
+
+- When updating project instructions, keep `CLAUDE.md` and `AGENTS.md` aligned. `CLAUDE.md` is the source of truth; `AGENTS.md` is the Codex-facing adapter.
+- Do not maintain two full copies of the same instructions. Put detailed shared guidance here and keep adapters short.
+- When creating a Claude skill that Codex should use, also copy it to `.agents/skills/` with its `SKILL.md` and supporting files kept together.
+- When creating a Claude agent that Codex should spawn, also create `.codex/agents/<name>.toml` and put the converted instructions in `developer_instructions`.
+- When adding shared knowledge, put it in `docs/`, `references/`, or `templates/` so every tool can read the same source.
+
 ---

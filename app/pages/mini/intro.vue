@@ -26,10 +26,10 @@ const goals = [
 ]
 
 const levels = [
-  { id: 'beginner', label: 'Yangi boshlovchi', desc: 'Endigina tanishishni boshlamoqdaman',            icon: 'ph:leaf-bold',          iconBg: '#e8f5e9', iconColor: '#22c55e' },
-  { id: 'middle',   label: "O'rta daraja",     desc: "Vositalarni bilaman, vaqti-vaqti bilan ishlataman", icon: 'ph:lightning-bold',     iconBg: '#fef3c7', iconColor: '#f59e0b' },
-  { id: 'advanced', label: 'Tajribali',         desc: 'Ish va loyihalarda muntazam ishlataman',         icon: 'ph:flame-bold',          iconBg: '#ffede6', iconColor: '#f97316' },
-  { id: 'pro',      label: 'Professional',      desc: "O'z yechimlarim va avtomatizatsiyalarim bor",    icon: 'ph:crown-bold',          iconBg: '#f0e9ff', iconColor: '#9333ea' },
+  { id: 'beginner', label: 'Yangi boshlovchi', desc: 'Endigina tanishishni boshlamoqdaman',            icon: 'ph:leaf-bold',      iconBg: '#e8f5e9', iconColor: '#22c55e' },
+  { id: 'middle',   label: "O'rta daraja",     desc: "Vositalarni bilaman, vaqti-vaqti bilan ishlataman", icon: 'ph:lightning-bold', iconBg: '#fef3c7', iconColor: '#f59e0b' },
+  { id: 'advanced', label: 'Tajribali',         desc: 'Ish va loyihalarda muntazam ishlataman',         icon: 'ph:flame-bold',     iconBg: '#ffede6', iconColor: '#f97316' },
+  { id: 'pro',      label: 'Professional',      desc: "O'z yechimlarim va avtomatizatsiyalarim bor",    icon: 'ph:crown-bold',     iconBg: '#f0e9ff', iconColor: '#9333ea' },
 ]
 
 const STORAGE_KEY = 'chayroom:intro'
@@ -66,29 +66,28 @@ useSeoMeta({ title: 'O\'zingiz haqingizda' })
 </script>
 
 <template>
-  <div style="background:#efefef; min-height:100vh">
+  <div style="background:#fffdf9; min-height:100vh">
 
     <!-- Header -->
-    <div class="flex items-center gap-3 px-4 pt-5 pb-4" style="background:#efefef">
+    <div class="flex items-center gap-3 px-4 pt-5 pb-4" style="background:#fffdf9">
       <button
         class="inline-flex items-center justify-center flex-none tg-press-sm"
-        style="width:44px;height:44px;border-radius:999px;background:#efefef;color:#14161f"
+        style="width:44px;height:44px;border-radius:999px;background:#f7f5ef;color:#0f1115"
         @click="router.back()"
       >
         <UIcon name="i-lucide-arrow-left" class="size-4.5" />
       </button>
-      <h1 class="text-[26px] font-black tracking-tight leading-tight" style="color:#14161f">O'zim haqimda</h1>
+      <h1 class="text-[26px] font-black tracking-tight leading-tight" style="color:#0f1115">O'zim haqimda</h1>
     </div>
 
     <div class="px-4 pb-8">
 
-      <!-- Subtitle -->
-      <p class="text-[14px] leading-relaxed mb-6" style="color:#70707a">
+      <p class="text-[14px] leading-relaxed mb-6" style="color:#6b7280">
         Bu javoblar maqsadlaringizga mos materiallar va tadbirlarni tanlashga yordam beradi.
       </p>
 
-      <!-- Profession — 2-col grid, single select -->
-      <p class="text-[17px] font-bold mb-3" style="color:#14161f">Nima bilan shug'ullanasiz?</p>
+      <!-- Profession -->
+      <p class="text-[17px] font-bold mb-3" style="color:#0f1115">Nima bilan shug'ullanasiz?</p>
       <div class="grid grid-cols-2 gap-2 mb-7">
         <button
           v-for="p in professions"
@@ -96,7 +95,7 @@ useSeoMeta({ title: 'O\'zingiz haqingizda' })
           class="flex items-center gap-2.5 px-3 py-3 rounded-2xl text-left tg-press-sm"
           :style="selectedProfession === p.id
             ? 'background:#3480f1; color:#ffffff'
-            : 'background:#ffffff; color:#14161f'"
+            : 'background:#f7f5ef; color:#0f1115; border:1px solid #e8e4da'"
           @click="selectedProfession = p.id"
         >
           <UIcon :name="p.icon" class="size-6 flex-none" />
@@ -104,9 +103,9 @@ useSeoMeta({ title: 'O\'zingiz haqingizda' })
         </button>
       </div>
 
-      <!-- Goals — full width, multi select -->
-      <p class="text-[17px] font-bold mb-1" style="color:#14161f">AI sohasidagi maqsadlaringiz?</p>
-      <p class="text-[13px] mb-3" style="color:#70707a">Bir nechtasini tanlash mumkin</p>
+      <!-- Goals -->
+      <p class="text-[17px] font-bold mb-1" style="color:#0f1115">AI sohasidagi maqsadlaringiz?</p>
+      <p class="text-[13px] mb-3" style="color:#6b7280">Bir nechtasini tanlash mumkin</p>
       <div class="space-y-2 mb-7">
         <button
           v-for="g in goals"
@@ -114,7 +113,7 @@ useSeoMeta({ title: 'O\'zingiz haqingizda' })
           class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left tg-press-sm"
           :style="selectedGoals.includes(g.id)
             ? 'background:#3480f1; color:#ffffff'
-            : 'background:#ffffff; color:#14161f'"
+            : 'background:#f7f5ef; color:#0f1115; border:1px solid #e8e4da'"
           @click="toggleGoal(g.id)"
         >
           <UIcon :name="g.icon" class="size-6 flex-none" />
@@ -122,8 +121,8 @@ useSeoMeta({ title: 'O\'zingiz haqingizda' })
         </button>
       </div>
 
-      <!-- Level — full width, single select with description -->
-      <p class="text-[17px] font-bold mb-3" style="color:#14161f">AI darajangiz?</p>
+      <!-- Level -->
+      <p class="text-[17px] font-bold mb-3" style="color:#0f1115">AI darajangiz?</p>
       <div class="space-y-2 mb-7">
         <button
           v-for="l in levels"
@@ -131,13 +130,13 @@ useSeoMeta({ title: 'O\'zingiz haqingizda' })
           class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-left tg-press-sm"
           :style="selectedLevel === l.id
             ? 'background:#3480f1; color:#ffffff'
-            : 'background:#ffffff; color:#14161f'"
+            : 'background:#f7f5ef; color:#0f1115; border:1px solid #e8e4da'"
           @click="selectedLevel = l.id"
         >
           <div
             class="flex-none grid place-items-center rounded-xl"
             style="width:38px;height:38px;flex-shrink:0"
-            :style="selectedLevel === l.id ? 'background:rgba(255,255,255,0.18)' : `background:${l.iconBg}`"
+            :style="selectedLevel === l.id ? 'background:rgba(255,255,255,0.2)' : `background:${l.iconBg}`"
           >
             <UIcon
               :name="l.icon"
@@ -147,7 +146,7 @@ useSeoMeta({ title: 'O\'zingiz haqingizda' })
           </div>
           <div>
             <p class="text-[15px] font-bold leading-snug">{{ l.label }}</p>
-            <p class="text-[12px] leading-snug mt-0.5" :style="selectedLevel === l.id ? 'color:rgba(255,255,255,0.75)' : 'color:#70707a'">{{ l.desc }}</p>
+            <p class="text-[12px] leading-snug mt-0.5" :style="selectedLevel === l.id ? 'color:rgba(255,255,255,0.75)' : 'color:#6b7280'">{{ l.desc }}</p>
           </div>
         </button>
       </div>
@@ -155,7 +154,7 @@ useSeoMeta({ title: 'O\'zingiz haqingizda' })
       <!-- Save -->
       <button
         class="w-full py-4 rounded-[999px] font-bold text-[16px] text-white tg-btn"
-        style="background:#3480f1; box-shadow:0 6px 20px rgba(52,128,241,0.3)"
+        style="background:linear-gradient(135deg,#3480f1,#6c63ff); box-shadow:0 6px 20px rgba(52,128,241,0.25)"
         @click="save"
       >
         Saqlash

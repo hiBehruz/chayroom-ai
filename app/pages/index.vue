@@ -1,6 +1,6 @@
 <!-- app/pages/index.vue -->
 <template>
-  <main>
+  <main class="bg-[#fffdf9]">
     <LandingHeroSection />
     <LandingClubForYouSection />
     <LandingWhatInsideSection />

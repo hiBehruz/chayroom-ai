@@ -7,23 +7,15 @@ const router = useRouter()
 const { isMiniApp, backButton } = useTelegramApp()
 const showNav = computed(() =>
   !isMiniApp.value && (
-    ['/', '/dashboard', '/profile'].includes(route.path) ||
-    route.path.startsWith('/courses') ||
-    route.path.startsWith('/guides') ||
-    route.path.startsWith('/login')
+    ['/', '/dashboard', '/profile', '/materials', '/community', '/rules', '/about-me'].includes(route.path)
+    || route.path.startsWith('/courses')
+    || route.path.startsWith('/guides')
+    || route.path.startsWith('/login')
   )
 )
-const contentReady = ref(false)
-const contentRef = ref<HTMLElement>()
 
 authStore.restoreFromStorage()
 
-watch(isMiniApp, (val) => {
-  if (import.meta.client) {
-    document.documentElement.style.background = val ? '#17212b' : ''
-    document.body.style.background = val ? '#17212b' : ''
-  }
-}, { immediate: true })
 
 const handleBack = () => router.back()
 
@@ -45,9 +37,41 @@ watch(() => route.path, () => {
   }
 }, { immediate: true })
 
-function onPageEnter(el: Element, done: () => void) {
-  const targets = getStaggerTargets(el)
+const MINI_HOME_PATHS = ['/dashboard']
 
+function onPageEnter(el: Element, done: () => void) {
+  if (isMiniApp.value) {
+    const isHome = MINI_HOME_PATHS.includes(route.path)
+
+    if (isHome) {
+      const targets = getStaggerTargets(el)
+      gsap.from(targets, {
+        y: 28,
+        opacity: 0,
+        duration: 0.38,
+        ease: 'power3.out',
+        stagger: 0.04,
+        clearProps: 'all',
+        onComplete: done
+      })
+    }
+    else {
+      gsap.fromTo(el,
+        { x: 24, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.28,
+          ease: 'cubic-bezier(0.32, 0.72, 0, 1)',
+          clearProps: 'all',
+          onComplete: done
+        }
+      )
+    }
+    return
+  }
+
+  const targets = getStaggerTargets(el)
   gsap.from(targets, {
     y: 56,
     opacity: 0,
@@ -59,7 +83,16 @@ function onPageEnter(el: Element, done: () => void) {
   })
 }
 
-function onPageLeave(_el: Element, done: () => void) {
+function onPageLeave(el: Element, done: () => void) {
+  if (isMiniApp.value) {
+    gsap.to(el, {
+      opacity: 0,
+      duration: 0.12,
+      ease: 'linear',
+      onComplete: done
+    })
+    return
+  }
   done()
 }
 
@@ -74,43 +107,15 @@ function getStaggerTargets(el: Element) {
   return [el]
 }
 
-function onLoaderDone() {
-  contentReady.value = true
-  nextTick(() => {
-    const el = contentRef.value
-    if (!el) return
-
-    const children = [...el.children] as HTMLElement[]
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-
-    if (showNav.value && children[0]) {
-      tl.from(children[0], { y: -56, opacity: 0, duration: 0.7 })
-    }
-
-    const rest = showNav.value ? children.slice(1) : children
-    if (rest.length) {
-      const targets = rest.flatMap(child => getStaggerTargets(child))
-      tl.from(targets, {
-        y: 40,
-        opacity: 0,
-        scale: 0.985,
-        duration: 0.85,
-        stagger: 0.07,
-        ease: 'power2.out',
-        clearProps: 'scale'
-      }, showNav.value ? '-=0.45' : '0')
-    }
-  })
-}
-
-useHead({
-  link: [
-    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-    { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap' }
-  ],
-  htmlAttrs: { lang: 'uz' }
-})
+useHead(computed(() => ({
+  htmlAttrs: {
+    lang: 'uz',
+    style: isMiniApp.value ? 'background:#fffdf9' : '',
+  },
+  bodyAttrs: {
+    style: isMiniApp.value ? 'background:#fffdf9' : '',
+  },
+})))
 
 useSeoMeta({
   title: 'Chayroom AI — AIni o\'rgan va hayotda qo\'lla',
@@ -120,15 +125,23 @@ useSeoMeta({
 
 <template>
   <UApp>
-    <AppPageLoader @done="onLoaderDone" />
-
-    <div
-      v-show="contentReady"
-      ref="contentRef"
-    >
+    <div>
       <AppNav v-if="showNav" />
-      <NuxtPage :transition="{ css: false, onEnter: onPageEnter, onLeave: onPageLeave }" />
-      <AppFooter v-if="!isMiniApp" />
+
+      <!-- Mini-app wrapper: constrains all pages to 390px -->
+      <template v-if="isMiniApp">
+        <div
+          class="mini-app-frame mini-app-shell overflow-x-hidden min-h-screen pb-20" style="background:#fffdf9"
+        >
+          <NuxtPage :transition="{ css: false, onEnter: onPageEnter, onLeave: onPageLeave }" />
+        </div>
+        <MiniAppBottomNav />
+      </template>
+
+      <template v-else>
+        <NuxtPage :transition="{ css: false, onEnter: onPageEnter, onLeave: onPageLeave }" />
+        <AppFooter />
+      </template>
     </div>
   </UApp>
 </template>

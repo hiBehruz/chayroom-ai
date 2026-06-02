@@ -22,7 +22,7 @@ const accessFeatures = [
     >
       <div
         v-if="open"
-        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-5 py-8"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 backdrop-blur-md px-5 py-8"
         role="dialog"
         aria-modal="true"
         aria-labelledby="access-modal-title"
@@ -88,7 +88,7 @@ const accessFeatures = [
                 >
                   <path
                     d="M16,18 L17.5,13 L21,11.5 L17.5,10 L16,5 L14.5,10 L11,11.5 L14.5,13Z"
-                    fill="#0075de"
+                    fill="#3480f1"
                     opacity="0.5"
                   />
                 </g>
@@ -98,7 +98,7 @@ const accessFeatures = [
                 >
                   <path
                     d="M102,20 L103,17 L105.5,16 L103,15 L102,12 L101,15 L98.5,16 L101,17Z"
-                    fill="#0075de"
+                    fill="#3480f1"
                     opacity="0.4"
                   />
                 </g>
@@ -138,10 +138,12 @@ const accessFeatures = [
             href="https://t.me/hellobehruz"
             target="_blank"
             rel="noopener noreferrer"
-            class="btn-primary btn-primary-dark w-full px-5! py-3.5! text-[16px]!"
+            class="modal-buy-btn"
           >
-            Купить в Telegram
-            <UIcon name="i-lucide-arrow-right" class="size-5" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10m-9.642-2.618q-1.458.607-5.831 2.513q-.711.282-.744.552c-.038.304.343.424.862.587l.218.07c.51.166 1.198.36 1.555.368q.486.01 1.084-.4q4.086-2.76 4.218-2.789c.063-.014.149-.032.207.02c.059.052.053.15.047.177c-.038.161-1.534 1.552-2.308 2.271q-.344.324-.683.653c-.474.457-.83.8.02 1.36c.861.568 1.73 1.134 2.57 1.733c.414.296.786.56 1.246.519c.267-.025.543-.276.683-1.026c.332-1.77.983-5.608 1.133-7.19a1.8 1.8 0 0 0-.017-.393a.42.42 0 0 0-.142-.27c-.12-.098-.305-.118-.387-.117c-.376.007-.953.207-3.73 1.362" />
+            </svg>
+            Telegram orqali kirish
           </a>
 
           <p class="mt-4 text-center text-[13px] leading-tight text-[#737376]">
@@ -154,6 +156,26 @@ const accessFeatures = [
 </template>
 
 <style scoped>
+.modal-buy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+  background: #3480f1;
+  border: 1px solid #3480f1;
+  border-radius: 999px;
+  padding: 12px 20px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 10px 24px rgba(52,128,241,0.28);
+  transition: gap 0.2s ease, opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+.modal-buy-btn:hover  { gap: 14px; opacity: 0.9; transform: scale(1.04); background: #2570e0; }
+.modal-buy-btn:active { opacity: 0.7; transform: scale(0.98); }
+
 .modal-card {
   animation:
     modal-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both,

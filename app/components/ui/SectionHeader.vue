@@ -16,7 +16,7 @@ defineProps<{
     >
       {{ eyebrow }}
     </div>
-    <h2 class="text-[36px] font-extrabold tracking-[-0.025em] leading-[1.1] text-[#1a1a1a] mb-3.5">
+    <h2 class="font-inter-display text-[48px] font-semibold leading-[1.1] tracking-[-0.02em] text-(--text) mb-3.5 max-md:text-[34px] max-md:leading-[38px]">
       {{ title }}
     </h2>
     <p

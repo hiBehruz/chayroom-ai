@@ -21,36 +21,55 @@ function toggle(i: number) {
 <template>
   <section
     id="faq"
-    class="py-16 scroll-mt-20"
+    class="faq-section py-26 scroll-mt-20 max-md:py-16"
   >
-    <div class="max-w-295 mx-auto px-10 max-md:px-5">
-      <UiSectionHeader
-        eyebrow=""
-        title="Ko‘p so‘raladigan savollar"
+    <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 max-md:px-5">
+      <div class="grid grid-cols-[0.78fr_1.22fr] gap-18 items-start max-lg:grid-cols-1 max-lg:gap-10">
+        <div class="sticky top-28 max-lg:static">
+          <h2 class="faq-section-title max-md:text-[34px] max-md:leading-[38px]">
+            Savol-javoblar
+          </h2>
+        </div>
 
-        class="mb-10"
-      />
-      <div class="flex flex-col gap-1 max-w-195 mx-auto">
-        <div
-          v-for="(item, i) in items"
-          :key="i"
-          class="border-b border-cx-line overflow-hidden"
-        >
-          <button
-            class="w-full px-6 py-5 font-semibold text-[15px] flex justify-between items-center text-left cursor-pointer max-md:px-4 max-md:py-4 max-md:text-[14px]"
-            @click="toggle(i)"
-          >
-            {{ item.q }}
-            <span :class="['text-lg text-cx-muted transition-transform duration-200', openIndex === i ? 'rotate-180' : '']">▾</span>
-          </button>
+        <div class="flex flex-col gap-0">
           <div
-            :class="[
-              'overflow-hidden transition-all duration-300',
-              openIndex === i ? 'max-h-40' : 'max-h-0'
-            ]"
+            v-for="(item, i) in items"
+            :key="i"
+            class="faq-item overflow-hidden"
           >
-            <div class="px-6 pb-5 text-sm text-cx-muted leading-[1.6]">
-              {{ item.a }}
+            <button
+              class="group w-full py-6 grid grid-cols-[32px_1fr] gap-5 items-start text-left cursor-pointer max-md:grid-cols-[26px_1fr] max-md:gap-3 max-md:py-4"
+              :class="i === 0 ? 'pt-0 max-md:pt-0' : ''"
+              @click="toggle(i)"
+            >
+              <span
+                :class="[
+                  'faq-symbol',
+                  openIndex === i ? 'is-open' : ''
+                ]"
+                aria-hidden="true"
+              >
+                <span class="faq-symbol-line" />
+                <span class="faq-symbol-line faq-symbol-line--vertical" />
+              </span>
+              <span class="text-[24px] font-bold leading-[28px] tracking-normal text-[#14161f] max-md:text-[20px] max-md:leading-[24px]">
+                {{ item.q }}
+              </span>
+            </button>
+            <div
+              :class="[
+                'overflow-hidden transition-all duration-300',
+                openIndex === i ? 'max-h-64' : 'max-h-0'
+              ]"
+            >
+              <div
+                :class="[
+                  'pl-[52px] pr-2 pb-7 text-[24px] font-medium leading-[1.38] text-[var(--text)] transition-all duration-500 ease-out max-md:pl-[38px] max-md:text-[18px]',
+                  openIndex === i ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'
+                ]"
+              >
+                {{ item.a }}
+              </div>
             </div>
           </div>
         </div>
@@ -58,3 +77,68 @@ function toggle(i: number) {
     </div>
   </section>
 </template>
+
+<style scoped>
+.faq-section {
+  background: #fffdf9;
+}
+
+.faq-section-title {
+  color: #14161f;
+  font-family: var(--font-inter-display);
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.96px;
+  line-height: 52.8px;
+}
+
+.faq-item + .faq-item {
+  margin-top: 2px;
+}
+
+.faq-symbol {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  transform-origin: center;
+  transition: transform 0.72s ease;
+}
+
+.faq-symbol-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 3px;
+  border-radius: 999px;
+  background: #3480f1;
+  transform: translate(-50%, -50%);
+  transition: transform 0.72s ease, opacity 0.6s ease;
+}
+
+.faq-symbol-line--vertical {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.faq-symbol.is-open {
+  transform: rotate(180deg);
+}
+
+.faq-symbol.is-open .faq-symbol-line--vertical {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(90deg) scaleX(0.2);
+}
+
+@media (max-width: 734px) {
+  .faq-symbol {
+    width: 26px;
+    height: 26px;
+  }
+
+  .faq-symbol-line {
+    width: 18px;
+    height: 2.5px;
+  }
+}
+</style>

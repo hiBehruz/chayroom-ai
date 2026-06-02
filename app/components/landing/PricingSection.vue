@@ -8,10 +8,11 @@ const plans = [
   {
     id: 'monthly',
     period: '1 oy',
-    desc: "Сможешь попробовать и протестировать",
-    oldPrice: "249 000 so'm",
+    icon: 'i-lucide-calendar-1',
+    desc: 'Sinab ko\'rish va o\'zingga mosligini tekshirish uchun',
+    oldPrice: '249 000 so\'m',
     price: '199 000',
-    unit: "so'm / oy",
+    unit: 'so\'m / oy',
     featured: false,
     badge: null,
     savings: null
@@ -19,10 +20,11 @@ const plans = [
   {
     id: 'quarterly',
     period: '3 oy',
-    desc: "Достаточно времени, чтобы увидеть серьёзные результаты",
-    oldPrice: "597 000 so'm",
+    icon: 'i-lucide-calendar-clock',
+    desc: 'Natijani ko\'rish va odatga aylantirish uchun eng qulay muddat',
+    oldPrice: '597 000 so\'m',
     price: '507 450',
-    unit: "so'm / 3 oy",
+    unit: 'so\'m / 3 oy',
     featured: true,
     badge: 'Foydali va ommabop',
     savings: '15% tejash'
@@ -30,17 +32,18 @@ const plans = [
   {
     id: 'half-year',
     period: '6 oy',
-    desc: "Максимальный фокус на том, чтобы AI стал частью твоей жизни",
-    oldPrice: "1 194 000 so'm",
+    icon: 'i-lucide-calendar-range',
+    desc: 'AIni ish, o\'qish va hayot tarzingga chuqur qo\'shish uchun',
+    oldPrice: '1 194 000 so\'m',
     price: '955 200',
-    unit: "so'm / 6 oy",
+    unit: 'so\'m / 6 oy',
     featured: false,
     badge: null,
     savings: '20% tejash'
   }
 ]
 
-const features = ["Barcha kurslar va qo'llanmalar", 'Telegram yopiq kanal', 'AI vositalar tahlili', "Qadam-baqadam yo'riqnomalar", 'Yangi materiallarga kirish']
+const features = ['Barcha kurslar va qo\'llanmalar', 'Telegram yopiq kanal', 'AI vositalar tahlili', 'Qadam-baqadam yo\'riqnomalar', 'Yangi materiallarga kirish']
 
 const sectionRef = ref<HTMLElement>()
 
@@ -61,97 +64,132 @@ function requestAccess(_planId: string) {
   <section
     id="pricing"
     ref="sectionRef"
-    class="py-16 scroll-mt-20"
+    class="pricing-section py-20 scroll-mt-20"
   >
-    <div class="max-w-295 mx-auto px-10 max-md:px-5">
-      <UiSectionHeader
-        eyebrow="Tariflar"
-        title="O'zingga mos formatni tanla"
-        subtitle="Obuna qulay, tushunarli va foydali. Yashirin shartlarsiz."
-        class="[&>div:first-child]:text-[14px] mb-12"
-      />
-      <div class="grid grid-cols-3 max-md:grid-cols-1 gap-4 max-md:gap-6 items-end">
+    <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 max-md:px-5">
+      <div class="pricing-top mb-12">
+        <div>
+          <div class="pricing-eyebrow">
+            Tariflar
+          </div>
+          <h2 class="pricing-title">
+            <svg
+              class="pricing-title-arrow"
+              viewBox="0 0 51 123"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                stroke="#3480F1"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="4"
+                d="M48.389 2.504c-56.832 14.135-66.334 64.133-.027 118.171m0 0c-.88-2.917-5.455-15.693-3.316-26.984m3.316 26.984c-3.026 1.244-15.117-2.621-25.881-11.551"
+              />
+            </svg>
+            <span>
+              O'zingizga mos tarifni
+              <span class="pricing-title-wavy">
+                tanlang
+                <svg
+                  viewBox="0 0 120 14"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M2 8 C12 2 18 2 28 8 S44 14 54 8 S70 2 80 8 S96 14 106 8 S114 2 118 6"
+                    stroke="#3480f1"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+            </span>
+            <svg
+              class="pricing-title-sparkle pricing-title-sparkle--small"
+              viewBox="0 0 26 26"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                stroke="#3480F1"
+                stroke-linejoin="round"
+                stroke-width="4"
+                d="M20.459 2.158C14.843 9.955 5.995 8.09 2.273 6.182c9.03 6.74 7.137 9.523 4.029 18.421 8.23-8.586 10.099-4.879 17.803-3.624-7.468-7.158-6.563-10.122-3.646-18.821Z"
+              />
+            </svg>
+          </h2>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 max-md:grid-cols-1 gap-5 max-md:gap-6 items-end">
         <div
           v-for="plan in plans"
           :key="plan.period"
-          class="relative flex justify-center max-md:justify-stretch"
-          :class="plan.badge ? 'pt-4' : ''"
+          class="pricing-plan relative flex justify-center max-md:justify-stretch"
+          :class="plan.badge ? 'pt-5' : ''"
         >
           <div
             v-if="plan.badge"
-            class="pricing-badge absolute top-0 left-1/2 -translate-x-1/2 text-[11px] font-bold px-3.5 py-1 rounded-full tracking-[.04em] whitespace-nowrap z-10"
+            class="pricing-badge"
           >
             {{ plan.badge }}
           </div>
           <div
-            v-sparkle
             :class="[
-              'price-card bg-[#f7f7f5] rounded-3xl flex flex-col max-md:w-full max-md:h-auto',
-              plan.featured ? 'w-[331.84px] h-[530.4px] p-7 shadow-lift max-md:ring-2 max-md:ring-cx-blue/40 max-md:ring-offset-2' : 'w-[325.33px] h-130 p-6'
+              'price-card flex flex-col max-md:w-full max-md:h-auto',
+              plan.featured ? 'price-card--featured w-[360px] min-h-[590px] p-8 pb-6' : 'w-[350px] min-h-[520px] p-6'
             ]"
           >
             <!-- Period + desc: fixed height for cross-card alignment -->
-            <div class="min-h-22 text-center mb-4">
-              <div class="text-xl font-bold text-[#1a1a1a] mb-2">
-                {{ plan.period }}
+            <div class="min-h-24 mb-5">
+              <div class="flex items-start justify-between gap-4">
+                <div class="price-period">
+                  <UIcon
+                    :name="plan.icon"
+                    class="price-period-icon"
+                  />
+                  {{ plan.period }}
+                </div>
               </div>
-              <div class="text-[13px] text-cx-muted leading-normal">
+              <div class="mt-3 text-[14px] text-cx-muted leading-normal">
                 {{ plan.desc }}
               </div>
             </div>
 
             <!-- Old price: fixed height -->
-            <div class="h-6 text-center mb-1">
+            <div class="h-6 mb-1">
               <span class="text-sm text-cx-faint line-through">{{ plan.oldPrice }}</span>
             </div>
 
             <!-- Main price + unit -->
-            <div class="text-center mb-6">
+            <div class="mb-5">
               <span class="price-amount text-[42px] font-extrabold tracking-[-0.03em] leading-none">{{ plan.price }}</span>
               <span class="text-sm text-cx-muted ml-1">{{ plan.unit }}</span>
             </div>
+            <div class="price-divider" />
 
             <!-- Features -->
-            <ul class="flex flex-col gap-2.5 mb-6 flex-1">
+            <ul class="flex flex-col gap-3 mb-8 flex-1">
               <li
                 v-for="feat in features"
                 :key="feat"
-                class="flex items-center gap-2.5 text-sm"
+                class="price-feature"
               >
-                <svg
-                  class="w-4 h-4 text-green-500 shrink-0 mt-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
-                </svg>
+                <UIcon
+                  name="i-lucide-check"
+                  class="price-check"
+                />
                 {{ feat }}
               </li>
               <li
                 v-if="plan.savings"
-                class="flex items-center gap-2.5 text-sm"
+                class="price-feature"
               >
-                <svg
-                  class="w-4 h-4 text-green-500 shrink-0 mt-0.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
-                </svg>
+                <UIcon
+                  name="i-lucide-check"
+                  class="price-check"
+                />
                 {{ plan.savings }}
               </li>
               <!-- placeholder to keep height consistent -->
@@ -167,24 +205,14 @@ function requestAccess(_planId: string) {
             </ul>
 
             <button
-              :class="[
-                'price-btn w-full',
-                plan.featured ? 'price-btn--featured' : 'price-btn--dark'
-              ]"
+              class="hero-link-btn hero-link-btn--blue flex w-full items-center justify-center px-6 py-[15px] text-[16px]"
               @click="requestAccess(plan.id)"
             >
               <span>Kirish huquqini olish</span>
-              <svg
-                class="price-btn-arrow"
-                viewBox="0 0 16 16"
-                fill="none"
-              ><path
-                d="M3 8h10M9 4l4 4-4 4"
-                stroke="currentColor"
-                stroke-width="1.6"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              /></svg>
+              <UIcon
+                name="i-solar-alt-arrow-right-bold"
+                class="price-btn-icon"
+              />
             </button>
           </div>
         </div>
@@ -196,6 +224,160 @@ function requestAccess(_planId: string) {
 </template>
 
 <style scoped>
+.pricing-section {
+  position: relative;
+  overflow: hidden;
+  background: #fffdf9;
+}
+
+.pricing-section::before {
+  content: none;
+}
+
+.pricing-section > div {
+  position: relative;
+  z-index: 1;
+}
+
+.pricing-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.pricing-eyebrow {
+  width: max-content;
+  margin-right: auto;
+  margin-bottom: 14px;
+  margin-left: auto;
+  padding: 0;
+  color: #3480f1;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pricing-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  max-width: 760px;
+  color: #0a0a0a;
+  font-family: var(--font-inter-display, inherit);
+  font-size: 50px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+.pricing-title-sparkle {
+  width: 58px;
+  height: 45px;
+  flex-shrink: 0;
+}
+
+.pricing-title-arrow {
+  width: 51px;
+  height: 123px;
+  flex-shrink: 0;
+}
+
+.pricing-title-wavy {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 12px;
+}
+
+.pricing-title-wavy svg {
+  position: absolute;
+  left: -12px;
+  bottom: 0;
+  width: calc(100% + 24px);
+  height: 12px;
+}
+
+.pricing-title-sparkle--small {
+  width: 26px;
+  height: 26px;
+}
+
+.pricing-subtitle {
+  margin: 0;
+  max-width: 460px;
+  color: #6b6b72;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.price-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(10,10,10,0.08);
+  border-radius: 28px;
+  background: #fbf9f4;
+  transform-origin: center;
+  transition: transform 0.22s ease, background-color 0.22s ease;
+}
+
+.price-card:hover {
+  transform: scale(1.025);
+}
+
+.price-card--featured::before {
+  content: none;
+}
+
+.price-period {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #0a0a0a;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.price-period-icon {
+  width: 38px;
+  height: 38px;
+  padding: 8px;
+  border: 1px solid rgba(10,10,10,0.92);
+  border-radius: 12px;
+  background: #0a0a0a;
+  flex-shrink: 0;
+  color: #ffffff;
+  transform-origin: center;
+  animation: price-period-icon-float 2.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.price-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #1f2328;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.price-check {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #0a0a0a !important;
+  transform-origin: center;
+  animation: price-check-pop 2.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+
 .price-btn {
   position: relative;
   display: flex;
@@ -203,142 +385,124 @@ function requestAccess(_planId: string) {
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 14px 24px;
-  border: 1px solid rgba(120, 184, 255, 0.72);
-  border-radius: 14px;
-  font-size: 15px;
+  padding: 15px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #0a0a0a;
+  color: #ffffff;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.01em;
   cursor: pointer;
   overflow: hidden;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.82) inset,
+    0 8px 24px rgba(10,10,10,0.04);
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.price-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.025);
+  background: #1a1a1a;
 }
 
 .price-btn:active {
-  transform: scale(0.97);
+  opacity: 0.7;
+  transform: scale(0.98);
 }
 
-.price-btn-arrow {
+.price-btn-icon {
   width: 16px;
   height: 16px;
-  transition: transform 0.2s ease;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
 }
 
-.price-btn:hover .price-btn-arrow,
-.price-card:hover .price-btn-arrow {
+.price-btn:hover .price-btn-icon {
   transform: translateX(3px);
 }
 
 .pricing-badge {
-  border: 1px solid rgba(0, 84, 185, 0.72);
-  background:
-    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.08), transparent 22%),
-    linear-gradient(105deg, #064aaf 0%, #006fd1 38%, #064b9f 68%, #03265f 100%);
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%) rotate(-4deg);
+  min-width: 180px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+  background: #3480f1;
   color: #fff;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.28) inset,
-    0 -1px 0 rgba(0,14,56,0.34) inset,
-    0 10px 24px rgba(0, 91, 200, 0.24);
+  padding: 8px 18px;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
 }
+
 
 .price-amount {
   display: inline-block;
-  background:
-    linear-gradient(128deg, #b9ecff 0%, #008cff 10%, #0a64d8 28%, #0642a7 52%, #062b78 76%, #020f3f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow:
-    0 1px 0 rgba(255,255,255,0.22),
-    0 14px 30px rgba(0, 63, 150, 0.22);
-  filter: drop-shadow(0 2px 0 rgba(1, 32, 92, 0.12));
+  color: #3480f1;
+}
+
+.price-divider {
+  height: 1px;
+  margin-bottom: 24px;
+  background: rgba(10,10,10,0.1);
 }
 
 .price-btn--featured {
-  border-color: rgba(2, 43, 120, 0.92);
-  background:
-    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.08), transparent 22%),
-    linear-gradient(105deg, #064aaf 0%, #006fd1 38%, #064b9f 68%, #03265f 100%);
-  background-size: 100% 100%;
-  color: #fff;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.28) inset,
-    0 -1px 0 rgba(0,14,56,0.34) inset,
-    0 14px 32px rgba(0, 63, 150, 0.3);
-  animation: btn-shimmer 3s ease infinite;
+  border-color: transparent;
+  background: #0a0a0a;
+  color: #ffffff;
 }
 
 .price-btn--featured:hover {
-  border-color: rgba(3, 38, 108, 0.98);
-  background:
-    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.1), transparent 22%),
-    linear-gradient(105deg, #0754bf 0%, #0878dc 38%, #0755ad 68%, #032a68 100%);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.32) inset,
-    0 -1px 0 rgba(0,14,56,0.32) inset,
-    0 18px 40px rgba(0, 63, 150, 0.36);
-  transform: translateY(-1px);
+  border-color: transparent;
+  background: #1a1a1a;
 }
 
 .price-btn--featured::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 24%, rgba(255,255,255,0.44) 50%, transparent 76%);
-  transform: translateX(-100%);
-  transition: transform 1.05s ease;
+  content: none;
 }
 
 .price-btn--featured:hover::after {
-  transform: translateX(100%);
+  transform: none;
 }
 
 .price-btn--dark {
-  background: linear-gradient(180deg, #f6fbff 0%, #eaf5ff 100%);
-  color: #006bd1;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 6px 18px rgba(0,117,222,0.08);
-  transition: color 0.28s ease, box-shadow 0.28s ease, transform 0.18s ease;
+  border-color: transparent;
+  background: #0a0a0a;
+  color: #ffffff;
 }
 
 .price-btn--dark::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(214,235,255,0.9) 100%);
-  border-radius: inherit;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  content: none;
 }
 
 .price-btn--dark:hover {
-  color: #005fbd;
-  border-color: rgba(73, 163, 255, 0.82);
-  box-shadow: 0 1px 0 rgba(255,255,255,1) inset, 0 10px 24px rgba(0,117,222,0.13);
-  transform: translateY(-1px);
+  color: #ffffff;
+  border-color: transparent;
+  background: #1a1a1a;
 }
 
 .price-btn--dark:hover::before {
-  transform: scaleX(1);
+  transform: none;
 }
 
 .price-btn--dark::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.65) 50%, transparent 60%);
-  transform: translateX(-100%);
-  transition: transform 0.5s ease 0.15s;
-  border-radius: inherit;
+  content: none;
 }
 
 .price-btn--dark:hover::after {
-  transform: translateX(100%);
+  transform: none;
 }
 
-.price-btn--dark span,
-.price-btn--dark .price-btn-arrow {
+.price-btn--featured span,
+.price-btn--dark span {
   position: relative;
   z-index: 1;
 }
@@ -346,5 +510,93 @@ function requestAccess(_planId: string) {
 @keyframes btn-shimmer {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
+}
+
+@keyframes price-period-icon-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+
+  35% {
+    transform: translateY(-2px) rotate(-4deg) scale(1.04, 0.98);
+  }
+
+  70% {
+    transform: translateY(1px) rotate(3deg) scale(0.98, 1.03);
+  }
+}
+
+@keyframes price-check-pop {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+
+  45% {
+    transform: translateY(-1px) scale(1.14);
+  }
+
+  70% {
+    transform: translateY(0) scale(0.96);
+  }
+}
+
+@keyframes pricing-badge-bob {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(-4deg) scale(1);
+  }
+
+  35% {
+    transform: translate(-50%, -53%) rotate(-6deg) scale(1.03, 0.98);
+  }
+
+  70% {
+    transform: translate(-50%, -48%) rotate(-2deg) scale(0.99, 1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .price-period-icon,
+  .price-check,
+  .pricing-badge {
+    animation: none;
+    will-change: auto;
+  }
+
+  .price-card:hover .price-period-icon,
+  .price-card:hover .price-check,
+  .pricing-badge:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 734px) {
+  .pricing-section {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .pricing-top {
+    gap: 18px;
+    margin-bottom: 32px;
+  }
+
+  .pricing-title {
+    font-size: 34px;
+    line-height: 1;
+  }
+
+  .pricing-subtitle {
+    max-width: 320px;
+  }
+
+  .price-card,
+  .price-card--featured {
+    min-height: auto;
+    border-radius: 22px;
+  }
+
+  .price-period {
+    font-size: 26px;
+  }
 }
 </style>

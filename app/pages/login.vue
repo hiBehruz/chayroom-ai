@@ -87,89 +87,105 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
 </script>
 
 <template>
-  <div class="min-h-screen bg-white px-4 py-10">
-    <div class="mx-auto flex min-h-[calc(100vh-80px)] w-full max-w-[440px] flex-col items-center justify-center">
-      <NuxtLink
-        to="/"
-        class="mb-14 inline-flex items-center gap-3 text-[#1f1f22] transition-opacity duration-200 hover:opacity-75"
-      >
-        <div class="grid size-7 place-items-center border border-[#c9c9ce] bg-white text-[15px] font-extrabold leading-none text-[#1f1f22]">
-          [
+  <div class="min-h-screen bg-[#fffdf9] flex flex-col items-center justify-center px-5 py-16">
+
+    <!-- Logo -->
+    <NuxtLink
+      to="/"
+      class="mb-10 flex items-center gap-2.5 transition-opacity duration-200 hover:opacity-70"
+    >
+      <span class="grid size-8 place-items-center rounded-xl bg-[#14161f]">
+        <UIcon name="i-ph-brain-fill" class="size-[17px] text-white" />
+      </span>
+      <span class="text-[20px] font-extrabold tracking-tight text-[#14161f]">Chayroom AI Club</span>
+    </NuxtLink>
+
+    <!-- Card -->
+    <div class="w-full max-w-100 rounded-[28px] border border-[#e8e8e6] bg-white shadow-[0_4px_24px_rgba(20,22,31,0.07)]">
+
+      <!-- Card header -->
+      <div class="px-10 pt-11 pb-8 text-center max-md:px-7 max-md:pt-9">
+        <div class="mb-6 grid size-14 place-items-center rounded-2xl bg-[#f0f5ff] mx-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-7" viewBox="0 0 24 24">
+            <path fill="#3480f1" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10m-9.642-2.618q-1.458.607-5.831 2.513q-.711.282-.744.552c-.038.304.343.424.862.587l.218.07c.51.166 1.198.36 1.555.368q.486.01 1.084-.4q4.086-2.76 4.218-2.789c.063-.014.149-.032.207.02c.059.052.053.15.047.177c-.038.161-1.534 1.552-2.308 2.271q-.344.324-.683.653c-.474.457-.83.8.02 1.36c.861.568 1.73 1.134 2.57 1.733c.414.296.786.56 1.246.519c.267-.025.543-.276.683-1.026c.332-1.77.983-5.608 1.133-7.19a1.8 1.8 0 0 0-.017-.393a.42.42 0 0 0-.142-.27c-.12-.098-.305-.118-.387-.117c-.376.007-.953.207-3.73 1.362" />
+          </svg>
         </div>
-        <span class="text-[22px] font-extrabold tracking-tight">AI Room Club</span>
-      </NuxtLink>
 
-      <div class="w-full rounded-[26px] border border-[#dedee2] bg-white px-10 py-11 max-md:px-6 max-md:py-8 text-center">
-        <h1 class="mb-8 text-[25px] font-extrabold tracking-tight text-[#242428]">
-          Войди через Telegram
+        <h1 class="text-[24px] font-extrabold tracking-tight text-[#14161f]">
+          Telegram orqali kiring
         </h1>
+        <p class="mt-2 text-[15px] leading-relaxed text-[#70707a]">
+          Kurslar va qo'llanmalarga bir bosmada kirish
+        </p>
+      </div>
 
+      <!-- Widget area -->
+      <div class="px-10 max-md:px-7">
         <div
           id="telegram-widget-container"
-          class="flex min-h-[48px] items-center justify-center"
+          class="flex min-h-13 items-center justify-center"
         >
-          <p
-            v-if="widgetState === 'loading'"
-            class="text-sm text-cx-faint"
-          >
-            Telegram загружается...
-          </p>
+          <div v-if="widgetState === 'loading'" class="flex items-center gap-2 text-[14px] text-[#a0a0a8]">
+            <span class="size-4 rounded-full border-2 border-[#e0e0e4] border-t-[#3480f1] animate-spin" />
+            Yuklanmoqda...
+          </div>
           <div
             v-else-if="widgetState === 'missing-bot'"
-            class="rounded-2xl bg-cx-blue-soft px-4 py-3 text-sm leading-relaxed text-cx-blue"
+            class="w-full rounded-2xl bg-[#f0f5ff] px-4 py-3 text-[13px] leading-relaxed text-[#3480f1]"
           >
-            Укажите <span class="font-semibold">NUXT_PUBLIC_TELEGRAM_BOT_USERNAME</span>, чтобы включить Telegram Login Widget.
+            <span class="font-bold">NUXT_PUBLIC_TELEGRAM_BOT_USERNAME</span> ko'rsatilmagan.
           </div>
           <div
             v-else-if="widgetState === 'mini-app'"
-            class="rounded-2xl bg-cx-blue-soft px-4 py-3 text-sm leading-relaxed text-cx-blue"
+            class="flex items-center gap-2 text-[14px] text-[#a0a0a8]"
           >
+            <span class="size-4 rounded-full border-2 border-[#e0e0e4] border-t-[#3480f1] animate-spin" />
             Kirilmoqda...
           </div>
           <div
             v-else-if="widgetState === 'mini-app-error'"
-            class="rounded-2xl bg-red-50 px-4 py-3 text-sm leading-relaxed text-red-600"
+            class="w-full rounded-2xl bg-red-50 px-4 py-3 text-[13px] text-red-600"
           >
-            Telegramni yangilang
+            Telegramni yangilang va qaytadan kirging.
           </div>
         </div>
 
-        <div
-          v-if="isDev"
-          class="mt-5 text-center"
-        >
-          <div class="mb-2 text-xs text-cx-faint">
-            — dev only —
-          </div>
+        <!-- Dev login -->
+        <div v-if="isDev" class="mt-5 text-center">
+          <p class="mb-2 text-[11px] font-semibold uppercase tracking-widest text-[#c0c0c8]">dev only</p>
           <button
-            class="btn-primary btn-primary-dark px-5! py-2! text-sm"
+            class="rounded-xl bg-[#14161f] px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity duration-200 hover:opacity-80"
             @click="authStore.devLogin(); goAfterLogin()"
           >
-            Dev login (mock)
+            Dev login
           </button>
         </div>
 
-        <button
-          class="mt-7 text-[14px] font-medium text-[#707078] transition-colors duration-200 hover:text-cx-ink"
-          type="button"
-          @click="mountTelegramWidget"
-        >
-          Войти через другой аккаунт
-        </button>
+        <!-- Switch account -->
+        <div class="mt-5 text-center">
+          <button
+            class="text-[13px] text-[#a0a0a8] transition-colors duration-200 hover:text-[#14161f]"
+            type="button"
+            @click="mountTelegramWidget"
+          >
+            Boshqa akkaunt orqali kirish
+          </button>
+        </div>
+      </div>
 
-        <p class="mx-auto mt-8 max-w-[330px] text-[15px] leading-7 text-[#707078]">
-          Мы получаем только имя, аватар и Telegram ID
-          <br>
-          для входа на сайт.
+      <!-- Card footer -->
+      <div class="mt-8 border-t border-[#f2f2f0] px-10 py-7 max-md:px-7">
+        <p class="text-center text-[12px] leading-relaxed text-[#b8b8c0]">
+          Faqat ism, rasm va Telegram ID olinadi. Boshqa ma'lumot so'ralmaydi.
         </p>
-
-        <div class="mt-8 border-t border-[#e8e8eb] pt-8">
+        <div class="mt-4 text-center">
           <a
             href="https://t.me/hellobehruz"
             target="_blank"
-            class="text-[15px] font-medium text-[#707078] transition-colors duration-200 hover:text-cx-blue"
+            rel="noopener noreferrer"
+            class="text-[13px] font-medium text-[#70707a] transition-colors duration-200 hover:text-[#3480f1]"
           >
-            Не приходит подтверждение?
+            Tasdiqlash kelmayaptimi? Yozing
           </a>
         </div>
       </div>

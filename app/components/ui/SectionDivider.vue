@@ -9,7 +9,7 @@
 <style scoped>
 .sparkle-lg {
   font-size: 26px;
-  color: #93C5FD;
+  color: #3480f1;
   animation: pulse-lg 3s ease-in-out infinite;
   line-height: 1;
   margin-bottom: 8px;
@@ -24,7 +24,7 @@
 
 .sparkle-dot {
   font-size: 13px;
-  color: #BFDBFE;
+  color: #3480f1;
   animation: pulse-sm 3s ease-in-out infinite 1.2s;
   line-height: 1;
   margin-bottom: 2px;

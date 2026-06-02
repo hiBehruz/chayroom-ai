@@ -30,22 +30,17 @@ const freeGuideCtaFeatures = [
   }
 ]
 
-onMounted(() => guidesStore.fetch())
+const { data: guide, status } = await useAsyncData(
+  `guide-${route.params.slug}`,
+  () => $fetch<import('~/stores/guides').Guide>(`/api/guides/${route.params.slug as string}`),
+  { getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key] }
+)
 
-const guide = ref<import('~/stores/guides').Guide | null>(null)
-const guideLoading = ref(true)
+if (!guide.value) {
+  throw createError({ statusCode: 404, statusMessage: 'Qo\'llanma topilmadi' })
+}
 
-onMounted(async () => {
-  try {
-    guide.value = await $fetch<import('~/stores/guides').Guide>(
-      `/api/guides/${route.params.slug as string}`
-    )
-  } catch {
-    throw createError({ statusCode: 404, statusMessage: 'Qo\'llanma topilmadi' })
-  } finally {
-    guideLoading.value = false
-  }
-})
+const guideLoading = computed(() => status.value === 'pending')
 
 // ── Inline edit ───────────────────────────────────────────
 const isEditing = ref(false)
@@ -185,7 +180,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
 </script>
 
 <template>
-  <div class="min-h-screen" :class="isMiniApp ? 'bg-[#efefef]' : 'bg-cx-surface'">
+  <div class="min-h-screen" :class="isMiniApp ? 'bg-[#fffdf9]' : 'bg-cx-surface'">
     <div class="mx-auto" :class="isMiniApp ? 'px-4 py-5 max-w-full' : 'w-[1240px] max-w-[calc(100vw-40px)] px-0 py-20 max-md:px-4 max-md:py-10'">
       <div v-if="guideLoading" class="flex items-center justify-center py-32">
         <span class="inline-block size-8 border-2 border-cx-line border-t-cx-blue rounded-full animate-spin" />

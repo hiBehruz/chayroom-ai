@@ -4,17 +4,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@pinia/nuxt',
-    '@sentry/nuxt/module'
   ],
-
-  sentry: {
-    dsn: process.env.NUXT_PUBLIC_SENTRY_DSN,
-    sourceMapsUploadOptions: {
-      org: 'chayroom-ai',
-      project: 'chayroom-nuxt',
-      disable: true,
-    },
-  },
 
   devtools: { enabled: true },
 

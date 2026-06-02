@@ -1,0 +1,3 @@
+chayroom.uz, www.chayroom.uz {
+	reverse_proxy nuxt:3000
+}

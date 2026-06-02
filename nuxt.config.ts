@@ -6,6 +6,13 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
   ],
 
+  nitro: {
+    prerender: {
+      crawlLinks: false,
+      routes: [],
+    },
+  },
+
   devtools: { enabled: true },
 
   css: ['~/assets/css/main.css'],

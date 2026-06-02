@@ -37,3 +37,13 @@ logs
 .codex/.env.*
 .agents/**/.env
 .agents/**/.env.*
+
+coverage/
+pnpm-debug.log*
+.pnpm-store/
+.claude/*.lock
+.claude/*.log
+.claude/logs/
+.ai/
+.agent/
+.secrets/

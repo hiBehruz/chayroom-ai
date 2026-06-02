@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     sourceMapsUploadOptions: {
       org: 'chayroom-ai',
       project: 'chayroom-nuxt',
+      disable: true,
     },
   },
 

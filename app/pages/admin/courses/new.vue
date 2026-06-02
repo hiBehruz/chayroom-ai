@@ -688,7 +688,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
 
             <div class="p-5">
               <ClientOnly v-if="contentTab === 'editor'">
-                <GuideEditor v-model="content" />
+                <GuidesEditor v-model="content" />
               </ClientOnly>
 
               <div v-else-if="contentTab === 'notion'">

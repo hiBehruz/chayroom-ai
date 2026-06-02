@@ -427,7 +427,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
           <div>
             <label class="block text-[16px] font-bold text-cx-muted uppercase tracking-wider mb-2">Kontent</label>
             <ClientOnly>
-              <GuideEditor v-model="editContent" />
+              <GuidesEditor v-model="editContent" />
             </ClientOnly>
           </div>
         </div>

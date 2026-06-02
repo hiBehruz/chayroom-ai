@@ -628,7 +628,7 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
 
               <!-- Visual editor tab -->
               <ClientOnly v-if="contentTab === 'editor'">
-                <GuideEditor v-model="content" />
+                <GuidesEditor v-model="content" />
               </ClientOnly>
 
               <!-- Notion tab -->

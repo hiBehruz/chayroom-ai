@@ -40,11 +40,15 @@ export default defineNuxtConfig({
     r2BucketName: '',
     r2PublicUrl: '',
     telegramBotToken: '',
+    tributeApiKey: '',
     public: {
       telegramBotUsername: '',
       appUrl: 'https://chayroom.uz',
       supportUsername: 'hellobehruz',
-      sentryDsn: ''
+      sentryDsn: '',
+      tributeTier1MonthUrl: '',
+      tributeTier3MonthUrl: '',
+      tributeTier6MonthUrl: ''
     }
   },
 

@@ -26,6 +26,9 @@ export const useAuthStore = defineStore('auth', () => {
     sameSite: 'lax'
   })
   const hasSubscription = ref(false)
+  const subscriptionPeriod = ref<string | null>(null)
+  const subscriptionExpiresAt = ref<string | null>(null)
+  const subscriptionCancelled = ref(false)
   const subCookie = useCookie<boolean | null>('cx-sub', {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: 'lax'
@@ -62,6 +65,22 @@ export const useAuthStore = defineStore('auth', () => {
 
     const name = user.value?.first_name?.toLowerCase() ?? ''
     return femaleNameHints.some(hint => name.includes(hint)) ? 'female' : 'male'
+  })
+
+  const daysLeft = computed(() => {
+    if (!subscriptionExpiresAt.value) return null
+    const ms = new Date(subscriptionExpiresAt.value).getTime() - Date.now()
+    return Math.max(0, Math.ceil(ms / 86_400_000))
+  })
+
+  const tariffLabel = computed(() => {
+    if (!subscriptionPeriod.value) return null
+    const map: Record<string, string> = {
+      monthly: 'AI Room Club — 1 oy',
+      '3month': 'AI Room Club — 3 oy',
+      '6month': 'AI Room Club — 6 oy'
+    }
+    return map[subscriptionPeriod.value] ?? 'AI Room Club'
   })
 
   function setUserSession(telegramUser: TelegramUser) {
@@ -101,14 +120,47 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function syncMe() {
+    if (!import.meta.client) return
+    try {
+      const res = await $fetch<{
+        user: TelegramUser | null
+        hasSubscription: boolean
+        subscription: { period: string | null, expiresAt: string, cancelledAt: string | null } | null
+      }>('/api/auth/me')
+
+      if (!res.user) {
+        logout()
+        return
+      }
+
+      if (res.hasSubscription && res.subscription) {
+        activateSubscription({
+          period: res.subscription.period,
+          expiresAt: res.subscription.expiresAt,
+          cancelledAt: res.subscription.cancelledAt
+        })
+      } else {
+        clearSubscription()
+      }
+    } catch {
+      // silent — leave existing state
+    }
+  }
+
   function login(telegramUser: TelegramUser) {
     setUserSession(telegramUser)
     void syncSubscription(telegramUser)
   }
 
-  function activateSubscription() {
+  function activateSubscription(data?: { period?: string | null, expiresAt?: string | null, cancelledAt?: string | null }) {
     hasSubscription.value = true
     subCookie.value = true
+    if (data) {
+      subscriptionPeriod.value = data.period ?? null
+      subscriptionExpiresAt.value = data.expiresAt ?? null
+      subscriptionCancelled.value = !!data.cancelledAt
+    }
   }
 
   function setAgentVariant(variant: AgentVariant) {
@@ -116,11 +168,18 @@ export const useAuthStore = defineStore('auth', () => {
     agentVariantCookie.value = variant
   }
 
+  function clearSubscription() {
+    hasSubscription.value = false
+    subCookie.value = null
+    subscriptionPeriod.value = null
+    subscriptionExpiresAt.value = null
+    subscriptionCancelled.value = false
+  }
+
   function logout() {
     user.value = null
     userCookie.value = null
-    hasSubscription.value = false
-    subCookie.value = null
+    clearSubscription()
     if (import.meta.client) {
       localStorage.removeItem('cx-user')
     }
@@ -187,6 +246,11 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user,
     hasSubscription,
+    subscriptionPeriod,
+    subscriptionExpiresAt,
+    subscriptionCancelled,
+    daysLeft,
+    tariffLabel,
     isOwner,
     agentVariant,
     resolvedAgentVariant,
@@ -195,6 +259,8 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     loginFromMiniApp,
     activateSubscription,
+    clearSubscription,
+    syncMe,
     setAgentVariant,
     logout,
     restoreFromStorage,

@@ -272,9 +272,9 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
                 </svg>
                 Bepul
               </span>
-              <span v-else class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-[#ddd6fe] bg-[#f5f3ff] text-[#7c3aed]">
+              <span v-else class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-red-200 bg-red-50 text-red-500">
                 <UIcon name="i-lucide-lock" class="size-3.5 shrink-0" />
-                Obuna asosida
+                По подписке
               </span>
             </div>
 

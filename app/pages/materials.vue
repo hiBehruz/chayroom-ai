@@ -10,17 +10,10 @@ const available = [
     iconColor: '#f97316',
     iconBg: 'rgba(249,115,22,0.12)',
   },
-  {
-    label: 'Kurslar',
-    href: '/courses',
-    icon: 'i-solar-square-academic-cap-bold',
-    description: "Tuzilgan video kurslar. Bosqichma-bosqich, amaliy mashqlar bilan.",
-    iconColor: '#8b5cf6',
-    iconBg: 'rgba(139,92,246,0.12)',
-  },
 ]
 
 const soon = [
+  { label: 'Kurslar', icon: 'i-solar-square-academic-cap-bold', iconColor: '#8b5cf6', iconBg: 'rgba(139,92,246,0.12)' },
   { label: 'Skilllar', icon: 'i-ph-brain-fill', iconColor: '#eab308', iconBg: 'rgba(234,179,8,0.12)' },
   { label: 'Yuzkeyslar', icon: 'i-solar-bag-3-bold', iconColor: '#22c55e', iconBg: 'rgba(34,197,94,0.12)' },
   { label: 'Efirlar', icon: 'i-solar-video-frame-bold', iconColor: '#ec4899', iconBg: 'rgba(236,72,153,0.12)' },
@@ -63,7 +56,8 @@ function isCurrentRoute(href: string) {
             'group flex flex-col justify-between h-66 max-md:h-auto max-md:gap-8 p-6 rounded-2xl transition-all duration-200 cursor-pointer',
             isCurrentRoute(item.href)
               ? 'bg-[#f7f5ef] border border-[#e8e6e1] shadow-[0_4px_24px_rgba(52,128,241,0.09)]'
-              : 'bg-[#f7f5ef] border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)]'
+              : 'bg-[#f7f5ef] border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)]',
+            item.dim ? 'opacity-50' : ''
           ]"
         >
           <div

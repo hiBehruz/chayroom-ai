@@ -2,11 +2,11 @@
 const open = defineModel<boolean>({ default: false })
 
 const accessFeatures = [
-  'Barcha kurslar va qo\'llanmalar',
-  'Yopiq chat AI Room Club',
-  'AI-asboblar tahlili',
-  'Bosqichma-bosqich ko\'rsatmalar',
-  'Yangi materiallarga kirish'
+  'Все курсы и гайды',
+  'Закрытый чат AI Room Club',
+  'Разборы AI-инструментов',
+  'Пошаговые инструкции',
+  'Доступ к новым материалам',
 ]
 
 const config = useRuntimeConfig()
@@ -140,10 +140,10 @@ const tiers = [
 
           <div class="mb-5 text-center">
             <h2 id="access-modal-title" class="text-[22px] font-extrabold leading-tight tracking-tight text-[#202023]">
-              Kirishni oling
+              Получи доступ
             </h2>
             <p class="mt-2 text-[15px] leading-tight text-[#707073]">
-              To'lov Telegram orqali Tribute'da
+              Оплата через Tribute в Telegram
             </p>
           </div>
 
@@ -158,26 +158,18 @@ const tiers = [
             </li>
           </ul>
 
-          <div class="mb-2 grid grid-cols-3 gap-2">
-            <a
-              v-for="tier in tiers"
-              :key="tier.label"
-              :href="tier.url || '#'"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex flex-col items-center gap-1 rounded-2xl border px-3 py-3 text-center transition-all duration-150 hover:scale-[1.03]"
-              :class="tier.highlight
-                ? 'border-[#3480f1] bg-[#3480f1] text-white shadow-[0_8px_20px_rgba(52,128,241,0.25)]'
-                : 'border-[#e8e6e1] bg-white text-[#14161f] hover:border-[#3480f1]'"
-            >
-              <span class="text-[12px] font-semibold opacity-80">{{ tier.label }}</span>
-              <span class="text-[17px] font-extrabold leading-tight">{{ tier.price }}</span>
-              <span v-if="tier.sub" class="text-[10px] font-medium opacity-70">{{ tier.sub }}</span>
-            </a>
-          </div>
+          <a
+            :href="tiers[1].url || 'https://t.me/tribute/app?startapp=sXgF'"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="modal-buy-btn mb-2"
+          >
+            Купить в Telegram
+            <UIcon name="i-lucide-arrow-right" class="size-4 shrink-0" />
+          </a>
 
-          <p class="mt-4 text-center text-[13px] leading-tight text-[#737376]">
-            To'lovdan so'ng kirish avtomatik faollashadi
+          <p class="text-center text-[13px] leading-tight text-[#737376]">
+            Доступ активируется автоматически после оплаты
           </p>
         </div>
       </div>

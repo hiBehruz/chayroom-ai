@@ -171,8 +171,9 @@ onMounted(() => {
 
 @media (max-width: 734px) {
   .guides-banner-title {
-    font-size: 36px;
-    line-height: 40px;
+    font-size: 28px;
+    line-height: 30.8px;
+    letter-spacing: -0.56px;
   }
 
   .guides-banner-desc {

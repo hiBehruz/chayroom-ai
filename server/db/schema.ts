@@ -73,6 +73,7 @@ export const courses = pgTable('courses', {
   accentTitle: text('accent_title').array().notNull().default([]),
   accentColor: text('accent_color'),
   content: text('content'),
+  isFree: boolean('is_free').notNull().default(false),
   order: integer('order').notNull().default(0),
   published: boolean('published').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),

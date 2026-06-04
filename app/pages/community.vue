@@ -82,7 +82,7 @@ const tags = ['AI-agentlar', 'Vibe coding', 'Avtomatlashtirish', 'Shaxsiy assist
         <span class="inline-block text-[13px] font-semibold tracking-widest uppercase text-cx-blue mb-4 max-md:mb-3">
           Yopiq klub
         </span>
-        <h1 class="font-inter-display text-[56px] font-semibold leading-[1.06] tracking-[-0.025em] text-[#14161f] mb-5 max-md:text-[36px] max-md:mb-4">
+        <h1 class="font-inter-display text-[56px] font-semibold leading-[1.06] tracking-[-0.025em] text-[#14161f] mb-5 max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px] max-md:mb-4">
           AI Room Club
         </h1>
         <p class="text-[18px] text-cx-muted leading-relaxed max-w-[560px] mb-7 max-md:text-[16px] max-md:mb-5">

@@ -1,100 +1,253 @@
 <script setup lang="ts">
-const router = useRouter()
-const { data: allGuides, pending } = useAsyncData('mini-guides', () => $fetch<any[]>('/api/guides'))
+import type { Guide } from '~/stores/guides'
 
-const chips = ['Hammasi', 'Vibe coding', 'AI-agentlar', 'Neyrolar', 'Claude']
-const activeChip = ref('Hammasi')
+const router = useRouter()
+
+const { data: allGuides, pending } = useAsyncData('mini-guides', () => $fetch<Guide[]>('/api/guides'))
+
+const chips = [
+  { label: 'Hammasi', value: 'all', icon: null },
+  { label: 'Vibe coding', value: 'vibe-coding', icon: 'i-solar-code-circle-bold' },
+  { label: 'AI-agentlar', value: 'ai-agents', icon: 'i-solar-command-bold' },
+  { label: 'Neyrolar', value: 'neural', icon: 'i-solar-atom-bold' },
+  { label: 'Claude', value: 'claude', icon: 'i-ph-robot-bold' }
+]
+
+const activeChip = ref('all')
+const filterRef = ref<HTMLElement | null>(null)
+const chipRefs = ref<HTMLElement[]>([])
+const indicatorStyle = ref({ left: '0px', width: '0px', opacity: '0' })
+
+function updateIndicator() {
+  const index = chips.findIndex(chip => chip.value === activeChip.value)
+  const btn = chipRefs.value[index]
+  const filter = filterRef.value
+
+  if (!btn || !filter) return
+
+  const btnRect = btn.getBoundingClientRect()
+  const filterRect = filter.getBoundingClientRect()
+
+  indicatorStyle.value = {
+    left: `${btnRect.left - filterRect.left + filter.scrollLeft}px`,
+    width: `${btnRect.width}px`,
+    opacity: '1'
+  }
+}
+
+function selectChip(value: string) {
+  activeChip.value = value
+  nextTick(() => {
+    updateIndicator()
+    requestAnimationFrame(updateIndicator)
+  })
+}
+
+function formatGuideDate(date: string | null) {
+  if (!date) return 'Yangi'
+
+  return new Intl.DateTimeFormat('uz-UZ', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(date))
+}
+
+function cardBg(guide: Guide) {
+  return guide.bg || '#f3efe7'
+}
 
 const guides = computed(() => allGuides.value ?? [])
 
-useSeoMeta({ title: "Qo'llanmalar" })
+onMounted(() => {
+  nextTick(() => {
+    updateIndicator()
+    requestAnimationFrame(updateIndicator)
+  })
+  document.fonts?.ready.then(updateIndicator)
+})
+
+useSeoMeta({ title: 'Qo\'llanmalar' })
 </script>
 
 <template>
   <div style="background:#fffdf9;min-height:100vh;font-family:inherit">
-
-    <!-- Header -->
-    <div class="flex items-center gap-3 px-5 pt-4 pb-2">
-      <button
-        class="inline-flex items-center justify-center flex-none tg-press-sm"
-        style="width:36px;height:36px;border-radius:50%;background:#f7f5ef;border:none"
-        @click="router.back()"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0f1115" stroke-width="2.5" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
-      </button>
-      <div>
-        <h1 style="font-size:26px;font-weight:800;letter-spacing:-0.03em;color:#0f1115;margin:0">Qo'llanmalar</h1>
-      </div>
-    </div>
-    <p style="font-size:13px;color:#6b7280;font-weight:500;margin:0;padding:0 20px 14px">Amaliy qo'llanmalar va bosqichma-bosqich ko'rsatmalar.</p>
-
-    <!-- Chip filters -->
-    <div class="flex gap-2.5 overflow-x-auto" style="padding:0 20px 14px;scrollbar-width:none">
-      <button
-        v-for="chip in chips"
-        :key="chip"
-        class="flex-none tg-press-sm"
-        style="height:36px;padding:0 18px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;border:none"
-        :style="activeChip === chip
-          ? 'background:#4c6ef0;color:#fff'
-          : 'background:#f7f5ef;color:#0f1115;border:1px solid #e8e4da'"
-        @click="activeChip = chip"
-      >
-        {{ chip }}
-      </button>
-    </div>
-
-    <!-- Skeleton -->
-    <div v-if="pending" class="flex flex-col gap-3" style="padding:0 20px 24px">
-      <div
-        v-for="i in 4"
-        :key="i"
-        class="flex items-center gap-3"
-        style="background:#f7f5ef;border-radius:20px;padding:14px"
-      >
-        <div class="skeleton flex-none" style="width:90px;height:90px;border-radius:14px" />
-        <div class="flex-1 flex flex-col gap-2">
-          <div class="skeleton" style="height:14px;width:80%;border-radius:8px" />
-          <div class="skeleton" style="height:11px;width:60%;border-radius:8px" />
-          <div class="skeleton" style="height:11px;width:40%;border-radius:8px" />
+    <div style="padding:18px 18px 28px">
+      <div class="mb-4 flex items-center gap-3">
+        <button
+          class="inline-flex flex-none items-center justify-center tg-press-sm"
+          style="width:40px;height:40px;border-radius:999px;background:#f4efe6;border:none"
+          @click="router.back()"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#0f1115"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M15 6l-6 6 6 6" />
+          </svg>
+        </button>
+        <div>
+          <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#9aa0a8">
+            Mini-app
+          </p>
+          <h1 style="margin:2px 0 0;font-size:30px;font-weight:800;letter-spacing:-0.04em;line-height:1;color:#0f1115">
+            Qo'llanmalar
+          </h1>
         </div>
       </div>
-    </div>
 
-    <!-- Guides list -->
-    <div v-else class="flex flex-col gap-3" style="padding:0 20px 24px">
-      <NuxtLink
-        v-for="(guide, i) in guides"
-        :key="guide.slug"
-        :to="`/guides/${guide.slug}`"
-        class="tg-press flex items-center gap-3 fade-up"
-        :class="`fade-up-d${Math.min(i, 5)}`"
-        style="background:#f7f5ef;border-radius:20px;padding:14px"
+      <div class="mb-5">
+        <p style="margin:0;max-width:280px;font-size:15px;line-height:1.55;color:#6b7280;font-weight:500">
+          Amaliy qo'llanmalar, bosqichma-bosqich yo'riqnomalar va ishga tez kirish uchun materiallar.
+        </p>
+      </div>
+
+      <div
+        class="overflow-x-auto"
+        style="padding-bottom:18px;scrollbar-width:none"
       >
         <div
-          class="flex-none grid place-items-center overflow-hidden"
-          style="width:90px;height:90px;border-radius:14px;background:#0f1115"
+          ref="filterRef"
+          class="relative inline-flex items-center gap-2 whitespace-nowrap"
         >
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <span
+            class="pointer-events-none absolute inset-y-0 rounded-full bg-[#262831]"
+            style="transition:left 250ms cubic-bezier(0.23,1,0.32,1),width 250ms cubic-bezier(0.23,1,0.32,1),opacity 150ms ease"
+            :style="indicatorStyle"
+          />
+          <button
+            v-for="(chip, i) in chips"
+            :key="chip.value"
+            :ref="el => { if (el) chipRefs[i] = el as HTMLElement }"
+            class="relative z-10 inline-flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-[14px] font-semibold whitespace-nowrap transition-[color] duration-150 active:scale-95"
+            :style="activeChip === chip.value ? 'color:#fffdf9;background:transparent' : 'color:#262831;background:#f4efe6'"
+            @click="selectChip(chip.value)"
+          >
+            <UIcon
+              v-if="chip.icon"
+              :name="chip.icon"
+              class="size-4"
+            />
+            {{ chip.label }}
+          </button>
+        </div>
+      </div>
+
+      <div
+        v-if="pending"
+        class="flex flex-col gap-4"
+      >
+        <div
+          v-for="i in 3"
+          :key="i"
+          class="flex items-center gap-3"
+          style="border-radius:24px;background:#ffffff;border:1px solid #e8e6e0;padding:12px"
+        >
+          <div
+            class="skeleton"
+            style="width:72px;height:72px;border-radius:16px"
+          />
+          <div class="min-w-0 flex-1">
+            <div
+              class="skeleton mb-3"
+              style="height:18px;width:82%;border-radius:10px"
+            />
+            <div
+              class="flex gap-2"
+            />
+            <div
+              class="skeleton inline-block"
+              style="height:22px;width:54px;border-radius:999px"
+            />
+            <div
+              class="skeleton inline-block"
+              style="height:22px;width:72px;border-radius:999px"
+            />
+          </div>
+          <div
+            class="skeleton shrink-0"
+            style="width:8px;height:14px;border-radius:4px"
+          />
+        </div>
+      </div>
+
+      <div
+        v-else
+        class="space-y-2.5"
+      >
+        <NuxtLink
+          v-for="(guide, i) in guides"
+          :key="guide.slug"
+          :to="`/guides/${guide.slug}`"
+          class="tg-press fade-up flex items-center gap-3"
+          :class="`fade-up-d${Math.min(i, 5)}`"
+          style="border-radius:24px;background:#ffffff;border:1px solid #e8e6e0;padding:12px;text-decoration:none"
+        >
+          <div
+            class="shrink-0 overflow-hidden rounded-2xl"
+            :style="{
+              width: '72px',
+              height: '72px',
+              backgroundColor: cardBg(guide),
+              backgroundImage: guide.coverUrl ? `url(${guide.coverUrl})` : undefined,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }"
+          />
+
+          <div class="min-w-0 flex-1">
+            <h3
+              style="margin:0 0 8px;font-size:14px;font-weight:800;line-height:1.35;color:#14161f;display:-webkit-box;overflow:hidden;text-overflow:ellipsis;-webkit-line-clamp:2;-webkit-box-orient:vertical"
+            >
+              {{ guide.title }}
+            </h3>
+            <div class="flex flex-wrap gap-1">
+              <span
+                style="border-radius:999px;background:#f0ede8;padding:2px 8px;font-size:10px;font-weight:700;color:#70707a"
+              >
+                {{ formatGuideDate(guide.publishedAt) }}
+              </span>
+              <span
+                v-for="tag in (guide.tags || []).slice(0, 2)"
+                :key="tag"
+                style="border-radius:999px;background:#f0ede8;padding:2px 8px;font-size:10px;font-weight:700;color:#70707a"
+              >
+                {{ tag }}
+              </span>
+            </div>
+          </div>
+
+          <svg
+            class="shrink-0"
+            width="8"
+            height="14"
+            viewBox="0 0 8 14"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M1 1l6 6-6 6"
+              stroke="#c0c0c8"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
+        </NuxtLink>
+
+        <div
+          v-if="!guides.length"
+          class="flex items-center justify-center"
+          style="padding:52px 0;color:#9aa0a8;font-size:14px;font-weight:500"
+        >
+          Qo'llanmalar topilmadi
         </div>
-
-        <div class="flex-1 min-w-0">
-          <h3 style="font-size:14px;font-weight:800;letter-spacing:-0.015em;color:#0f1115;margin:0 0 4px;line-height:1.2">{{ guide.title }}</h3>
-          <p
-            v-if="guide.description"
-            style="font-size:11.5px;color:#6b7280;font-weight:500;margin:0 0 6px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical"
-          >{{ guide.description }}</p>
-          <span style="background:#ede9e0;color:#0f1115;padding:4px 9px;border-radius:999px;font-size:10.5px;font-weight:700">Qo'llanma</span>
-        </div>
-
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4c8d2" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
-      </NuxtLink>
-
-      <div v-if="!guides.length" class="flex items-center justify-center" style="padding:48px 0;color:#9aa0a8;font-size:14px;font-weight:500">
-        Qo'llanmalar topilmadi
       </div>
     </div>
   </div>

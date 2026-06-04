@@ -73,7 +73,7 @@ onMounted(() => {
         </div>
 
         <div class="text-center mb-14 max-md:mb-10">
-          <h2 class="text-white text-[42px] font-bold tracking-[-0.02em] leading-[1.1] mb-3 max-md:text-[30px]">
+          <h2 class="text-white text-[42px] font-bold tracking-[-0.02em] leading-[1.1] mb-3 max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px]">
             AIni qayerda va qanday qo'llash mumkin
           </h2>
           <p class="text-[#6b7280] text-[18px] leading-relaxed max-w-150 mx-auto max-md:text-[16px]">

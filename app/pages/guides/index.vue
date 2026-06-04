@@ -1,72 +1,58 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
-const hasSubscription = computed(() => authStore.hasSubscription)
 
 const LEVEL_COLORS: Record<string, string> = {
-  'Yangi boshlagan': '#22c55e',
-  "O'rta": '#3480f1',
-  'Tajribali': '#14161f',
+  'Yangi boshlagan': '#10b981',
+  "O'rta": '#f59e0b',
+  'Tajribali': '#8b5cf6',
   'Professional': '#8b5cf6',
 }
 const LEVEL_ICONS: Record<string, string> = {
-  'Yangi boshlagan': 'i-lucide-award',
+  'Yangi boshlagan': 'i-lucide-sprout',
   "O'rta": 'i-lucide-bar-chart-2',
   'Tajribali': 'i-lucide-flame',
   'Professional': 'i-lucide-rocket',
 }
-function levelColor(l: string | null) { return LEVEL_COLORS[l ?? ''] ?? '#22c55e' }
+function levelColor(l: string | null) { return LEVEL_COLORS[l ?? ''] ?? '#3480f1' }
 function levelIcon(l: string | null) { return LEVEL_ICONS[l ?? ''] ?? 'i-lucide-award' }
+function levelLabel(l: string | null) {
+  if (l === 'Yangi boshlagan') return "Boshlangich"
+  if (l === "O'rta") return "O'rta daraja"
+  if (l === 'Tajribali' || l === 'Professional') return "Pro"
+  return l ?? "Boshlangich"
+}
 const isOwner = computed(() => authStore.isOwner)
 
 const categories = [
   { label: 'Все', value: 'all', icon: 'i-lucide-layout-grid', color: '' },
-  { label: 'Вайбкодинг', value: 'vibe-coding', icon: 'i-solar-code-circle-bold', color: '#6366f1' },
-  { label: 'AI-агенты', value: 'ai-agents', icon: 'i-solar-command-bold', color: '#f97316' },
-  { label: 'Нейросети', value: 'neural-networks', icon: 'i-solar-atom-bold', color: '#22c55e' },
-  { label: 'Контент', value: 'content', icon: 'i-solar-pen-new-round-bold', color: '#ec4899' }
+  { label: 'Claude', value: 'vibe-coding', icon: 'i-simple-icons-claude', color: '#6366f1' },
+  { label: 'ChatGPT', value: 'ai-agents', icon: 'i-simple-icons-openai', color: '#f97316' },
+  { label: 'AI-agentlar', value: 'neural-networks', icon: 'i-solar-atom-bold', color: '#22c55e' },
+  { label: 'Kontent', value: 'content', icon: 'i-solar-pen-new-round-bold', color: '#ec4899' }
 ]
 const activeCategory = ref('all')
-const categoryFilterRef = ref<HTMLElement | null>(null)
-const categoryRefs = ref<HTMLElement[]>([])
-const categoryIndicatorStyle = ref({ left: '0px', width: '0px', opacity: '0' })
-
-function updateCategoryIndicator() {
-  const index = categories.findIndex(category => category.value === activeCategory.value)
-  const activeButton = categoryRefs.value[index]
-  const filter = categoryFilterRef.value
-  if (!activeButton || !filter) return
-
-  const activeRect = activeButton.getBoundingClientRect()
-  const filterRect = filter.getBoundingClientRect()
-  categoryIndicatorStyle.value = {
-    left: (activeRect.left - filterRect.left) + 'px',
-    width: activeRect.width + 'px',
-    opacity: '1'
-  }
-}
-
-function scheduleCategoryIndicatorUpdate() {
-  nextTick(() => {
-    updateCategoryIndicator()
-    requestAnimationFrame(updateCategoryIndicator)
-  })
-}
 
 function selectCategory(category: string) {
   activeCategory.value = category
-  scheduleCategoryIndicatorUpdate()
 }
 
-let categoryResizeHandler: () => void = () => {}
-onMounted(() => {
-  categoryResizeHandler = updateCategoryIndicator
-  window.addEventListener('resize', categoryResizeHandler, { passive: true })
-  scheduleCategoryIndicatorUpdate()
-  document.fonts?.ready.then(updateCategoryIndicator)
-})
-onUnmounted(() => {
-  window.removeEventListener('resize', categoryResizeHandler)
-})
+function guideTrack(guide: { category: string | null, tags?: string[] | null }) {
+  const category = guide.category ?? ''
+  if (category === 'Claude' || category === 'Vibe coding') return 'Claude'
+  if (category === 'ChatGPT' || category === 'AI agentlar') return 'ChatGPT'
+  if (category === 'AI-agentlar' || category === 'Neyrotarmoqlar') return 'AI-agentlar'
+  const tagText = (guide.tags ?? []).join(' ').toLowerCase()
+  if (tagText.includes('claude')) return 'Claude'
+  if (tagText.includes('chatgpt')) return 'ChatGPT'
+  return 'Kontent'
+}
+function guideTrackIcon(guide: { category: string | null, tags?: string[] | null }) {
+  const track = guideTrack(guide)
+  if (track === 'Claude') return 'i-simple-icons-claude'
+  if (track === 'ChatGPT') return 'i-simple-icons-openai'
+  return 'i-solar-tag-bold'
+}
+
 
 const { isMiniApp } = useTelegramApp()
 
@@ -77,15 +63,15 @@ const filtered = computed(() => {
   const all = guidesStore.guides
   if (activeCategory.value === 'all') return all
   if (activeCategory.value === 'vibe-coding') {
-    return all.filter(g => g.category === 'Vibe coding' || g.tags?.some(tag => tag.toLowerCase() === 'vibe coding'))
+    return all.filter(g => g.category === 'Claude' || g.category === 'Vibe coding')
   }
   if (activeCategory.value === 'ai-agents') {
-    return all.filter(g => g.category === 'AI agentlar' || g.tags?.some(tag => tag.toLowerCase().includes('agent')))
+    return all.filter(g => g.category === 'ChatGPT' || g.category === 'AI agentlar')
   }
   if (activeCategory.value === 'neural-networks') {
-    return all.filter(g => g.category === 'Neyrotarmoqlar' || g.tags?.includes('Neyrotarmoqlar'))
+    return all.filter(g => g.category === 'AI-agentlar' || g.category === 'Neyrotarmoqlar')
   }
-  return all.filter(g => g.category === 'Kontent' || g.category === 'Content' || g.tags?.some(tag => ['kontent', 'content'].includes(tag.toLowerCase())))
+  return all.filter(g => g.category === 'Kontent' || g.category === 'Content')
 })
 
 useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
@@ -166,34 +152,33 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
 
   <!-- ── DESKTOP layout ── -->
   <div v-else class="guides-page min-h-screen bg-[var(--bg)]">
-    <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 pb-20 pt-0 max-md:px-4 max-md:pt-0">
-      <section class="guides-hero relative mx-auto flex max-w-310 flex-col items-center justify-center overflow-hidden text-center py-10 max-md:py-8 border-b border-[#e8e6e1]">
-        <h1 class="guides-title relative z-10 text-(--text) max-[734px]:text-[44px] max-[734px]:leading-[1.1] max-[734px]:tracking-[-0.03em]">
-          <span class="block">Eng kerakli amaliy<br><span class="relative inline-block">qo'llanmalar<svg class="absolute -bottom-2 -left-[3%] w-[106%] overflow-visible" viewBox="0 0 600 18" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M10,12 C150,2 450,2 590,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="vector-effect:non-scaling-stroke"/></svg></span> jamlanmasi</span>
+    <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 pb-20 pt-0 max-md:w-full max-md:max-w-none max-md:mx-0 max-md:px-0 max-md:pt-0">
+      <section class="guides-hero relative mx-auto flex max-w-310 flex-col items-center justify-center overflow-hidden text-center py-10 border-b border-[#e8e6e1] max-md:pt-5 max-md:pb-4 max-md:px-6 max-md:border-none">
+        <h1 class="guides-title relative z-10 text-(--text) text-[48px]! leading-[52.8px]! tracking-[-0.96px]! max-[734px]:text-[28px]! max-[734px]:leading-[30.8px]! max-[734px]:tracking-[-0.56px]!">
+          <span class="relative inline-block pb-2 max-md:pb-0">
+            Qo'llanmalar
+            <svg class="absolute -bottom-1 left-[-3%] w-[106%] overflow-visible" viewBox="0 0 600 18" preserveAspectRatio="none" fill="none" aria-hidden="true">
+              <path d="M10,12 C150,2 450,2 590,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="vector-effect:non-scaling-stroke"/>
+            </svg>
+          </span>
         </h1>
       </section>
 
       <div
         :class="[
-          'mt-10 mb-16 flex items-center gap-4 overflow-visible max-md:mt-7 max-md:mb-10 max-md:flex-wrap max-md:justify-center',
+          'mt-10 mb-14 flex items-center gap-2 max-md:mt-4 max-md:mb-6 max-md:w-full max-md:overflow-x-auto max-md:px-4 max-md:gap-1 max-md:justify-start scrollbar-none',
           isOwner ? 'justify-between' : 'justify-center'
         ]"
       >
-        <div
-          ref="categoryFilterRef"
-          class="relative inline-flex shrink-0 items-center gap-2 rounded-full whitespace-nowrap"
-        >
-          <span
-            class="absolute inset-y-0 rounded-full bg-[#262831] transition-[left,width,opacity] duration-250 ease-out pointer-events-none"
-            :style="categoryIndicatorStyle"
-          />
+        <div class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap max-md:gap-1">
           <button
-            v-for="(cat, i) in categories"
+            v-for="cat in categories"
             :key="cat.label"
-            :ref="el => { if (el) categoryRefs[i] = el as HTMLElement }"
             :class="[
-              'guides-filter-button relative z-10 inline-flex items-center gap-2 rounded-full text-[18px] font-semibold max-md:text-[15px]',
-              activeCategory === cat.value ? 'is-active text-(--bg)' : 'bg-[#f7f5f0] text-[#262831]'
+              'guides-filter-button inline-flex items-center gap-2 rounded-full text-[18px] font-semibold transition-all duration-200',
+              activeCategory === cat.value
+                ? 'bg-[#14161f] text-[#fffdf9]'
+                : 'bg-[#f7f5ef] text-[#14161f] hover:bg-[#eceae4]'
             ]"
             @click="selectCategory(cat.value)"
           >
@@ -221,7 +206,7 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
         enter-active-class="transition-[opacity,transform] duration-100 ease-out"
         enter-from-class="opacity-0 translate-y-1"
         leave-active-class="hidden"
-        class="grid grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-3"
+        class="grid grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-3 max-md:gap-6 max-md:px-4"
       >
         <article
           v-for="guide in filtered"
@@ -231,15 +216,10 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
         >
           <div
             :class="[
-              'guide-preview relative h-66 overflow-hidden rounded-[28px] max-[734px]:h-40 max-[734px]:rounded-[20px]',
+              'guide-preview relative overflow-hidden rounded-[28px] max-[734px]:rounded-[20px]',
               guide.bg === '#f5ede0' ? 'guide-preview-light' : ''
             ]"
-            :style="{
-              backgroundColor: guide.bg,
-              backgroundImage: guide.coverUrl ? `url(${guide.coverUrl})` : undefined,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }"
+            :style="{ backgroundColor: guide.bg }"
           >
             <button
               v-if="isOwner"
@@ -251,6 +231,13 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
                 class="size-4"
               />
             </button>
+
+            <img
+              v-if="guide.coverUrl"
+              :src="guide.coverUrl"
+              class="absolute inset-0 w-full h-full object-cover block"
+              alt=""
+            />
 
             <div v-if="!guide.coverUrl" class="guide-card-art absolute inset-0">
               <span class="guide-art-star guide-art-star-1" />
@@ -267,67 +254,45 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
 
           </div>
 
-          <div class="guide-card-body px-2 pt-5">
-            <div class="mb-3 min-h-8 flex items-start">
+          <div class="guide-card-body px-2 pt-6 max-md:px-0 max-md:pt-3">
+            <div class="mb-3 flex flex-wrap items-center gap-1.5 max-md:gap-1 max-md:mb-1.5">
               <span
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[13px] font-bold"
-                :style="{ background: levelColor(guide.level) + '18', color: levelColor(guide.level) }"
+                class="guide-meta-chip inline-flex items-center gap-1.5 whitespace-nowrap rounded-md max-md:text-[14px] max-md:leading-5"
+                :style="{ background: levelColor(guide.level) + '20', color: levelColor(guide.level) }"
               >
-                <UIcon :name="levelIcon(guide.level)" class="size-3.5 shrink-0" />
-                {{ guide.level ?? "Boshlang'ich daraja" }}
+                {{ levelLabel(guide.level) }}
               </span>
-            </div>
-
-            <h2 class="line-clamp-1 text-[20px] font-bold leading-[1.15] tracking-tight text-[#14161f] mb-2">
-              {{ guide.title }}
-            </h2>
-            <p class="guide-card-desc mt-2 line-clamp-2 text-[14px] leading-[1.5] text-[#30313a]">
-              {{ guide.description }}
-            </p>
-
-            <div class="guide-card-actions flex items-center justify-between gap-3">
-              <span
-                v-if="guide.isFree"
-                class="inline-flex items-center gap-2 rounded-lg bg-emerald-100 px-2.5 py-1 text-[13px] font-semibold text-emerald-700"
-                style="line-height:1"
-              >
-                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+              <span class="guide-meta-chip inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-[#f7f5ef] text-[#14161f] max-md:text-[14px] max-md:leading-5">
+                <UIcon :name="guideTrackIcon(guide)" class="size-4 shrink-0" />
+                {{ guideTrack(guide) }}
+              </span>
+              <span v-if="guide.isFree" class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-[#86efac] bg-[#f0fdf4] text-[#16a34a]">
+                <svg class="size-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
                 Bepul
               </span>
-              <span
-                v-else-if="hasSubscription"
-                class="inline-flex items-center gap-2 rounded-lg bg-emerald-100 px-2.5 py-1 text-[13px] font-semibold text-emerald-700"
-                style="line-height:1"
-              >
-                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
-                Obuna ichida
-              </span>
-              <span
-                v-else
-                class="inline-flex items-center gap-2 rounded-lg bg-amber-100 px-2.5 py-1 text-[13px] font-semibold text-amber-700"
-                style="line-height:1"
-              >
-                <UIcon name="i-lucide-lock-keyhole" class="size-4" />
+              <span v-else class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-[#ddd6fe] bg-[#f5f3ff] text-[#7c3aed]">
+                <UIcon name="i-lucide-lock" class="size-3.5 shrink-0" />
                 Obuna asosida
               </span>
-
-              <span class="inline-flex items-center gap-1.5 rounded-full bg-[#1a1a1a] px-4 py-2 text-[13px] font-semibold text-white transition-all duration-200 group-hover:bg-[#3480f1]">
-                Qo'llanmani o'qish
-                <UIcon name="i-lucide-arrow-right" class="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-              </span>
             </div>
+
+            <h2 class="line-clamp-2 text-[24px] font-semibold leading-[28px] text-[#14161f] max-md:text-[18px] max-md:leading-6">
+              {{ guide.title }}
+            </h2>
           </div>
         </article>
       </TransitionGroup>
 
       <div
         v-else
-        class="flex min-h-105 flex-col items-center justify-center gap-3 text-cx-muted"
+        class="flex min-h-105 flex-col items-center justify-center gap-3 text-cx-muted max-md:px-4"
       >
         <div class="grid size-16 place-items-center rounded-2xl bg-[#1a1a1a]">
           <UIcon name="i-solar-document-text-bold" class="size-8 text-white" />
         </div>
-        <p class="text-[36px] font-bold text-[#1a1a1a]">Bu kategoriyada qo'llanmalar hali yo'q</p>
+        <p class="text-[18px] font-semibold text-[#1a1a1a]">Bu kategoriyada qo'llanmalar hali yo'q</p>
       </div>
     </div>
   </div>
@@ -353,25 +318,27 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
   transform: scale(1.04);
 }
 
-.guides-filter-button .guides-filter-icon {
-  filter: drop-shadow(0 1px 0 rgba(20, 22, 31, 0.08));
-  color: #14161f !important;
-  background-color: #14161f !important;
+@media (max-width: 734px) {
+  .guides-filter-button {
+    padding: 6px 16px;
+    font-size: 15px;
+    line-height: 24px;
+    gap: 4px;
+  }
 }
 
-.guides-filter-button.is-active .guides-filter-icon {
-  color: var(--bg) !important;
-  background-color: var(--bg) !important;
+.guides-filter-button .guides-filter-icon {
+  color: inherit;
 }
 
 .guides-add-button {
-  min-height: 48px;
-  padding: 0 20px;
+  min-height: 36px;
+  padding: 0 14px;
   border-radius: 999px;
   background: #14161f;
   color: #fffdf9;
   font-family: var(--font-inter), 'Inter Fallback', sans-serif;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 24px;
   transform-origin: center;
@@ -476,7 +443,8 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
 }
 
 .guide-card {
-  width: 397px;
+  width: 100%;
+  max-width: 397px;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -487,7 +455,10 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
 @media (max-width: 734px) {
   .guide-card {
     width: 100%;
-    min-width: 343px;
+    max-width: 370px;
+    padding: 0 4px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -501,7 +472,10 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
   overflow: clip;
   border-radius: 28px;
   isolation: isolate;
+  flex-shrink: 0;
+  aspect-ratio: 16 / 9;
 }
+
 
 @media (max-width: 734px) {
   .guide-preview {
@@ -510,7 +484,7 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
 }
 
 .guide-card:hover .guide-preview {
-  box-shadow: 0 20px 46px rgba(20, 21, 31, 0.12);
+  box-shadow: none;
 }
 
 .guide-card-body {
@@ -529,11 +503,23 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
 }
 
 .guide-meta-chip {
-  min-height: 42px;
-  padding: 8px 15px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
   font-family: var(--font-inter), 'Inter Fallback', sans-serif;
-  font-size: 18px;
-  line-height: 1;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+@media (max-width: 734px) {
+  .guide-meta-chip {
+    font-size: 14px;
+    line-height: 20px;
+    gap: 4px;
+  }
 }
 
 .guide-card-art {

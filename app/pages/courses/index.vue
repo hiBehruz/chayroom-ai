@@ -16,47 +16,15 @@ const isAccessModalOpen = ref(false)
 function openCourse(slug: string) {
   navigateTo(`/courses/${slug}`)
 }
-const categoryFilterRef = ref<HTMLElement | null>(null)
-const categoryRefs = ref<HTMLElement[]>([])
-const categoryIndicatorStyle = ref({ left: '6px', width: '0px', opacity: '0' })
-
-function updateCategoryIndicator() {
-  const index = categories.findIndex(c => c.value === activeCategory.value)
-  const activeButton = categoryRefs.value[index]
-  const filter = categoryFilterRef.value
-  if (!activeButton || !filter) return
-
-  const activeRect = activeButton.getBoundingClientRect()
-  const filterRect = filter.getBoundingClientRect()
-  categoryIndicatorStyle.value = {
-    left: (activeRect.left - filterRect.left) + 'px',
-    width: activeRect.width + 'px',
-    opacity: '1'
-  }
-}
-
-function scheduleCategoryIndicatorUpdate() {
-  nextTick(() => {
-    updateCategoryIndicator()
-    requestAnimationFrame(updateCategoryIndicator)
-  })
-}
-
 function selectCategory(value: string) {
   activeCategory.value = value
-  scheduleCategoryIndicatorUpdate()
 }
 
-let categoryResizeHandler: () => void
-onMounted(() => {
-  categoryResizeHandler = updateCategoryIndicator
-  window.addEventListener('resize', categoryResizeHandler, { passive: true })
-  scheduleCategoryIndicatorUpdate()
-  document.fonts?.ready.then(updateCategoryIndicator)
-})
-onUnmounted(() => {
-  window.removeEventListener('resize', categoryResizeHandler)
-})
+async function toggleFree(course: import('~/stores/courses').Course) {
+  const newVal = !course.free
+  await $fetch(`/api/courses/${course.slug}`, { method: 'PATCH', body: { isFree: newVal } })
+  await coursesStore.load(true)
+}
 
 const { isMiniApp } = useTelegramApp()
 
@@ -157,10 +125,10 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 
   <!-- ── DESKTOP layout ── -->
   <div v-else class="bg-cx-surface">
-    <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 pt-0 pb-8 max-md:px-4">
+    <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 pt-0 pb-8 max-md:w-full max-md:max-w-none max-md:mx-0 max-md:px-0">
       <!-- Hero -->
-      <section class="relative mx-auto flex max-w-310 flex-col items-center justify-center overflow-hidden text-center py-10 max-md:py-8 border-b border-[#e8e6e1]">
-        <h1 class="courses-title relative z-10 text-[#14161f] max-[734px]:text-[44px] max-[734px]:leading-[1.1] max-[734px]:tracking-[-0.03em]">
+      <section class="relative mx-auto flex max-w-310 flex-col items-center justify-center overflow-hidden text-center py-10 max-md:py-8 max-md:px-6 border-b border-[#e8e6e1]">
+        <h1 class="courses-title relative z-10 text-[#14161f] max-[734px]:text-[28px] max-[734px]:leading-[30.8px] max-[734px]:tracking-[-0.56px]">
           <span class="block max-md:hidden">AI agentlar, <span class="relative inline-block">neyrotarmoqlar<svg class="absolute -bottom-2 left-[-3%] w-[106%] overflow-visible" viewBox="0 0 600 18" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M10,12 C150,2 450,2 590,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="vector-effect:non-scaling-stroke"/></svg></span> va<br>vibe coding kurslari</span>
           <span class="hidden max-md:block">Kurslar</span>
         </h1>
@@ -170,37 +138,25 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
       <!-- Category filter -->
       <div
         :class="[
-          'mt-8 mb-16 flex items-center gap-4 overflow-visible max-md:mt-6 max-md:mb-10 max-md:flex-wrap max-md:justify-center',
+          'mt-10 mb-14 flex items-center gap-2 max-md:mt-4 max-md:mb-6 max-md:w-full max-md:overflow-x-auto max-md:px-4 max-md:gap-1 max-md:justify-start scrollbar-none',
           isOwner ? 'justify-between' : 'justify-center'
         ]"
       >
-        <div class="overflow-x-auto scrollbar-none">
-        <div
-          ref="categoryFilterRef"
-          class="relative inline-flex shrink-0 items-center gap-2 rounded-full whitespace-nowrap"
-        >
-          <span
-            class="absolute inset-y-0 rounded-full bg-[#262831] transition-[left,width,opacity] duration-250 ease-out pointer-events-none"
-            :style="categoryIndicatorStyle"
-          />
+        <div class="inline-flex shrink-0 items-center gap-2 whitespace-nowrap max-md:gap-1">
           <button
-            v-for="(cat, i) in categories"
+            v-for="cat in categories"
             :key="cat.value"
-            :ref="el => { if (el) categoryRefs[i] = el as HTMLElement }"
             :class="[
-              'course-filter-button relative z-10 inline-flex items-center gap-2 rounded-full text-[18px] font-semibold max-md:text-[15px]',
-              activeCategory === cat.value ? 'is-active text-white' : 'bg-[#f7f5f0] text-[#262831]'
+              'course-filter-button inline-flex items-center gap-2 rounded-full text-[18px] font-semibold transition-all duration-200',
+              activeCategory === cat.value
+                ? 'bg-[#14161f] text-[#fffdf9]'
+                : 'bg-[#f7f5ef] text-[#14161f] hover:bg-[#eceae4]'
             ]"
             @click="selectCategory(cat.value)"
           >
-            <UIcon
-              v-if="cat.icon"
-              :name="cat.icon"
-              class="size-6 max-md:size-5"
-            />
+            <UIcon v-if="cat.icon" :name="cat.icon" class="size-5 max-md:size-4" />
             {{ cat.label }}
           </button>
-        </div>
         </div>
 
         <NuxtLink
@@ -220,7 +176,7 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
         enter-active-class="transition-[opacity,transform] duration-100 ease-out"
         enter-from-class="opacity-0 translate-y-1"
         leave-active-class="hidden"
-        class="grid grid-cols-1 gap-7 min-[680px]:grid-cols-2 min-[1024px]:grid-cols-3"
+        class="grid grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-3 max-md:gap-6 max-md:px-4"
       >
         <article
           v-for="course in filtered"
@@ -233,17 +189,22 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
             class="course-preview relative overflow-hidden rounded-[28px] max-[734px]:rounded-[20px]"
             :style="{ backgroundColor: course.bg }"
           >
-            <span
-              class="absolute left-5 top-5 z-20 rounded-full px-3 py-1 text-[12px] uppercase tracking-wide"
-              :style="{ backgroundColor: course.dark ? '#ffffff22' : '#ffffffcc', color: course.dark ? '#ffffff' : '#14161f' }"
-            >{{ course.badge }}</span>
-
-
-            <span
-              v-if="course.level"
-              class="absolute right-5 top-5 z-20 rounded-full px-3 py-1 text-[12px] font-semibold"
-              :style="{ backgroundColor: course.levelColor + '33', color: course.levelColor }"
-            >{{ course.level }}</span>
+            <div v-if="isOwner" class="absolute right-5 top-5 z-20 flex gap-2">
+              <button
+                class="grid size-9 place-items-center rounded-full backdrop-blur-sm transition-all"
+                :class="course.free ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-black/40 text-white hover:bg-black/60'"
+                :title="course.free ? 'Pullik qilish' : 'Bepul qilish'"
+                @click.stop="toggleFree(course)"
+              >
+                <UIcon :name="course.free ? 'i-lucide-unlock' : 'i-lucide-lock'" class="size-4" />
+              </button>
+              <button
+                class="grid size-9 place-items-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-all hover:bg-black/60"
+                @click.stop="navigateTo('/admin/courses/edit/' + course.slug)"
+              >
+                <UIcon name="i-lucide-pencil" class="size-4" />
+              </button>
+            </div>
 
             <div class="course-card-art absolute inset-0" :class="course.dark ? 'text-white' : 'text-[#14161f]'">
               <span class="art-star art-star-1" />
@@ -254,49 +215,34 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
               <span class="art-object" :style="{ backgroundColor: course.accentColor }" />
               <span class="art-hand" :class="course.dark ? 'art-hand-dark' : ''" />
             </div>
-
           </div>
 
           <!-- Body -->
-          <div class="course-card-body px-2 pt-5">
-            <div class="mb-3 min-h-8 flex items-start">
+          <div class="course-card-body px-2 pt-6 max-md:px-0 max-md:pt-3">
+            <div class="mb-3 flex flex-nowrap items-center gap-1.5 overflow-hidden max-md:gap-1 max-md:mb-1.5">
               <span
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[13px] font-bold"
-                :style="{ background: course.levelColor + '18', color: course.levelColor }"
+                class="course-meta-chip inline-flex items-center gap-1.5 whitespace-nowrap rounded-md"
+                :style="{ background: (course.levelColor || '#22c55e') + '20', color: course.levelColor || '#22c55e' }"
               >
                 <UIcon :name="courseLevelIcon(course.level)" class="size-3.5 shrink-0" />
                 {{ course.level }}
               </span>
+              <span class="course-meta-chip inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-[#f7f5ef] text-[#14161f]">
+                <UIcon name="i-solar-tag-bold" class="size-4 shrink-0" />
+                {{ course.tags[0] }}
+              </span>
             </div>
 
-            <h2 class="text-[20px] font-bold leading-[1.15] tracking-tight text-[#14161f] mb-2">
+            <h2 class="line-clamp-2 text-[24px] font-semibold leading-[28px] text-[#14161f] max-md:text-[18px] max-md:leading-6">
               {{ course.title }}
             </h2>
-            <p class="course-card-desc line-clamp-2 text-[14px] leading-normal text-[#30313a]">
-              {{ course.desc }}
-            </p>
 
-            <div class="course-card-actions flex items-center justify-between gap-3">
-              <span
-                v-if="hasSubscription"
-                class="inline-flex items-center gap-2 rounded-lg bg-emerald-100 px-2.5 py-1 text-[13px] font-semibold text-emerald-700"
-                style="line-height:1"
-              >
-                <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
-                Obuna ichida
-              </span>
-              <span
-                v-else
-                class="inline-flex items-center gap-2 rounded-lg bg-amber-100 px-2.5 py-1 text-[13px] font-semibold text-amber-700"
-                style="line-height:1"
-              >
-                <UIcon name="i-lucide-lock-keyhole" class="size-4" />
-                Obuna asosida
-              </span>
-
-              <span class="inline-flex items-center gap-1.5 rounded-full bg-[#1a1a1a] px-4 py-2 text-[13px] font-semibold text-white transition-all duration-200 group-hover:bg-[#3480f1]">
-                Kursni ko'rish
-                <UIcon name="i-lucide-arrow-right" class="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            <div v-if="course.free" class="mt-2">
+              <span class="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-0.5 text-[12px] font-semibold text-emerald-700">
+                <svg class="size-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                Bepul
               </span>
             </div>
           </div>
@@ -310,7 +256,7 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
         <div class="grid size-16 place-items-center rounded-2xl bg-[#1a1a1a]">
           <UIcon name="i-lucide-book-open" class="size-8 text-white" />
         </div>
-        <p class="text-[36px] font-bold text-[#1a1a1a]">Bu kategoriyada kurslar hali yo'q</p>
+        <p class="text-[18px] font-semibold text-[#1a1a1a]">Bu kategoriyada kurslar hali yo'q</p>
       </div>
     </div>
 
@@ -320,12 +266,12 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 
 <style scoped>
 .courses-add-button {
-  min-height: 48px;
-  padding: 0 20px;
+  min-height: 36px;
+  padding: 0 14px;
   border-radius: 999px;
   background: #14161f;
   color: #fffdf9;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 24px;
   transform-origin: center;
@@ -377,6 +323,7 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 
 .course-filter-button {
   padding: 11px 18px 13px;
+  font-family: var(--font-inter), 'Inter Fallback', sans-serif;
   line-height: 1;
   transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
@@ -385,11 +332,30 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
   transform: scale(1.04);
 }
 
+@media (max-width: 734px) {
+  .course-filter-button {
+    padding: 6px 16px;
+    font-size: 15px;
+    line-height: 24px;
+    gap: 4px;
+  }
+}
+
 .course-card {
   width: 100%;
+  max-width: 397px;
   min-width: 0;
   transform-origin: center top;
   transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (max-width: 734px) {
+  .course-card {
+    max-width: 370px;
+    padding: 0 4px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .course-card:hover {
@@ -397,15 +363,9 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 }
 
 .course-preview {
-  height: 264px;
+  aspect-ratio: 16 / 9;
   box-shadow: none;
   transition: box-shadow 0.32s ease;
-}
-
-@media (max-width: 734px) {
-  .course-preview {
-    height: 200px;
-  }
 }
 
 .course-card:hover .course-preview {
@@ -413,24 +373,23 @@ useSeoMeta({ title: 'Kurslar — Chayroom AI' })
 }
 
 .course-card-body {
-  display: grid;
-  grid-template-rows: auto 52px 64px;
-}
-
-.course-card-desc {
-  min-height: 52px;
-}
-
-.course-card-actions {
-  align-self: end;
-  min-height: 64px;
+  display: flex;
+  flex-direction: column;
 }
 
 .course-meta-chip {
-  min-height: 42px;
-  padding: 8px 15px 10px;
-  font-size: 18px;
-  line-height: 1;
+  padding: 6px 10px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+@media (max-width: 734px) {
+  .course-meta-chip {
+    font-size: 14px;
+    line-height: 20px;
+    gap: 4px;
+  }
 }
 
 /* Art decorations */

@@ -26,7 +26,7 @@ function toggle(i: number) {
     <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 max-md:px-5">
       <div class="grid grid-cols-[0.78fr_1.22fr] gap-18 items-start max-lg:grid-cols-1 max-lg:gap-10">
         <div class="sticky top-28 max-lg:static">
-          <h2 class="faq-section-title max-md:text-[34px] max-md:leading-[38px]">
+          <h2 class="faq-section-title max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px]">
             Savol-javoblar
           </h2>
         </div>

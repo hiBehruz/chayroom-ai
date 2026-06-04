@@ -57,7 +57,7 @@ onMounted(() => {
               />
             </div>
           </ClientOnly>
-          <h2 class="font-inter-display text-[60px] font-semibold leading-[1.1] tracking-[-0.02em] text-(--text) max-md:text-[34px]">
+          <h2 class="font-inter-display text-[60px] font-semibold leading-[1.1] tracking-[-0.02em] text-(--text) max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px]">
             Boshlashga tayyormisan?
           </h2>
           <p class="text-[15px] text-cx-muted leading-[1.6] max-w-100">

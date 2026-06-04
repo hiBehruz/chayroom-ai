@@ -55,9 +55,9 @@ const editTagInput = ref('')
 const editBg = ref('')
 
 const levelOptions = [
-  { label: 'Yangi boshlagan', color: '#22c55e', icon: 'i-lucide-leaf' },
-  { label: "O'rta",           color: '#3480f1', icon: 'i-lucide-bar-chart-2' },
-  { label: 'Tajribali',       color: '#14161f', icon: 'i-lucide-flame' },
+  { label: 'Yangi boshlagan', color: '#10b981', icon: 'i-lucide-sprout' },
+  { label: "O'rta",           color: '#f59e0b', icon: 'i-lucide-bar-chart-2' },
+  { label: 'Tajribali',       color: '#8b5cf6', icon: 'i-lucide-flame' },
   { label: 'Professional',    color: '#8b5cf6', icon: 'i-lucide-rocket' },
 ]
 const editAccent = ref('')
@@ -65,25 +65,39 @@ const editCategory = ref('')
 const editImage = ref('')
 const imageInputRef = ref<HTMLInputElement | null>(null)
 const imageUploading = ref(false)
+const imageError = ref('')
+
+
+const localObjectUrl = ref('')
 
 async function onImagePick(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
+  if (imageInputRef.value) imageInputRef.value.value = ''
+  if (localObjectUrl.value) URL.revokeObjectURL(localObjectUrl.value)
+  localObjectUrl.value = URL.createObjectURL(file)
+  editImage.value = localObjectUrl.value
   imageUploading.value = true
+  imageError.value = ''
   try {
-    const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string; publicUrl: string }>(
-      '/api/upload/presign',
-      { method: 'POST', body: { filename: file.name, contentType: file.type } }
-    )
-    await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
+    const name = encodeURIComponent(`cover-${Date.now()}-${file.name}`)
+    const res = await fetch('/api/upload/image', {
+      method: 'POST',
+      body: file,
+      headers: { 'Content-Type': file.type || 'image/jpeg', 'X-Filename': name },
+    })
+    if (!res.ok) throw new Error(await res.text() || `Server xatosi: ${res.status}`)
+    const { publicUrl } = await res.json()
     editImage.value = publicUrl
+  } catch (err: unknown) {
+    imageError.value = err instanceof Error ? err.message : 'Yuklashda xatolik yuz berdi'
   } finally {
     imageUploading.value = false
-    if (imageInputRef.value) imageInputRef.value.value = ''
   }
 }
 
 function removeImage() {
+  if (localObjectUrl.value) { URL.revokeObjectURL(localObjectUrl.value); localObjectUrl.value = '' }
   editImage.value = ''
   if (imageInputRef.value) imageInputRef.value.value = ''
 }
@@ -96,7 +110,7 @@ const bgPresets = [
   { label: 'To\'q ko\'k', value: '#0d1117', dark: true },
   { label: 'To\'q yashil', value: '#0d1f1a', dark: true }
 ]
-const categories = ['Vibe coding', 'AI agentlar', 'Neyrotarmoqlar', 'Kontent']
+const categories = ['Claude', 'ChatGPT', 'AI-agentlar', 'Kontent']
 
 function startEdit() {
   const g = guide.value
@@ -142,6 +156,9 @@ async function saveEdit() {
   guide.value = await $fetch<import('~/stores/guides').Guide>(`/api/guides/${(guide.value as import('~/stores/guides').Guide).slug}`)
   isEditing.value = false
 }
+
+const coverError = ref(false)
+watch(() => guide.value?.coverUrl, () => { coverError.value = false })
 
 function addEditTag() {
   const t = editTagInput.value.trim()
@@ -399,7 +416,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
           <div>
             <label class="block text-[16px] font-bold text-cx-muted uppercase tracking-wider mb-2">Rasm</label>
             <div v-if="editImage" class="relative rounded-xl overflow-hidden border border-cx-line">
-              <img :src="editImage" alt="cover" class="w-full h-40 object-cover" />
+              <img :src="editImage" alt="cover" class="w-full h-auto block" />
               <button
                 class="absolute top-2 right-2 grid size-7 place-items-center rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
                 @click="removeImage"
@@ -421,6 +438,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
                 <p class="text-[12px] text-cx-muted mt-0.5">PNG, JPG</p>
               </div>
             </label>
+            <p v-if="imageError" class="mt-2 text-[12px] text-red-500 font-semibold">{{ imageError }}</p>
           </div>
 
           <!-- Content -->
@@ -434,8 +452,8 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
 
 
         <!-- Cover image -->
-        <div v-if="guide.coverUrl" class="mb-8 rounded-2xl overflow-hidden h-40 md:h-118.75" :style="isMiniApp ? 'width:100%;height:200px' : 'width:882px;max-width:100%'">
-          <img :src="guide.coverUrl" alt="" class="w-full h-full object-cover" />
+        <div v-if="guide.coverUrl && !coverError" class="mb-8 rounded-2xl overflow-hidden" :style="isMiniApp ? 'width:100%;height:200px' : 'width:882px;max-width:100%;height:400px'">
+          <img :src="guide.coverUrl" alt="" class="w-full h-full object-cover block" @error="coverError = true" />
         </div>
 
         <!-- Tags + access badge -->
@@ -495,7 +513,6 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
             />
             По подписке
           </span>
-          <span class="guide-meta-chip">2 min read</span>
         </div>
 
         <!-- Title -->
@@ -542,7 +559,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
         <!-- Content block -->
         <div
           v-else
-          class="guide-content prose max-w-none text-[#14161f]"
+          class="rich-content prose max-w-none text-[#14161f]"
           v-html="guide.content"
         />
 
@@ -666,6 +683,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
       </div>
     </div>
   </Teleport>
+
 </template>
 
 <style scoped>
@@ -771,76 +789,19 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
   line-height: 32px;
 }
 
-.guide-content :deep(h2) {
-  margin: 34px 0 12px;
-  color: #14161f;
-  font-family: var(--font-inter-display);
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 38px;
-}
-
-.guide-content :deep(h3) {
-  margin: 28px 0 10px;
-  color: #14161f;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 30px;
-}
-
-.guide-content :deep(p),
-.guide-content :deep(li) {
-  color: #252733;
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 32px;
-}
-
-.guide-content :deep(p) {
-  margin-bottom: 24px;
-}
-
-.guide-content :deep(ul),
-.guide-content :deep(ol) {
-  margin: 0 0 24px;
-  padding-left: 28px;
-}
-
-.guide-content :deep(code) {
-  border-radius: 6px;
-  background: #f7f5ef;
-  padding: 2px 6px;
-  color: #14161f;
-  font-size: 18px;
-}
-
-.guide-content :deep(pre) {
-  margin-bottom: 28px;
-  overflow-x: auto;
-  border-radius: 20px;
-  background: #14161f;
-  padding: 22px;
-  color: #fffdf9;
-}
-
-.guide-content :deep(pre code) {
-  background: transparent;
-  padding: 0;
-  color: inherit;
-}
 
 @media (max-width: 734px) {
   .guide-detail-title {
-    font-size: 36px;
-    line-height: 40px;
+    font-size: 28px;
+    line-height: 30.8px;
+    letter-spacing: -0.56px;
   }
 
-  .guide-detail-desc,
-  .guide-content :deep(p),
-  .guide-content :deep(li) {
-    font-size: 18px;
+  .guide-detail-desc {
+    font-size: 20px;
     line-height: 28px;
   }
+
 
   .guide-visual {
     border-radius: 20px;

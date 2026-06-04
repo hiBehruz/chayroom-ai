@@ -47,7 +47,7 @@ onMounted(() => {
   >
     <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 max-md:px-5">
       <div class="text-center mb-12">
-        <h2 class="font-inter-display text-[48px] font-semibold leading-[1.1] tracking-[-0.02em] text-(--text) max-md:text-[34px] max-md:leading-9.5">
+        <h2 class="font-inter-display text-[48px] font-semibold leading-[1.1] tracking-[-0.02em] text-(--text) max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px]">
           Chayroom AI ichida nimalar bor?<br>
           Va nega biz bilan <span class="what-inside-underline">rivojlanish<svg viewBox="0 0 220 18" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M8,12 C60,2 160,2 212,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="vector-effect:non-scaling-stroke"/></svg></span> to'g'ri tanlov
         </h2>

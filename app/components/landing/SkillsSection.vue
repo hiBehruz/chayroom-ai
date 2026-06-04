@@ -64,7 +64,7 @@ onMounted(() => {
         <div class="mb-3 text-[14px] font-bold tracking-[0.08em] text-cx-blue uppercase">
           Ko'nikmalar
         </div>
-        <h2 class="font-inter-display text-[48px] font-semibold leading-[1.1] tracking-[-0.02em] text-(--text) max-md:text-[34px]">
+        <h2 class="font-inter-display text-[48px] font-semibold leading-[1.1] tracking-[-0.02em] text-(--text) max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px]">
           Telegram yopiq kanalda nimalarni
           <span class="skills-title-underline">
             o'rganasan?

@@ -5,6 +5,7 @@ const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 const { isMiniApp, backButton } = useTelegramApp()
+const showMiniNav = computed(() => isMiniApp.value && authStore.hasSubscription)
 const showNav = computed(() =>
   !isMiniApp.value && (
     ['/', '/dashboard', '/profile', '/materials', '/community', '/rules', '/about-me'].includes(route.path)
@@ -15,12 +16,16 @@ const showNav = computed(() =>
 )
 
 authStore.restoreFromStorage()
-
-
 const handleBack = () => router.back()
 
 onMounted(() => {
   if (!isMiniApp.value) return
+
+  const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user
+  if (tgUser && !authStore.hasSubscription) {
+    void authStore.loginFromMiniApp(tgUser)
+  }
+
   backButton.onClick(handleBack)
 })
 
@@ -36,6 +41,16 @@ watch(() => route.path, () => {
     backButton.show()
   }
 }, { immediate: true })
+
+watchEffect(() => {
+  if (!import.meta.client) return
+  if (!isMiniApp.value) return
+  if (!authStore.user) return
+  if (authStore.hasSubscription) return
+  if (route.path === '/dashboard' || route.path === '/login') return
+
+  router.replace('/dashboard')
+})
 
 const MINI_HOME_PATHS = ['/dashboard']
 
@@ -54,8 +69,7 @@ function onPageEnter(el: Element, done: () => void) {
         clearProps: 'all',
         onComplete: done
       })
-    }
-    else {
+    } else {
       gsap.fromTo(el,
         { x: 24, opacity: 0 },
         {
@@ -110,11 +124,11 @@ function getStaggerTargets(el: Element) {
 useHead(computed(() => ({
   htmlAttrs: {
     lang: 'uz',
-    style: isMiniApp.value ? 'background:#fffdf9' : '',
+    style: isMiniApp.value ? 'background:#fffdf9' : ''
   },
   bodyAttrs: {
-    style: isMiniApp.value ? 'background:#fffdf9' : '',
-  },
+    style: isMiniApp.value ? 'background:#fffdf9' : ''
+  }
 })))
 
 useSeoMeta({
@@ -131,11 +145,12 @@ useSeoMeta({
       <!-- Mini-app wrapper: constrains all pages to 390px -->
       <template v-if="isMiniApp">
         <div
-          class="mini-app-frame mini-app-shell overflow-x-hidden min-h-screen pb-20" style="background:#fffdf9"
+          class="mini-app-frame mini-app-shell overflow-x-hidden min-h-screen pb-20"
+          style="background:#fffdf9"
         >
           <NuxtPage :transition="{ css: false, onEnter: onPageEnter, onLeave: onPageLeave }" />
         </div>
-        <MiniAppBottomNav />
+        <MiniAppBottomNav v-if="showMiniNav" />
       </template>
 
       <template v-else>

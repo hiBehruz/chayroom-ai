@@ -33,12 +33,12 @@ const spaces = [
 ]
 
 const contents = [
-  { icon: 'noto:open-book', title: 'Gaidlar', desc: 'Muayyan vositalardan foydalanish bo\'yicha amaliy ko\'rsatmalar.', soon: false },
-  { icon: 'noto:graduation-cap', title: 'Kurslar', desc: 'Darslar va topshiriqlar bilan bosqichma-bosqich dasturlar.', soon: false },
-  { icon: 'noto:sparkles', title: 'Skilllar', desc: 'Muayyan vazifa uchun muayyan ko\'nikma.', soon: true },
-  { icon: 'noto:memo', title: 'Use-caselar', desc: 'Ishda va hayotda AI qo\'llanishining real misollari.', soon: true },
-  { icon: 'noto:microphone', title: 'Efirlar', desc: 'Jamoa bilan jonli qo\'ng\'iroqlar, keyslarni tahlil qilish va Q&A.', soon: true },
-  { icon: 'noto:hammer-and-wrench', title: 'Workshoplar', desc: 'Amaliy mashg\'ulotlar — birgalikda biror narsa yasaymiz.', soon: true },
+  { icon: 'solar:notes-minimalistic-bold',   iconColor: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)',  title: 'Gaidlar',     desc: 'Muayyan vositalardan foydalanish bo\'yicha amaliy ko\'rsatmalar.', soon: false },
+  { icon: 'solar:square-academic-cap-bold',  iconColor: '#1f8a5b', iconBg: 'rgba(31,138,91,0.15)',   title: 'Kurslar',     desc: 'Darslar va topshiriqlar bilan bosqichma-bosqich dasturlar.', soon: false },
+  { icon: 'solar:settings-minimalistic-bold',iconColor: '#7c3aed', iconBg: 'rgba(124,58,237,0.12)',  title: 'Skilllar',    desc: 'Muayyan vazifa uchun muayyan ko\'nikma.', soon: true },
+  { icon: 'solar:widget-bold',               iconColor: '#d97706', iconBg: 'rgba(217,119,6,0.12)',   title: 'Use-caselar', desc: 'Ishda va hayotda AI qo\'llanishining real misollari.', soon: true },
+  { icon: 'solar:microphone-bold',           iconColor: '#e53e3e', iconBg: 'rgba(229,62,62,0.12)',   title: 'Efirlar',     desc: 'Jamoa bilan jonli qo\'ng\'iroqlar, keyslarni tahlil qilish va Q&A.', soon: true },
+  { icon: 'solar:people-nearby-bold',        iconColor: '#0d9488', iconBg: 'rgba(13,148,136,0.12)', title: 'Workshoplar', desc: 'Amaliy mashg\'ulotlar — birgalikda biror narsa yasaymiz.', soon: true },
 ]
 
 const steps = [
@@ -151,14 +151,15 @@ useSeoMeta({ title: 'AI Room Club haqida' })
             v-for="item in contents"
             :key="item.title"
             class="p-4 rounded-2xl relative"
-            style="background:#f7f5ef;border:1px solid #e8e4da"
+            :style="`background:#f7f5ef;border:1px solid #e8e4da;${item.soon ? 'opacity:0.45' : ''}`"
           >
             <span
               v-if="item.soon"
-              class="absolute top-3 right-3 text-[9px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded-full"
-              style="background:#ede9e0;color:#9aa0a8"
-            >TEZ KUNDA</span>
-            <UIcon :name="item.icon" class="size-9 mb-3 block" />
+              class="absolute top-3 right-3 text-amber-600 bg-amber-100 text-[9px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded-full"
+            >Tez kunda</span>
+            <div class="size-10 rounded-xl flex items-center justify-center mb-3" :style="`background:${item.iconBg}`">
+              <UIcon :name="item.icon" class="size-5" :style="`color:${item.iconColor}`" />
+            </div>
             <p class="text-[13px] font-bold mb-1" style="color:#0f1115">{{ item.title }}</p>
             <p class="text-[11px] leading-relaxed" style="color:#6b7280">{{ item.desc }}</p>
           </div>

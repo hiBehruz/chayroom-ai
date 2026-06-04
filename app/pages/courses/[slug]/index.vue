@@ -137,6 +137,13 @@ useSeoMeta({ title: computed(() => `${course.value?.title ?? 'Kurs'} — Chayroo
 
         <!-- LEFT: modules -->
         <div>
+          <!-- Rich content -->
+          <div
+            v-if="course.content"
+            class="rich-content prose max-w-none text-[#14161f] mb-10"
+            v-html="course.content"
+          />
+
           <h2 class="course-detail-section-title flex items-center gap-3 font-extrabold text-[#1a1a1a] mb-4" :class="isMiniApp ? 'text-[18px]' : 'text-[40px]'">
             <UIcon name="i-solar-bill-list-bold" :class="isMiniApp ? 'size-5' : 'size-9'" />
             Kurs tarkibi

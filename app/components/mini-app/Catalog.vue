@@ -20,9 +20,9 @@ function submit() { closeModal() }
     style="background:#fffdf9;min-height:100vh;font-family:inherit"
   >
     <!-- Header -->
-    <div style="padding:16px 20px 8px">
-      <h1 style="font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;color:#0f1115;margin:0">Materiallar</h1>
-      <p style="font-size:14px;margin:4px 0 0;color:#6b7280;font-weight:400">O'rganish formatini tanlang.</p>
+    <div class="font-sans" style="padding:16px 20px 8px">
+      <div class="font-sans" style="font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;color:#0f1115;margin:0">Materiallar</div>
+      <div class="font-sans" style="font-size:14px;margin:4px 0 0;color:#6b7280;font-weight:400">O'rganish formatini tanlang.</div>
     </div>
 
     <!-- 2×3 grid -->
@@ -70,7 +70,7 @@ function submit() { closeModal() }
         class="relative flex flex-col justify-between"
         style="background:#f7f5ef;border-radius:22px;padding:18px;height:130px;overflow:hidden;opacity:0.45"
       >
-        <span style="position:absolute;top:14px;right:14px;background:#fffdf9;color:#9aa0a8;font-size:9.5px;font-weight:700;padding:4px 8px;border-radius:999px;letter-spacing:.06em">TEZ KUNDA</span>
+        <span class="text-amber-600 bg-amber-100" style="position:absolute;top:14px;right:14px;font-size:9.5px;font-weight:700;padding:4px 8px;border-radius:999px;letter-spacing:.06em">Tez kunda</span>
         <div :style="`width:44px;height:44px;border-radius:50%;background:${soon.iconBg};display:grid;place-items:center`">
           <UIcon :name="soon.icon" class="size-5.5" :style="`color:${soon.color}`" />
         </div>

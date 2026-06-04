@@ -24,6 +24,7 @@ export default defineEventHandler(async (event) => {
       badge: courses.badge,
       accentTitle: courses.accentTitle,
       accentColor: courses.accentColor,
+      isFree: courses.isFree,
       order: courses.order,
       published: courses.published,
       createdAt: courses.createdAt,

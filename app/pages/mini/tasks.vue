@@ -17,19 +17,19 @@ useSeoMeta({ title: 'Vazifalar' })
 </script>
 
 <template>
-  <div style="background:#13141a; min-height:100vh">
+  <div style="background:#fffdf9; min-height:100vh">
     <div class="w-full pb-28">
 
       <!-- Header -->
       <div class="flex items-center gap-3 px-4 pt-5 pb-4">
         <button
           class="inline-flex items-center justify-center flex-none tg-press-sm"
-          style="width:44px;height:44px;border-radius:999px;background:rgba(255,255,255,0.08);color:#ffffff"
+          style="width:44px;height:44px;border-radius:999px;background:#f0ede6;color:#0f1115"
           @click="router.back()"
         >
           <UIcon name="i-lucide-arrow-left" class="size-4.5" />
         </button>
-        <h1 class="text-[26px] font-black tracking-tight leading-tight" style="color:#ffffff">Vazifalar</h1>
+        <h1 class="text-[26px] font-black tracking-tight leading-tight" style="color:#0f1115">Vazifalar</h1>
       </div>
 
       <!-- Progress card -->
@@ -58,10 +58,10 @@ useSeoMeta({ title: 'Vazifalar' })
           :key="task.id"
           :to="task.link || undefined"
           class="flex items-center gap-4 p-4 rounded-2xl tg-press-sm"
-          style="background:#1e1f27; border:1px solid rgba(255,255,255,0.07)"
+          style="background:#f7f5ef; border:1px solid #e8e4da"
         >
           <UIcon :name="task.icon" class="size-9 flex-none" />
-          <span class="flex-1 text-[15px] font-semibold leading-snug" style="color:#ffffff">{{ task.label }}</span>
+          <span class="flex-1 text-[15px] font-semibold leading-snug" style="color:#0f1115">{{ task.label }}</span>
           <div class="flex items-center gap-2 flex-none">
             <div
               v-if="task.done"
@@ -72,7 +72,7 @@ useSeoMeta({ title: 'Vazifalar' })
                 <path d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
-            <span v-if="task.link" style="color:rgba(255,255,255,0.25); font-size:18px">›</span>
+            <span v-if="task.link" style="color:#c4c8d2; font-size:18px">›</span>
           </div>
         </component>
       </div>

@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm'
 import { db } from '../../db/index'
 import { users, subscriptions } from '../../db/schema'
 import { sendTelegramMessage } from '../../utils/telegram'
+import { buildMiniAppLoginUrl, buildPlatformMenuButton, setTelegramChatMenuButton } from '../../utils/telegram-bot.js'
 
 interface LoginBody {
   id: number
@@ -31,14 +32,14 @@ export default defineEventHandler(async (event) => {
       firstName: body.first_name,
       lastName: body.last_name ?? null,
       username: body.username ?? null,
-      photoUrl: body.photo_url ?? null,
+      photoUrl: body.photo_url ?? null
     })
   } else {
     await db.update(users).set({
       firstName: body.first_name,
       lastName: body.last_name ?? null,
       username: body.username ?? null,
-      photoUrl: body.photo_url ?? null,
+      photoUrl: body.photo_url ?? null
     }).where(eq(users.telegramId, telegramId))
   }
 
@@ -56,8 +57,16 @@ export default defineEventHandler(async (event) => {
 
   // Send welcome bot message on first login
   const botToken = config.telegramBotToken
-  if (botToken && isFirstLogin) {
+  if (botToken) {
     const appUrl = config.public.appUrl || 'https://chayroom.uz'
+    const platformUrl = buildMiniAppLoginUrl(appUrl)
+
+    await setTelegramChatMenuButton(botToken, buildPlatformMenuButton(appUrl))
+
+    if (!isFirstLogin) {
+      return { hasSubscription }
+    }
+
     const supportUsername = config.public.supportUsername || 'hellobehruz'
 
     const welcomeText = `Salom, ${body.first_name}! 👋\n\nChayroom AI Club'ga xush kelibsiz — bu yerda biz AI'ni hayot, ish va biznesga joriy qilamiz.\n\nIchida: AI-agentlar, vibe coding, neyrotarmoqlar va boshqa amaliy materiallar.\n\nBoshlaylikmi?`
@@ -65,9 +74,9 @@ export default defineEventHandler(async (event) => {
     await sendTelegramMessage(botToken, body.id, welcomeText, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: '🚀 Platformani ochish', web_app: { url: `${appUrl}/dashboard` } }],
+          [{ text: '🚀 Platformani ochish', web_app: { url: platformUrl } }],
           [{ text: '💳 Obunani boshqarish', url: `${appUrl}/profile` }],
-          [{ text: '💬 Qo\'llab-quvvatlash', url: `https://t.me/${supportUsername}` }],
+          [{ text: '💬 Qo\'llab-quvvatlash', url: `https://t.me/${supportUsername}` }]
         ]
       }
     })

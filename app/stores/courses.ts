@@ -39,6 +39,7 @@ export interface Course {
   image?: string
   coverUrl?: string
   content?: string
+  free: boolean
 }
 
 export const useCoursesStore = defineStore('courses', () => {
@@ -82,7 +83,7 @@ function normalizeFromApi(row: any): Course {
     desc: row.description ?? '',
     tags: row.tags ?? [],
     level: row.level ?? '',
-    levelColor: row.levelColor ?? '#22c55e',
+    levelColor: row.levelColor ?? '#3480f1',
     rating: row.rating ?? 0,
     participants: row.participants ?? 0,
     duration: row.duration ?? '',
@@ -110,5 +111,6 @@ function normalizeFromApi(row: any): Course {
     accentColor: row.accentColor ?? '#3480f1',
     image: row.coverUrl ?? undefined,
     content: row.content ?? undefined,
+    free: row.isFree ?? false,
   }
 }

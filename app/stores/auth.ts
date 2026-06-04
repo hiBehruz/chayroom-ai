@@ -64,7 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
     return femaleNameHints.some(hint => name.includes(hint)) ? 'female' : 'male'
   })
 
-  function login(telegramUser: TelegramUser) {
+  function setUserSession(telegramUser: TelegramUser) {
     user.value = {
       ...telegramUser,
       telegramId: telegramUser.telegramId ?? telegramUser.id
@@ -72,19 +72,38 @@ export const useAuthStore = defineStore('auth', () => {
     userCookie.value = user.value
     if (import.meta.client) {
       localStorage.setItem('cx-user', JSON.stringify(user.value))
-      $fetch('/api/auth/login', {
-        method: 'POST',
-        body: {
-          id: telegramUser.id,
-          first_name: telegramUser.first_name,
-          last_name: telegramUser.last_name,
-          username: telegramUser.username,
-          photo_url: telegramUser.photo_url,
-        }
-      }).then((res: any) => {
-        if (res?.hasSubscription) activateSubscription()
-      }).catch(() => {})
     }
+  }
+
+  async function syncSubscription(telegramUser: TelegramUser) {
+    if (import.meta.client) {
+      try {
+        const res = await $fetch<{ hasSubscription?: boolean }>('/api/auth/login', {
+          method: 'POST',
+          body: {
+            id: telegramUser.id,
+            first_name: telegramUser.first_name,
+            last_name: telegramUser.last_name,
+            username: telegramUser.username,
+            photo_url: telegramUser.photo_url
+          }
+        })
+
+        if (res?.hasSubscription) {
+          activateSubscription()
+        } else {
+          hasSubscription.value = false
+          subCookie.value = null
+        }
+      } catch {
+        return
+      }
+    }
+  }
+
+  function login(telegramUser: TelegramUser) {
+    setUserSession(telegramUser)
+    void syncSubscription(telegramUser)
   }
 
   function activateSubscription() {
@@ -150,8 +169,8 @@ export const useAuthStore = defineStore('auth', () => {
     })
   }
 
-  function loginFromMiniApp(tgUser: TelegramWebAppUser) {
-    login({
+  async function loginFromMiniApp(tgUser: TelegramWebAppUser) {
+    const telegramUser = {
       id: tgUser.id,
       telegramId: tgUser.id,
       first_name: tgUser.first_name,
@@ -159,7 +178,10 @@ export const useAuthStore = defineStore('auth', () => {
       username: tgUser.username,
       photo_url: tgUser.photo_url,
       hash: 'twa'
-    })
+    }
+
+    setUserSession(telegramUser)
+    await syncSubscription(telegramUser)
   }
 
   return {

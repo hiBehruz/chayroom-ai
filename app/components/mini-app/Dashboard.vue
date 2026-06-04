@@ -3,7 +3,8 @@ const NuxtLinkComponent = resolveComponent('NuxtLink')
 const authStore = useAuthStore()
 authStore.restoreFromStorage()
 const hasSubscription = computed(() => authStore.hasSubscription)
-const displayName = computed(() => authStore.displayName || authStore.user?.first_name || '')
+const tgFirstName = import.meta.client ? (window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name ?? '') : ''
+const displayName = computed(() => authStore.user?.first_name || authStore.displayName || tgFirstName)
 
 const checking = ref(false)
 const checked = ref(false)
@@ -134,7 +135,7 @@ const freshItems = computed(() => {
     <template v-else>
 
       <!-- Greeting -->
-      <div style="padding:16px 20px 18px">
+      <div style="padding:16px 18px 18px">
         <div style="font-weight:800;font-size:26px;letter-spacing:-0.03em;color:#0f1115;display:flex;align-items:center;gap:6px">
           Salom, {{ displayName }} 👋
         </div>
@@ -143,12 +144,12 @@ const freshItems = computed(() => {
 
       <!-- VAZIFALAR -->
       <div class="mb-5">
-        <div class="flex items-center justify-between mb-2" style="padding:0 20px">
+        <div class="flex items-center justify-between mb-2" style="padding:0 18px">
           <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.025em;color:#0f1115;margin:0">Vazifalar</h2>
           <span style="font-size:12px;font-weight:500;color:#6b7280">{{ taskOverview.progress }}/{{ taskOverview.total }} bajarildi</span>
         </div>
 
-        <div class="flex gap-3 overflow-x-auto" style="padding:12px 20px 22px;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none">
+        <div class="flex gap-3 overflow-x-auto" style="padding:12px 18px 22px;scroll-padding-inline:18px;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none">
           <!-- Dark progress card -->
           <NuxtLink
             to="/mini/tasks"
@@ -194,7 +195,7 @@ const freshItems = computed(() => {
       </div>
 
       <!-- DAVOM ETISH -->
-      <div v-if="continueItem" class="mb-4" style="padding:0 20px">
+      <div v-if="continueItem" class="mb-4" style="padding:0 18px">
         <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.025em;color:#0f1115;margin:0 0 12px">Davom etish</h2>
         <NuxtLink
           :to="`/guides/${continueItem.slug}`"
@@ -218,7 +219,7 @@ const freshItems = computed(() => {
       </div>
 
       <!-- YANGI MATERIALLAR -->
-      <div style="padding:8px 20px 24px">
+      <div style="padding:8px 18px 24px">
         <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.025em;color:#0f1115;margin:0 0 12px">Yangi materiallar</h2>
 
         <!-- Skeleton -->

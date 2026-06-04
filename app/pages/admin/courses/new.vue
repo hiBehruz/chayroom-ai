@@ -15,12 +15,12 @@ const desc = ref('')
 const badge = ref('kurs')
 const duration = ref('')
 const level = ref("Boshlang'ich")
-const levelColor = ref('#22c55e')
+const levelColor = ref('#10b981')
 
 const levelOptions = [
-  { label: "Boshlang'ich", color: '#22c55e' },
+  { label: "Boshlang'ich", color: '#10b981' },
   { label: "O'rta", color: '#f59e0b' },
-  { label: "Ilg'or", color: '#ef4444' },
+  { label: "Ilg'or", color: '#8b5cf6' },
 ]
 
 const slug = computed(() =>

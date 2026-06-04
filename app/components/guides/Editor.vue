@@ -96,19 +96,19 @@ const editor = useEditor({
       const ext = file.type.split('/')[1] || 'png'
       const filename = `paste-${Date.now()}.${ext}`
 
-      $fetch<{ uploadUrl: string; publicUrl: string }>('/api/upload/presign', {
+      fetch('/api/upload/image', {
         method: 'POST',
-        body: { filename, contentType: file.type },
-      }).then(({ uploadUrl, publicUrl }) =>
-        fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
-          .then(() => {
-            view.dispatch(
-              view.state.tr.replaceSelectionWith(
-                view.state.schema.nodes.image.create({ src: publicUrl })
-              )
+        body: file,
+        headers: { 'Content-Type': file.type, 'X-Filename': encodeURIComponent(filename) },
+      })
+        .then(res => res.json())
+        .then(({ publicUrl }) => {
+          view.dispatch(
+            view.state.tr.replaceSelectionWith(
+              view.state.schema.nodes.image.create({ src: publicUrl })
             )
-          })
-      )
+          )
+        })
 
       return true
     }
@@ -284,7 +284,8 @@ async function insertVideo(file: File) {
       '/api/upload/presign',
       { method: 'POST', body: { filename: file.name, contentType: file.type } }
     )
-    await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
+    const res = await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
+    if (!res.ok) throw new Error(`Upload failed: ${res.status}`)
     editor.value.chain().focus().insertContent({ type: 'videoBlock', attrs: { src: publicUrl } }).run()
   } finally {
     videoUploading.value = false

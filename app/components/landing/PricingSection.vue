@@ -581,8 +581,9 @@ function requestAccess(_planId: string) {
   }
 
   .pricing-title {
-    font-size: 34px;
-    line-height: 1;
+    font-size: 28px;
+    line-height: 30.8px;
+    letter-spacing: -0.56px;
   }
 
   .pricing-subtitle {

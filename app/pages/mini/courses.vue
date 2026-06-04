@@ -2,8 +2,40 @@
 const router = useRouter()
 const { data: allCourses, pending } = useAsyncData('mini-courses', () => $fetch<any[]>('/api/courses'))
 
-const chips = ['Hammasi', 'Vibe coding', 'AI agentlar', 'Neyrolar']
-const activeChip = ref('Hammasi')
+const chips = [
+  { label: 'Hammasi',     value: 'all',         icon: null },
+  { label: 'Vibe coding', value: 'vibe-coding', icon: 'i-solar-code-circle-bold' },
+  { label: 'AI agentlar', value: 'ai-agents',   icon: 'i-solar-command-bold' },
+  { label: 'Neyrolar',    value: 'neural',       icon: 'i-solar-atom-bold' },
+]
+const activeChip = ref('all')
+const filterRef = ref<HTMLElement | null>(null)
+const chipRefs = ref<HTMLElement[]>([])
+const indicatorStyle = ref({ left: '0px', width: '0px', opacity: '0' })
+
+function updateIndicator() {
+  const index = chips.findIndex(c => c.value === activeChip.value)
+  const btn = chipRefs.value[index]
+  const filter = filterRef.value
+  if (!btn || !filter) return
+  const btnRect = btn.getBoundingClientRect()
+  const filterRect = filter.getBoundingClientRect()
+  indicatorStyle.value = {
+    left: (btnRect.left - filterRect.left + filter.scrollLeft) + 'px',
+    width: btnRect.width + 'px',
+    opacity: '1'
+  }
+}
+
+function selectChip(value: string) {
+  activeChip.value = value
+  nextTick(() => { updateIndicator(); requestAnimationFrame(updateIndicator) })
+}
+
+onMounted(() => {
+  nextTick(() => { updateIndicator(); requestAnimationFrame(updateIndicator) })
+  document.fonts?.ready.then(updateIndicator)
+})
 
 const courses = computed(() => allCourses.value ?? [])
 
@@ -29,19 +61,25 @@ useSeoMeta({ title: 'Kurslar' })
     <p style="font-size:13px;color:#6b7280;font-weight:500;margin:0;padding:0 20px 14px">AI agentlar, neyrotarmoqlar va vibe coding.</p>
 
     <!-- Chip filters -->
-    <div class="flex gap-2.5 overflow-x-auto" style="padding:0 20px 14px;scrollbar-width:none">
-      <button
-        v-for="chip in chips"
-        :key="chip"
-        class="flex-none tg-press-sm"
-        style="height:36px;padding:0 18px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;border:none"
-        :style="activeChip === chip
-          ? 'background:#4c6ef0;color:#fff'
-          : 'background:#f7f5ef;color:#0f1115;border:1px solid #e8e4da'"
-        @click="activeChip = chip"
-      >
-        {{ chip }}
-      </button>
+    <div class="overflow-x-auto" style="padding:0 20px 14px;scrollbar-width:none">
+      <div ref="filterRef" class="relative inline-flex items-center gap-2 whitespace-nowrap">
+        <span
+          class="absolute inset-y-0 rounded-full bg-[#262831] pointer-events-none"
+          style="transition:left 250ms cubic-bezier(0.23,1,0.32,1),width 250ms cubic-bezier(0.23,1,0.32,1),opacity 150ms ease"
+          :style="indicatorStyle"
+        />
+        <button
+          v-for="(chip, i) in chips"
+          :key="chip.value"
+          :ref="el => { if (el) chipRefs[i] = el as HTMLElement }"
+          class="relative z-10 flex-none inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[14px] font-semibold whitespace-nowrap active:scale-95 transition-[color] duration-150"
+          :style="activeChip === chip.value ? 'color:#fffdf9;background:transparent' : 'color:#262831;background:#f7f5f0'"
+          @click="selectChip(chip.value)"
+        >
+          <UIcon v-if="chip.icon" :name="chip.icon" class="size-4" />
+          {{ chip.label }}
+        </button>
+      </div>
     </div>
 
     <!-- Skeleton -->

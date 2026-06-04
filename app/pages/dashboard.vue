@@ -91,7 +91,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
 
       <!-- Welcome -->
       <div class="mb-7 text-center">
-        <h1 class="font-inter-display text-[60px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#1a1a1a] max-md:text-[36px]">
+        <h1 class="font-inter-display text-[60px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#1a1a1a] max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px]">
           <span class="relative inline-block">Привет,<svg class="absolute -bottom-1 left-[-1%] w-[102%] overflow-visible" viewBox="0 0 600 18" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M10,12 C150,2 450,2 590,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="vector-effect:non-scaling-stroke"/></svg></span> {{ user?.first_name }} 👋🏻
         </h1>
         <p class="text-[15px] text-cx-muted mt-3">Bu yerda kurslar, qo'llanmalar va hamjamiyatingiz — barchasi bir joyda.</p>

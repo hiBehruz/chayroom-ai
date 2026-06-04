@@ -9,13 +9,13 @@ const DRAFT_KEY = 'guide-draft-new'
 const title = ref('')
 const desc = ref('')
 const badge = ref("qo'llanma")
-const category = ref('Neyrotarmoqlar')
+const category = ref('Claude')
 const free = ref(false)
 const level = ref('Yangi boshlagan')
 const levelOptions = [
-  { label: 'Yangi boshlagan', color: '#22c55e', icon: 'i-lucide-leaf',       desc: 'Faqat tanishishni boshlamoqda' },
-  { label: "O'rta",           color: '#3480f1', icon: 'i-lucide-bar-chart-2', desc: 'Vositalarni biladi, vaqti-vaqti bilan ishlatadi' },
-  { label: 'Tajribali',       color: '#14161f', icon: 'i-lucide-flame',       desc: 'Muntazam ishlaydi, loyihalarga tatbiq etadi' },
+  { label: 'Yangi boshlagan', color: '#10b981', icon: 'i-lucide-sprout',      desc: 'Faqat tanishishni boshlamoqda' },
+  { label: "O'rta",           color: '#f59e0b', icon: 'i-lucide-bar-chart-2', desc: 'Vositalarni biladi, vaqti-vaqti bilan ishlatadi' },
+  { label: 'Tajribali',       color: '#8b5cf6', icon: 'i-lucide-flame',       desc: 'Muntazam ishlaydi, loyihalarga tatbiq etadi' },
   { label: 'Professional',    color: '#8b5cf6', icon: 'i-lucide-rocket',      desc: "O'z yechimlarini yaratadi va avtomatlashtiradi" },
 ]
 const content = ref('')
@@ -166,7 +166,7 @@ function onNotionPaste(e: ClipboardEvent) {
   }, 1800)
 }
 
-const categories = ['Vibe coding', 'AI agentlar', 'Neyrotarmoqlar', 'Kontent']
+const categories = ['Claude', 'ChatGPT', 'AI-agentlar', 'Kontent']
 
 const slug = computed(() =>
   title.value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-')
@@ -234,114 +234,40 @@ watch(
 
 const imageInputRef = ref<HTMLInputElement | null>(null)
 const imageUploading = ref(false)
+const imageError = ref('')
+
+const localObjectUrl = ref('')
 
 async function onImagePick(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
+  if (imageInputRef.value) imageInputRef.value.value = ''
+  if (localObjectUrl.value) URL.revokeObjectURL(localObjectUrl.value)
+  localObjectUrl.value = URL.createObjectURL(file)
+  previewImage.value = localObjectUrl.value
   imageUploading.value = true
+  imageError.value = ''
   try {
-    const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string; publicUrl: string }>(
-      '/api/upload/presign',
-      { method: 'POST', body: { filename: file.name, contentType: file.type } }
-    )
-    await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
+    const name = encodeURIComponent(`cover-${Date.now()}-${file.name}`)
+    const res = await fetch('/api/upload/image', {
+      method: 'POST',
+      body: file,
+      headers: { 'Content-Type': file.type || 'image/jpeg', 'X-Filename': name },
+    })
+    if (!res.ok) throw new Error(await res.text() || `Server xatosi: ${res.status}`)
+    const { publicUrl } = await res.json()
     previewImage.value = publicUrl
+  } catch (err: unknown) {
+    imageError.value = err instanceof Error ? err.message : 'Yuklashda xatolik yuz berdi'
   } finally {
     imageUploading.value = false
-    if (imageInputRef.value) imageInputRef.value.value = ''
   }
 }
 
 function removeImage() {
+  if (localObjectUrl.value) { URL.revokeObjectURL(localObjectUrl.value); localObjectUrl.value = '' }
   previewImage.value = ''
   if (imageInputRef.value) imageInputRef.value.value = ''
-}
-
-const CROP_W = 480
-const CROP_H = 270
-const cropModalOpen = ref(false)
-const cropOffsetX = ref(0)
-const cropOffsetY = ref(0)
-const cropScale = ref(1)
-const cropNatW = ref(0)
-const cropNatH = ref(0)
-let _cropDragging = false
-let _cropLastX = 0
-let _cropLastY = 0
-
-const cropImgStyle = computed(() => ({
-  position: 'absolute' as const,
-  width: `${cropNatW.value * cropScale.value}px`,
-  height: `${cropNatH.value * cropScale.value}px`,
-  left: `${cropOffsetX.value}px`,
-  top: `${cropOffsetY.value}px`,
-  userSelect: 'none' as const,
-  pointerEvents: 'none' as const,
-}))
-
-function openCropModal() {
-  const img = new Image()
-  img.onload = () => {
-    cropNatW.value = img.naturalWidth
-    cropNatH.value = img.naturalHeight
-    const s = Math.max(CROP_W / img.naturalWidth, CROP_H / img.naturalHeight)
-    cropScale.value = s
-    cropOffsetX.value = (CROP_W - img.naturalWidth * s) / 2
-    cropOffsetY.value = (CROP_H - img.naturalHeight * s) / 2
-    cropModalOpen.value = true
-  }
-  img.src = previewImage.value
-}
-
-function onCropPointerDown(e: PointerEvent) {
-  _cropDragging = true
-  _cropLastX = e.clientX
-  _cropLastY = e.clientY
-  ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-}
-
-function onCropPointerMove(e: PointerEvent) {
-  if (!_cropDragging) return
-  const scaledW = cropNatW.value * cropScale.value
-  const scaledH = cropNatH.value * cropScale.value
-  cropOffsetX.value = Math.min(0, Math.max(CROP_W - scaledW, cropOffsetX.value + e.clientX - _cropLastX))
-  cropOffsetY.value = Math.min(0, Math.max(CROP_H - scaledH, cropOffsetY.value + e.clientY - _cropLastY))
-  _cropLastX = e.clientX
-  _cropLastY = e.clientY
-}
-
-function onCropPointerUp() { _cropDragging = false }
-
-function applyCrop() {
-  const img = new Image()
-  img.onload = async () => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 800
-    canvas.height = 450
-    const ctx = canvas.getContext('2d')!
-    ctx.drawImage(
-      img,
-      -cropOffsetX.value / cropScale.value,
-      -cropOffsetY.value / cropScale.value,
-      CROP_W / cropScale.value,
-      CROP_H / cropScale.value,
-      0, 0, 800, 450
-    )
-    cropModalOpen.value = false
-    imageUploading.value = true
-    try {
-      const blob = await new Promise<Blob>(res => canvas.toBlob(b => res(b!), 'image/jpeg', 0.92))
-      const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string; publicUrl: string }>(
-        '/api/upload/presign',
-        { method: 'POST', body: { filename: `cover-${Date.now()}.jpg`, contentType: 'image/jpeg' } }
-      )
-      await fetch(uploadUrl, { method: 'PUT', body: blob, headers: { 'Content-Type': 'image/jpeg' } })
-      previewImage.value = publicUrl
-    } finally {
-      imageUploading.value = false
-    }
-  }
-  img.src = previewImage.value
 }
 
 const errors = ref<string[]>([])
@@ -504,9 +430,9 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                   <div class="flex flex-wrap gap-1.5">
                     <button
                       v-for="cat in [
-                        { label: 'Vibe coding', icon: 'i-lucide-zap' },
-                        { label: 'AI agentlar', icon: 'i-lucide-bot' },
-                        { label: 'Neyrotarmoqlar', icon: 'i-lucide-brain' },
+                        { label: 'Claude', icon: 'i-lucide-zap' },
+                        { label: 'ChatGPT', icon: 'i-lucide-bot' },
+                        { label: 'AI-agentlar', icon: 'i-lucide-brain' },
                         { label: 'Kontent', icon: 'i-lucide-pen-line' },
                       ]"
                       :key="cat.label"
@@ -790,22 +716,14 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
               <!-- Image -->
               <div>
                 <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2.5">Muqova rasmi</label>
-                <div v-if="previewImage" class="relative rounded-xl overflow-hidden border border-cx-line bg-[#f7f7f5]" style="aspect-ratio:397/264">
-                  <img :src="previewImage" alt="cover" class="absolute inset-0 w-full h-full object-contain" />
-                  <div class="absolute top-2 right-2 flex gap-1.5">
-                    <button
-                      class="grid size-7 place-items-center rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
-                      @click="openCropModal"
-                    >
-                      <UIcon name="i-lucide-crop" class="size-3.5" />
-                    </button>
-                    <button
-                      class="grid size-7 place-items-center rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
-                      @click="removeImage"
-                    >
-                      <UIcon name="i-lucide-x" class="size-3.5" />
-                    </button>
-                  </div>
+                <div v-if="previewImage" class="relative rounded-xl overflow-hidden border border-cx-line bg-[#f7f7f5]">
+                  <img :src="previewImage" alt="cover" class="w-full h-auto block" />
+                  <button
+                    class="absolute top-2 right-2 grid size-7 place-items-center rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
+                    @click="removeImage"
+                  >
+                    <UIcon name="i-lucide-x" class="size-3.5" />
+                  </button>
                 </div>
                 <label
                   v-else
@@ -821,6 +739,7 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                     <p class="text-[11px] text-cx-muted mt-0.5">PNG, JPG — karta muqovasi</p>
                   </div>
                 </label>
+                <p v-if="imageError" class="mt-2 text-[11px] text-red-500 font-semibold">{{ imageError }}</p>
               </div>
 
             </div>
@@ -882,42 +801,4 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
     </div>
   </div>
 
-  <!-- Crop modal -->
-  <Teleport to="body">
-    <div
-      v-if="cropModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      @click.self="cropModalOpen = false"
-    >
-      <div class="bg-white rounded-2xl p-6 shadow-2xl">
-        <h3 class="text-[15px] font-bold text-cx-ink mb-4">Rasmni moslashtirish</h3>
-
-        <div
-          class="relative overflow-hidden rounded-xl border border-cx-line cursor-grab active:cursor-grabbing select-none"
-          style="width: 480px; height: 270px;"
-          @pointerdown="onCropPointerDown"
-          @pointermove="onCropPointerMove"
-          @pointerup="onCropPointerUp"
-          @pointercancel="onCropPointerUp"
-        >
-          <img :src="previewImage" alt="" :style="cropImgStyle" @dragstart.prevent />
-        </div>
-
-        <p class="text-[12px] text-cx-muted mt-2 mb-5">Rasmni suring va kerakli qismni tanlang</p>
-
-        <div class="flex justify-end gap-2.5">
-          <button
-            type="button"
-            class="px-4 py-2 rounded-xl border border-cx-line text-[13px] font-semibold text-cx-muted hover:text-cx-ink hover:border-[#c0c0bc] transition-colors"
-            @click="cropModalOpen = false"
-          >
-            Bekor qilish
-          </button>
-          <button type="button" class="btn-primary px-5! py-2! text-[13px]!" @click="applyCrop">
-            Saqlash
-          </button>
-        </div>
-      </div>
-    </div>
-  </Teleport>
 </template>

@@ -4,15 +4,23 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const isAccessModalOpen = ref(false)
 
+const { data: exchangeData } = await useFetch('/api/exchange-rate')
+const usdRate = computed(() => exchangeData.value?.rate ?? null)
+function toSom(usd: number) {
+  if (!usdRate.value) return ''
+  return '≈ ' + Math.round(usd * usdRate.value).toLocaleString('ru-RU') + ' so\'m'
+}
+
 const plans = [
   {
     id: 'monthly',
     period: '1 oy',
     icon: 'i-lucide-calendar-1',
     desc: 'Sinab ko\'rish va o\'zingga mosligini tekshirish uchun',
-    oldPrice: '249 000 so\'m',
-    price: '199 000',
-    unit: 'so\'m / oy',
+    oldPrice: '20 $',
+    price: '15.90',
+    usdAmount: 15.90,
+    unit: '$/oy',
     featured: false,
     badge: null,
     savings: null
@@ -22,24 +30,26 @@ const plans = [
     period: '3 oy',
     icon: 'i-lucide-calendar-clock',
     desc: 'Natijani ko\'rish va odatga aylantirish uchun eng qulay muddat',
-    oldPrice: '597 000 so\'m',
-    price: '507 450',
-    unit: 'so\'m / 3 oy',
+    oldPrice: '49 $',
+    price: '39.90',
+    usdAmount: 39.90,
+    unit: '$/3 oy',
     featured: true,
     badge: 'Foydali va ommabop',
-    savings: '15% tejash'
+    savings: 'Ekonom 15%'
   },
   {
     id: 'half-year',
     period: '6 oy',
     icon: 'i-lucide-calendar-range',
     desc: 'AIni ish, o\'qish va hayot tarzingga chuqur qo\'shish uchun',
-    oldPrice: '1 194 000 so\'m',
-    price: '955 200',
-    unit: 'so\'m / 6 oy',
+    oldPrice: '89 $',
+    price: '69.90',
+    usdAmount: 69.90,
+    unit: '$/6 oy',
     featured: false,
     badge: null,
-    savings: '20% tejash'
+    savings: 'Ekonom 26%'
   }
 ]
 
@@ -122,12 +132,12 @@ function requestAccess(_planId: string) {
         </div>
       </div>
 
-      <div class="grid grid-cols-3 max-md:grid-cols-1 gap-5 max-md:gap-6 items-end">
+      <div class="grid grid-cols-3 max-md:grid-cols-1 gap-10 max-md:gap-6">
         <div
           v-for="plan in plans"
           :key="plan.period"
-          class="pricing-plan relative flex justify-center max-md:justify-stretch"
-          :class="plan.badge ? 'pt-5' : ''"
+          class="pricing-plan relative flex flex-col"
+          :class="plan.badge ? 'pt-8' : (plan.id === 'monthly' ? 'pt-14 pb-0' : plan.id === 'half-year' ? 'pt-8 pb-6' : '')"
         >
           <div
             v-if="plan.badge"
@@ -137,13 +147,13 @@ function requestAccess(_planId: string) {
           </div>
           <div
             :class="[
-              'price-card flex flex-col max-md:w-full max-md:h-auto',
-              plan.featured ? 'price-card--featured w-[360px] min-h-[590px] p-8 pb-6' : 'w-[350px] min-h-[520px] p-6'
+              'price-card flex flex-col flex-1 w-full max-md:h-auto',
+              plan.featured ? 'price-card--featured p-8 pb-6' : 'p-6'
             ]"
           >
             <!-- Period + desc: fixed height for cross-card alignment -->
             <div class="min-h-24 mb-5">
-              <div class="flex items-start justify-between gap-4">
+              <div class="flex items-center justify-center">
                 <div class="price-period">
                   <UIcon
                     :name="plan.icon"
@@ -152,22 +162,22 @@ function requestAccess(_planId: string) {
                   {{ plan.period }}
                 </div>
               </div>
-              <div class="mt-3 text-[14px] text-cx-muted leading-normal">
+              <div class="mt-3 text-[14px] text-cx-muted leading-normal text-center">
                 {{ plan.desc }}
               </div>
             </div>
 
             <!-- Old price: fixed height -->
-            <div class="h-6 mb-1">
+            <div class="h-6 mb-1 text-center">
               <span class="text-sm text-cx-faint line-through">{{ plan.oldPrice }}</span>
             </div>
 
             <!-- Main price + unit -->
-            <div class="mb-5">
+            <div class="mb-5 text-center">
               <span class="price-amount text-[42px] font-extrabold tracking-[-0.03em] leading-none">{{ plan.price }}</span>
               <span class="text-sm text-cx-muted ml-1">{{ plan.unit }}</span>
+              <div v-if="usdRate" class="text-[12px] text-cx-faint mt-1">{{ toSom(plan.usdAmount) }}</div>
             </div>
-            <div class="price-divider" />
 
             <!-- Features -->
             <ul class="flex flex-col gap-3 mb-8 flex-1">
@@ -425,17 +435,17 @@ function requestAccess(_planId: string) {
 
 .pricing-badge {
   position: absolute;
-  top: 48px;
+  top: 36px;
   left: 50%;
   z-index: 2;
-  transform: translate(-50%, -50%) rotate(-4deg);
-  min-width: 180px;
+  transform: translate(-50%, -50%);
+  min-width: 140px;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 999px;
   background: #3480f1;
   color: #fff;
-  padding: 8px 18px;
-  font-size: 15px;
+  padding: 5px 14px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1;
   text-align: center;
@@ -590,8 +600,7 @@ function requestAccess(_planId: string) {
     max-width: 320px;
   }
 
-  .price-card,
-  .price-card--featured {
+  .price-card {
     min-height: auto;
     border-radius: 22px;
   }

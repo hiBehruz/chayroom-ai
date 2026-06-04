@@ -30,6 +30,9 @@ export const subscriptions = pgTable('subscriptions', {
   userId: integer('user_id').notNull().references(() => users.id),
   status: subscriptionStatusEnum('status').notNull().default('ACTIVE'),
   expiresAt: timestamp('expires_at').notNull(),
+  tributeSubscriptionId: integer('tribute_subscription_id').unique(),
+  period: text('period'),
+  cancelledAt: timestamp('cancelled_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })

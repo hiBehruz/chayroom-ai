@@ -2,11 +2,35 @@
 const open = defineModel<boolean>({ default: false })
 
 const accessFeatures = [
-  'Все курсы и гайды',
-  'Закрытый чат AI Room Club',
-  'Разборы AI-инструментов',
-  'Пошаговые инструкции',
-  'Доступ к новым материалам'
+  'Barcha kurslar va qo\'llanmalar',
+  'Yopiq chat AI Room Club',
+  'AI-asboblar tahlili',
+  'Bosqichma-bosqich ko\'rsatmalar',
+  'Yangi materiallarga kirish'
+]
+
+const config = useRuntimeConfig()
+const tiers = [
+  {
+    label: '1 oy',
+    price: '$15.90',
+    url: config.public.tributeTier1MonthUrl,
+    highlight: false
+  },
+  {
+    label: '3 oy',
+    price: '$39.90',
+    sub: '$13.30 / oy',
+    url: config.public.tributeTier3MonthUrl,
+    highlight: true
+  },
+  {
+    label: '6 oy',
+    price: '$69.90',
+    sub: '$11.65 / oy',
+    url: config.public.tributeTier6MonthUrl,
+    highlight: false
+  }
 ]
 </script>
 
@@ -116,10 +140,10 @@ const accessFeatures = [
 
           <div class="mb-5 text-center">
             <h2 id="access-modal-title" class="text-[22px] font-extrabold leading-tight tracking-tight text-[#202023]">
-              Получи доступ
+              Kirishni oling
             </h2>
             <p class="mt-2 text-[15px] leading-tight text-[#707073]">
-              Оплата через Tribute в Telegram
+              To'lov Telegram orqali Tribute'da
             </p>
           </div>
 
@@ -134,20 +158,26 @@ const accessFeatures = [
             </li>
           </ul>
 
-          <a
-            href="https://t.me/hellobehruz"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="modal-buy-btn"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10m-9.642-2.618q-1.458.607-5.831 2.513q-.711.282-.744.552c-.038.304.343.424.862.587l.218.07c.51.166 1.198.36 1.555.368q.486.01 1.084-.4q4.086-2.76 4.218-2.789c.063-.014.149-.032.207.02c.059.052.053.15.047.177c-.038.161-1.534 1.552-2.308 2.271q-.344.324-.683.653c-.474.457-.83.8.02 1.36c.861.568 1.73 1.134 2.57 1.733c.414.296.786.56 1.246.519c.267-.025.543-.276.683-1.026c.332-1.77.983-5.608 1.133-7.19a1.8 1.8 0 0 0-.017-.393a.42.42 0 0 0-.142-.27c-.12-.098-.305-.118-.387-.117c-.376.007-.953.207-3.73 1.362" />
-            </svg>
-            Telegram orqali kirish
-          </a>
+          <div class="mb-2 grid grid-cols-3 gap-2">
+            <a
+              v-for="tier in tiers"
+              :key="tier.label"
+              :href="tier.url || '#'"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex flex-col items-center gap-1 rounded-2xl border px-3 py-3 text-center transition-all duration-150 hover:scale-[1.03]"
+              :class="tier.highlight
+                ? 'border-[#3480f1] bg-[#3480f1] text-white shadow-[0_8px_20px_rgba(52,128,241,0.25)]'
+                : 'border-[#e8e6e1] bg-white text-[#14161f] hover:border-[#3480f1]'"
+            >
+              <span class="text-[12px] font-semibold opacity-80">{{ tier.label }}</span>
+              <span class="text-[17px] font-extrabold leading-tight">{{ tier.price }}</span>
+              <span v-if="tier.sub" class="text-[10px] font-medium opacity-70">{{ tier.sub }}</span>
+            </a>
+          </div>
 
           <p class="mt-4 text-center text-[13px] leading-tight text-[#737376]">
-            Доступ активируется автоматически после оплаты
+            To'lovdan so'ng kirish avtomatik faollashadi
           </p>
         </div>
       </div>

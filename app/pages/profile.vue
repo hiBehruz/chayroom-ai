@@ -7,7 +7,6 @@ authStore.restoreFromStorage()
 const user = computed(() => authStore.user)
 const displayName = computed(() => authStore.displayName || user.value?.first_name || 'Behruz Zaripov')
 const username = computed(() => user.value?.username || 'hellobehruz')
-const subscriptionUntil = '8 iyun 2026'
 
 const initials = computed(() => {
   const parts = displayName.value.trim().split(/\s+/)
@@ -28,6 +27,7 @@ const aboutMe = ref<{
 
 onMounted(() => {
   try { aboutMe.value = JSON.parse(localStorage.getItem(ABOUT_KEY) || '{}') } catch {}
+  void authStore.syncMe()
 })
 
 const occupationLabel = computed(() => {
@@ -43,8 +43,21 @@ const levelLabels: Record<string, string> = {
   pro: 'Professional',
 }
 
-onMounted(() => {
-  authStore.activateSubscription()
+const hasSubscription = computed(() => authStore.hasSubscription)
+const subscriptionExpiresAt = computed(() => {
+  const iso = authStore.subscriptionExpiresAt
+  if (!iso) return '—'
+  return new Date(iso).toLocaleDateString('uz-UZ', { day: 'numeric', month: 'long', year: 'numeric' })
+})
+const tariffLabel = computed(() => authStore.tariffLabel ?? 'Obunasiz')
+const subscriptionStatusLabel = computed(() => {
+  if (!authStore.hasSubscription) return "Yo'q"
+  if (authStore.subscriptionCancelled) return 'Bekor qilingan'
+  return 'Faol'
+})
+const daysLeftLabel = computed(() => {
+  const n = authStore.daysLeft
+  return n === null ? '—' : `${n} kun`
 })
 
 function logout() {
@@ -83,22 +96,22 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
             <div class="bg-[#f7f5ef] rounded-[20px] p-4">
               <UIcon name="solar:crown-bold" class="size-5 mb-2" style="color:#f59e0b" />
               <p class="text-[10px] font-bold uppercase tracking-[0.08em] mb-1" style="color:#9aa0a8">Tarif</p>
-              <p class="text-[16px] font-extrabold tracking-tight text-[#1a1a1a]">Chayroom AI Club</p>
+              <p class="text-[16px] font-extrabold tracking-tight text-[#1a1a1a]">{{ tariffLabel }}</p>
             </div>
             <div class="bg-[#f7f5ef] rounded-[20px] p-4">
               <UIcon name="solar:shield-check-bold" class="size-5 mb-2" style="color:#4caf82" />
               <p class="text-[10px] font-bold uppercase tracking-[0.08em] mb-1" style="color:#9aa0a8">Obuna holati</p>
-              <p class="text-[16px] font-extrabold tracking-tight text-[#1a1a1a]">Faol</p>
+              <p class="text-[16px] font-extrabold tracking-tight text-[#1a1a1a]">{{ subscriptionStatusLabel }}</p>
             </div>
             <div class="bg-[#f7f5ef] rounded-[20px] p-4">
               <UIcon name="solar:calendar-bold" class="size-5 mb-2" style="color:#4c6ef0" />
               <p class="text-[10px] font-bold uppercase tracking-[0.08em] mb-1" style="color:#9aa0a8">Qolgan kunlar</p>
-              <p class="text-[16px] font-extrabold tracking-tight text-[#1a1a1a]">14 kun</p>
+              <p class="text-[16px] font-extrabold tracking-tight text-[#1a1a1a]">{{ daysLeftLabel }}</p>
             </div>
             <div class="bg-[#f7f5ef] rounded-[20px] p-4">
               <UIcon name="solar:card-bold" class="size-5 mb-2" style="color:#9333ea" />
               <p class="text-[10px] font-bold uppercase tracking-[0.08em] mb-1" style="color:#9aa0a8">Tugash sanasi</p>
-              <p class="text-[16px] font-extrabold tracking-tight text-[#1a1a1a]">{{ subscriptionUntil }}</p>
+              <p class="text-[16px] font-extrabold tracking-tight text-[#1a1a1a]">{{ subscriptionExpiresAt }}</p>
             </div>
           </div>
 
@@ -204,7 +217,7 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
               </div>
               <div>
                 <p class="text-[11px] font-bold uppercase tracking-[0.1em] text-cx-muted mb-1">Tarif</p>
-                <p class="text-[17px] font-bold text-[#14161f]">AI Room Club</p>
+                <p class="text-[17px] font-bold text-[#14161f]">{{ tariffLabel }}</p>
               </div>
             </div>
             <div class="bg-[#f7f5ef] rounded-2xl p-6 flex flex-col justify-between h-48">
@@ -213,7 +226,7 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
               </div>
               <div>
                 <p class="text-[11px] font-bold uppercase tracking-[0.1em] text-cx-muted mb-1">Obuna holati</p>
-                <p class="text-[17px] font-bold text-[#14161f]">Faol</p>
+                <p class="text-[17px] font-bold text-[#14161f]">{{ subscriptionStatusLabel }}</p>
               </div>
             </div>
             <div class="bg-[#f7f5ef] rounded-2xl p-6 flex flex-col justify-between h-48">
@@ -222,7 +235,7 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
               </div>
               <div>
                 <p class="text-[11px] font-bold uppercase tracking-[0.1em] text-cx-muted mb-1">Kun qoldi</p>
-                <p class="text-[17px] font-bold text-[#14161f]">14 kun</p>
+                <p class="text-[17px] font-bold text-[#14161f]">{{ daysLeftLabel }}</p>
               </div>
             </div>
             <div class="bg-[#f7f5ef] rounded-2xl p-6 flex flex-col justify-between h-48">
@@ -231,7 +244,7 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
               </div>
               <div>
                 <p class="text-[11px] font-bold uppercase tracking-[0.1em] text-cx-muted mb-1">Tugash sanasi</p>
-                <p class="text-[17px] font-bold text-[#14161f]">{{ subscriptionUntil }}</p>
+                <p class="text-[17px] font-bold text-[#14161f]">{{ subscriptionExpiresAt }}</p>
               </div>
             </div>
           </div>

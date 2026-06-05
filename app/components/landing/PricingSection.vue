@@ -137,7 +137,7 @@ function requestAccess(_planId: string) {
           v-for="plan in plans"
           :key="plan.period"
           class="pricing-plan relative flex flex-col"
-          :class="plan.badge ? 'pt-8' : (plan.id === 'monthly' ? 'pt-8' : plan.id === 'half-year' ? 'pt-8 pb-6' : '')"
+          :class="plan.badge ? 'pt-8' : (plan.id === 'monthly' ? 'pt-10' : plan.id === 'half-year' ? 'pt-8 pb-6' : '')"
         >
           <div
             v-if="plan.badge"

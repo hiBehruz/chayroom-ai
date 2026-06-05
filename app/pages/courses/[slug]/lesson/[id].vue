@@ -58,6 +58,7 @@ const flatLessons: FlatLesson[] = []
 let idx = 1
 for (let mi = 0; mi < course.modulesList.length; mi++) {
   const mod = course.modulesList[mi]
+  if (!mod) continue
   for (const l of mod.lessons) {
     flatLessons.push({ ...l, flatIndex: idx, modIndex: mi, modTitle: mod.title })
     idx++
@@ -70,6 +71,7 @@ if (!lesson) throw createError({ statusCode: 404, statusMessage: 'Dars topilmadi
 const prevLesson = flatLessons.find(l => l.flatIndex === lessonId - 1)
 const nextLesson = flatLessons.find(l => l.flatIndex === lessonId + 1)
 const currentMod = course.modulesList[lesson.modIndex]
+if (!currentMod) throw createError({ statusCode: 404, statusMessage: 'Modul topilmadi' })
 
 const progress = computed(() => Math.round((lessonId - 1) / course.lessons * 100))
 

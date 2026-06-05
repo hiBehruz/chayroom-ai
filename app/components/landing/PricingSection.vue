@@ -137,7 +137,7 @@ function requestAccess(_planId: string) {
           v-for="plan in plans"
           :key="plan.period"
           class="pricing-plan relative flex flex-col"
-          :class="plan.badge ? 'pt-8' : (plan.id === 'monthly' ? 'pt-14 pb-0' : plan.id === 'half-year' ? 'pt-8 pb-6' : '')"
+          :class="plan.badge ? 'pt-8' : (plan.id === 'monthly' ? 'pt-20 pb-0 max-md:pt-8' : plan.id === 'half-year' ? 'pt-8 pb-6' : '')"
         >
           <div
             v-if="plan.badge"
@@ -148,7 +148,7 @@ function requestAccess(_planId: string) {
           <div
             :class="[
               'price-card flex flex-col flex-1 w-full max-md:h-auto',
-              plan.featured ? 'price-card--featured p-8 pb-6' : 'p-6'
+              plan.featured ? 'price-card--featured -mt-6 p-8 pb-6 mb-6 max-md:mt-0 max-md:mb-0' : plan.id === 'monthly' ? 'p-6 pb-[18px] max-md:pb-6' : 'p-6'
             ]"
           >
             <!-- Period + desc: fixed height for cross-card alignment -->
@@ -176,7 +176,12 @@ function requestAccess(_planId: string) {
             <div class="mb-5 text-center">
               <span class="price-amount text-[42px] font-extrabold tracking-[-0.03em] leading-none">{{ plan.price }}</span>
               <span class="text-sm text-cx-muted ml-1">{{ plan.unit }}</span>
-              <div v-if="usdRate" class="text-[12px] text-cx-faint mt-1">{{ toSom(plan.usdAmount) }}</div>
+              <div
+                v-if="usdRate"
+                class="text-[12px] text-cx-faint mt-1"
+              >
+                {{ toSom(plan.usdAmount) }}
+              </div>
             </div>
 
             <!-- Features -->
@@ -215,7 +220,10 @@ function requestAccess(_planId: string) {
             </ul>
 
             <button
-              class="hero-link-btn hero-link-btn--blue flex w-full items-center justify-center px-6 py-[15px] text-[16px]"
+              :class="[
+                'hero-link-btn hero-link-btn--blue flex w-full items-center justify-center px-6 py-[15px] text-[16px]',
+                plan.featured ? 'translate-y-1 max-md:translate-y-0' : ''
+              ]"
               @click="requestAccess(plan.id)"
             >
               <span>Kirish huquqini olish</span>
@@ -387,7 +395,6 @@ function requestAccess(_planId: string) {
   will-change: transform;
 }
 
-
 .price-btn {
   position: relative;
   display: flex;
@@ -451,7 +458,6 @@ function requestAccess(_planId: string) {
   text-align: center;
   white-space: nowrap;
 }
-
 
 .price-amount {
   display: inline-block;

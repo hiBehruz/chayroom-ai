@@ -77,9 +77,10 @@ const bgPresets = [
   { label: "To'q ko'k", value: '#0f172a', dark: true },
   { label: "To'q yashil", value: '#0d1f1a', dark: true },
 ]
-const bg = ref(bgPresets[0].value)
+const defaultBg = bgPresets[0]?.value ?? '#3480f1'
+const bg = ref(defaultBg)
 
-function selectBg(preset: typeof bgPresets[0]) {
+function selectBg(preset: typeof bgPresets[number]) {
   bg.value = preset.value
   dark.value = preset.dark
 }
@@ -156,7 +157,7 @@ function onNotionPaste(e: ClipboardEvent) {
 
   notionPasted.value = true
   setTimeout(() => {
-    contentTab.value = 'html'
+    contentTab.value = 'editor'
     notionPasted.value = false
   }, 1800)
 }
@@ -175,7 +176,9 @@ function removeModule(mi: number) {
 }
 
 function addLesson(mi: number) {
-  modulesList.value[mi].lessons.push({
+  const module = modulesList.value[mi]
+  if (!module) return
+  module.lessons.push({
     title: '',
     type: 'Nazariy',
     duration: '',
@@ -201,7 +204,8 @@ async function uploadVideo(mi: number, li: number, file: File) {
       body: file,
       headers: { 'Content-Type': file.type },
     })
-    modulesList.value[mi].lessons[li].videoUrl = publicUrl
+    const lesson = modulesList.value[mi]?.lessons[li]
+    if (lesson) lesson.videoUrl = publicUrl
   } catch (e: any) {
     uploadError.value = e?.message ?? 'Yuklashda xato'
   } finally {
@@ -216,11 +220,12 @@ function onVideoFileChange(mi: number, li: number, e: Event) {
 }
 
 function removeVideo(mi: number, li: number) {
-  modulesList.value[mi].lessons[li].videoUrl = undefined
+  const lesson = modulesList.value[mi]?.lessons[li]
+  if (lesson) lesson.videoUrl = undefined
 }
 
 function removeLesson(mi: number, li: number) {
-  modulesList.value[mi].lessons.splice(li, 1)
+  modulesList.value[mi]?.lessons.splice(li, 1)
 }
 
 // ── Computed stats ────────────────────────────────────────
@@ -279,6 +284,7 @@ async function save() {
       accentColor: accentColor.value,
       image: previewImage.value || undefined,
       content: content.value || undefined,
+      free: false,
     }
 
     const result = await coursesStore.addCourse(course)

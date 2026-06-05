@@ -59,6 +59,15 @@ const daysLeftLabel = computed(() => {
   const n = authStore.daysLeft
   return n === null ? '—' : `${n} kun`
 })
+const agentOptions: {
+  value: import('~/stores/auth').AgentVariant
+  label: string
+  desc: string
+}[] = [
+  { value: 'auto', label: 'Avto', desc: 'Ismga qarab' },
+  { value: 'male', label: 'Erkak', desc: 'Erkak avatar' },
+  { value: 'female', label: 'Ayol', desc: 'Ayol avatar' }
+]
 
 function logout() {
   authStore.logout()

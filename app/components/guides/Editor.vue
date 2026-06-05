@@ -103,9 +103,11 @@ const editor = useEditor({
       })
         .then(res => res.json())
         .then(({ publicUrl }) => {
+          const imageNode = view.state.schema.nodes.image
+          if (!imageNode) return
           view.dispatch(
             view.state.tr.replaceSelectionWith(
-              view.state.schema.nodes.image.create({ src: publicUrl })
+              imageNode.create({ src: publicUrl })
             )
           )
         })
@@ -121,7 +123,7 @@ const editor = useEditor({
 watch(() => props.modelValue, (val) => {
   if (!editor.value) return
   if (editor.value.getHTML() === val) return
-  editor.value.commands.setContent(val, false, { preserveWhitespace: true })
+  editor.value.commands.setContent(val, { emitUpdate: false, parseOptions: { preserveWhitespace: true } })
 })
 
 onBeforeUnmount(() => editor.value?.destroy())
@@ -163,6 +165,7 @@ const fonts = [
   { label: 'Georgia', value: 'Georgia, serif' },
   { label: 'Mono', value: '"SF Mono", "Fira Code", monospace' },
 ]
+const defaultFontValue = fonts[0]?.value ?? '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
 
 function currentFont() {
   const f = editor.value?.getAttributes('textStyle').fontFamily
@@ -186,7 +189,7 @@ async function translateToUzbek() {
       method: 'POST',
       body: { html: editor.value.getHTML() }
     })
-    editor.value.commands.setContent(html, false, { preserveWhitespace: true })
+    editor.value.commands.setContent(html, { emitUpdate: false, parseOptions: { preserveWhitespace: true } })
   } catch (e: unknown) {
     translateError.value = e instanceof Error ? e.message : 'Xatolik yuz berdi'
   } finally {
@@ -320,7 +323,7 @@ const tools = [
         <select
           class="h-7 px-1.5 rounded-lg text-[12px] font-semibold text-cx-ink bg-transparent border border-cx-line hover:border-cx-blue focus:outline-none focus:border-cx-blue transition-colors cursor-pointer"
           :value="currentFont()"
-          @change="setFont(fonts.find(f => f.label === ($event.target as HTMLSelectElement).value)?.value ?? fonts[0].value)"
+          @change="setFont(fonts.find(f => f.label === ($event.target as HTMLSelectElement).value)?.value ?? defaultFontValue)"
         >
           <option v-for="f in fonts" :key="f.label" :value="f.label">{{ f.label }}</option>
         </select>

@@ -9,6 +9,7 @@ const available = [
     description: "Qisqa, foydali yozma materiallar. AI, vibe coding va no-code mavzularida.",
     iconColor: '#f97316',
     iconBg: 'rgba(249,115,22,0.12)',
+    dim: false,
   },
 ]
 

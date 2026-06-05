@@ -219,7 +219,7 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
               'guide-preview relative overflow-hidden rounded-[28px] max-[734px]:rounded-[20px]',
               guide.bg === '#f5ede0' ? 'guide-preview-light' : ''
             ]"
-            :style="{ backgroundColor: guide.bg }"
+            :style="{ backgroundColor: guide.bg ?? undefined }"
           >
             <button
               v-if="isOwner"
@@ -247,7 +247,7 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
               <span class="guide-art-orbit" />
               <span
                 class="guide-art-object"
-                :style="{ backgroundColor: guide.accent }"
+                :style="{ backgroundColor: guide.accent ?? undefined }"
               />
               <span class="guide-art-hand" />
             </div>

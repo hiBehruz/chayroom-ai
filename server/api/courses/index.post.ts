@@ -19,23 +19,33 @@ export default defineEventHandler(async (event) => {
     accentTitle: body.accentTitle ?? [],
     accentColor: body.accentColor ?? null,
     content: body.content ?? null,
-    published: true,
+    published: true
   }).returning({ id: courses.id, slug: courses.slug })
+  if (!course) {
+    throw createError({ statusCode: 500, statusMessage: 'Kurs yaratilmadi' })
+  }
 
-  for (let mi = 0; mi < (body.modulesList ?? []).length; mi++) {
-    const mod = body.modulesList[mi]
-    const [module] = await db.insert(modules).values({
+  const modulesList = Array.isArray(body.modulesList) ? body.modulesList : []
+  for (let mi = 0; mi < modulesList.length; mi++) {
+    const mod = modulesList[mi]
+    if (!mod) continue
+    const [courseModule] = await db.insert(modules).values({
       courseId: course.id,
       title: mod.title,
       subtitle: mod.subtitle ?? null,
       duration: mod.duration ?? null,
-      order: mi,
+      order: mi
     }).returning({ id: modules.id })
+    if (!courseModule) {
+      throw createError({ statusCode: 500, statusMessage: 'Modul yaratilmadi' })
+    }
 
-    for (let li = 0; li < (mod.lessons ?? []).length; li++) {
-      const lesson = mod.lessons[li]
+    const lessonsList = Array.isArray(mod.lessons) ? mod.lessons : []
+    for (let li = 0; li < lessonsList.length; li++) {
+      const lesson = lessonsList[li]
+      if (!lesson) continue
       await db.insert(lessons).values({
-        moduleId: module.id,
+        moduleId: courseModule.id,
         title: lesson.title,
         type: lesson.type ?? 'Nazariy',
         duration: lesson.duration ?? null,
@@ -43,7 +53,7 @@ export default defineEventHandler(async (event) => {
         videoUrl: lesson.videoUrl ?? null,
         content: lesson.content ?? null,
         order: li,
-        published: true,
+        published: true
       })
     }
   }

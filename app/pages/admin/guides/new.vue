@@ -85,7 +85,7 @@ async function onZipPick(e: Event) {
 
     zipStatus.value = 'success'
     zipMessage.value = `${imgEls.length} rasm bilan import qilindi`
-    setTimeout(() => { contentTab.value = 'html'; zipStatus.value = 'idle' }, 2000)
+    setTimeout(() => { contentTab.value = 'editor'; zipStatus.value = 'idle' }, 2000)
   } catch (err: unknown) {
     zipStatus.value = 'error'
     zipMessage.value = err instanceof Error ? err.message : 'Xatolik yuz berdi'
@@ -161,7 +161,7 @@ function onNotionPaste(e: ClipboardEvent) {
 
   notionPasted.value = true
   setTimeout(() => {
-    contentTab.value = 'html'
+    contentTab.value = 'editor'
     notionPasted.value = false
   }, 1800)
 }
@@ -185,9 +185,10 @@ const bgPresets = [
   { label: "To'q ko'k", value: '#0d1117', dark: true },
   { label: "To'q yashil", value: '#0d1f1a', dark: true },
 ]
-const bg = ref(bgPresets[0].value)
+const defaultBg = bgPresets[0]?.value ?? '#f5ede0'
+const bg = ref(defaultBg)
 const bgDark = ref(false)
-function selectBg(preset: typeof bgPresets[0]) {
+function selectBg(preset: typeof bgPresets[number]) {
   bg.value = preset.value
   bgDark.value = preset.dark
 }
@@ -568,7 +569,7 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                     <UIcon name="i-lucide-check" class="size-6 text-green-600" />
                   </div>
                   <p class="text-[14px] font-bold text-green-700">Muvaffaqiyatli import qilindi!</p>
-                  <p class="text-[12px] text-green-600">HTML tabga o'tilmoqda...</p>
+                  <p class="text-[12px] text-green-600">Vizual editorga o'tilmoqda...</p>
                 </div>
 
                 <!-- Paste zone -->

@@ -32,6 +32,9 @@ const tiers = [
     highlight: false
   }
 ]
+
+const defaultTributeUrl = 'https://t.me/tribute/app?startapp=sXgF'
+const featuredTierUrl = computed(() => tiers.find(tier => tier.highlight)?.url ?? defaultTributeUrl)
 </script>
 
 <template>
@@ -159,7 +162,7 @@ const tiers = [
           </ul>
 
           <a
-            :href="tiers[1].url || 'https://t.me/tribute/app?startapp=sXgF'"
+            :href="featuredTierUrl"
             target="_blank"
             rel="noopener noreferrer"
             class="modal-buy-btn mb-2"

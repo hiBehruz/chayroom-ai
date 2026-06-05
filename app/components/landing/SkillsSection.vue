@@ -20,9 +20,15 @@ const currentPage = ref(0)
 const trackRef = ref<HTMLElement>()
 
 let touchStartX = 0
-function onTouchStart(e: TouchEvent) { touchStartX = e.touches[0].clientX }
+function onTouchStart(e: TouchEvent) {
+  const touch = e.touches[0]
+  if (!touch) return
+  touchStartX = touch.clientX
+}
 function onTouchEnd(e: TouchEvent) {
-  const delta = touchStartX - e.changedTouches[0].clientX
+  const touch = e.changedTouches[0]
+  if (!touch) return
+  const delta = touchStartX - touch.clientX
   if (Math.abs(delta) < 40) return
   if (delta > 0) next()
   else prev()

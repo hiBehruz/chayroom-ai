@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ src: string }>()
+const props = defineProps<{ src: string }>()
 
 const videoRef = ref<HTMLVideoElement | null>(null)
 let player: import('plyr').default | null = null

@@ -117,14 +117,14 @@ function startEdit() {
   if (!g) return
   editTitle.value = g.title
   editDesc.value = g.description ?? ''
-  editContent.value = g.content
-  editBadge.value = g.badge
+  editContent.value = g.content ?? ''
+  editBadge.value = g.badge ?? ''
   editFree.value = g.isFree
   editLevel.value = g.level ?? 'Yangi boshlagan'
-  editTags.value = [...g.tags]
-  editBg.value = g.bg
-  editAccent.value = g.accent
-  editCategory.value = g.category
+  editTags.value = [...(g.tags ?? [])]
+  editBg.value = g.bg ?? '#f5ede0'
+  editAccent.value = g.accent ?? '#e8b97a'
+  editCategory.value = g.category ?? 'Claude'
   editImage.value = g.coverUrl ?? ''
   isEditing.value = true
 }

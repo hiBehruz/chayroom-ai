@@ -16,8 +16,7 @@ function splitIntoChunks(html: string): string[] {
     if (current.length + part.length > CHUNK_SIZE && current.length > 0) {
       chunks.push(current)
       current = part
-    }
-    else {
+    } else {
       current += part
     }
   }
@@ -45,7 +44,9 @@ async function translateChunk(chunk: string, apiKey: string): Promise<string> {
       }
     }
   )
-  return response.choices[0].message.content
+  const content = response.choices[0]?.message.content
+  if (!content) throw new Error('OpenAI javob qaytarmadi')
+  return content
 }
 
 export default defineEventHandler(async (event) => {
@@ -68,9 +69,12 @@ export default defineEventHandler(async (event) => {
     }
 
     return { html: translated.join('') }
-  }
-  catch (err: unknown) {
-    const e = err as { statusCode?: number; statusMessage?: string; data?: { error?: { message?: string } } }
+  } catch (err: unknown) {
+    const e = err as {
+      statusCode?: number
+      statusMessage?: string
+      data?: { error?: { message?: string } }
+    }
     throw createError({
       statusCode: e?.statusCode ?? 502,
       statusMessage: e?.data?.error?.message ?? e?.statusMessage ?? 'OpenAI request failed'

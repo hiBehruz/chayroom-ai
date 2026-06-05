@@ -15,7 +15,7 @@ const openModules = ref<Set<number>>(new Set([0]))
 function getLessonFlatIndex(modIndex: number, lessonIndex: number): number {
   let offset = 0
   for (let i = 0; i < modIndex; i++) {
-    offset += (course.value?.modulesList[i].lessons.length ?? 0)
+    offset += (course.value?.modulesList[i]?.lessons.length ?? 0)
   }
   return offset + lessonIndex + 1
 }
@@ -34,7 +34,7 @@ useSeoMeta({ title: computed(() => `${course.value?.title ?? 'Kurs'} — Chayroo
 </script>
 
 <template>
-  <div class="min-h-screen" :class="isMiniApp ? 'bg-[#efefef] is-mini' : 'bg-cx-surface'">
+  <div v-if="course" class="min-h-screen" :class="isMiniApp ? 'bg-[#efefef] is-mini' : 'bg-cx-surface'">
     <!-- Preview image wrapper -->
     <div class="mx-auto" :class="isMiniApp ? 'px-4 pt-5 max-w-full' : 'w-310 max-w-[calc(100vw-40px)] px-0 pt-8 max-md:px-4'">
       <div class="mx-auto max-w-full" :class="isMiniApp ? '' : 'w-220.5'">

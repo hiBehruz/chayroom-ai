@@ -1,3 +1,5 @@
+import { requireAdmin } from '../utils/admin-session'
+
 const SYSTEM_PROMPT = 'Translate the HTML content from Russian to Uzbek. Preserve all HTML tags exactly as they are. Only translate the text content inside the tags. Return only the translated HTML, no explanations.'
 
 // ~40k chars per chunk to stay well under 200k TPM
@@ -50,6 +52,7 @@ async function translateChunk(chunk: string, apiKey: string): Promise<string> {
 }
 
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const { html } = await readBody<{ html: string }>(event)
   const config = useRuntimeConfig()
 

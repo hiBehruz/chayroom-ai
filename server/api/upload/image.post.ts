@@ -1,6 +1,8 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { requireAdmin } from '../../utils/admin-session'
 
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const contentType = getHeader(event, 'content-type') || ''
   const filename = decodeURIComponent(getHeader(event, 'x-filename') || `image-${Date.now()}.jpg`)
 

@@ -1,7 +1,9 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { requireAdmin } from '../../utils/admin-session'
 
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const { filename, contentType } = await readBody<{
     filename: string
     contentType: string

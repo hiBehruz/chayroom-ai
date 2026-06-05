@@ -1,8 +1,10 @@
 import { db } from '../../db'
 import { guides, categories } from '../../db/schema'
 import { eq } from 'drizzle-orm'
+import { requireAdmin } from '../../utils/admin-session'
 
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const slug = getRouterParam(event, 'slug')!
   const body = await readBody(event)
 

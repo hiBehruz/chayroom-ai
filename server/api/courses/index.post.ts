@@ -1,7 +1,9 @@
 import { db } from '../../db'
 import { courses, modules, lessons } from '../../db/schema'
+import { requireAdmin } from '../../utils/admin-session'
 
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const body = await readBody(event)
 
   const [course] = await db.insert(courses).values({

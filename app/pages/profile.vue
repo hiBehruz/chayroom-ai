@@ -62,16 +62,6 @@ const daysLeftLabel = computed(() => {
   const n = authStore.daysLeft
   return n === null ? '—' : `${n} kun`
 })
-const agentOptions: {
-  value: import('~/stores/auth').AgentVariant
-  label: string
-  desc: string
-}[] = [
-  { value: 'auto', label: 'Avto', desc: 'Ismga qarab' },
-  { value: 'male', label: 'Erkak', desc: 'Erkak avatar' },
-  { value: 'female', label: 'Ayol', desc: 'Ayol avatar' }
-]
-
 function logout() {
   authStore.logout()
   navigateTo('/')
@@ -366,11 +356,11 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
       <div class="mx-auto w-[1240px] max-w-[calc(100vw-40px)] px-0 pb-14 pt-12 max-md:px-4">
         <!-- User header -->
         <div class="flex flex-col items-center text-center mb-8">
-          <div class="w-24 h-24 rounded-full bg-[#f0eee8] flex items-center justify-center mb-4">
-            <AppPixelAgentAvatar
-              :variant="authStore.resolvedAgentVariant"
-              size="lg"
-            />
+          <div
+            class="w-24 h-24 rounded-full flex items-center justify-center text-white font-black text-[30px] tracking-tight mb-4"
+            style="background:linear-gradient(135deg,#f97316,#ef4444)"
+          >
+            {{ initials }}
           </div>
           <h1 class="font-inter-display text-[26px] font-bold leading-tight tracking-[-0.01em] text-[#14161f]">
             {{ displayName }}
@@ -462,37 +452,6 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
                   {{ subscriptionExpiresAt }}
                 </p>
               </div>
-            </div>
-          </div>
-
-          <!-- Pixel agent -->
-          <div class="bg-[#f7f5ef] rounded-2xl p-6">
-            <p class="text-[11px] font-bold uppercase tracking-[0.1em] text-cx-muted mb-4">
-              Pixel agent
-            </p>
-            <div class="grid grid-cols-3 gap-3">
-              <button
-                v-for="option in agentOptions"
-                :key="option.value"
-                class="border transition-all duration-200 focus:outline-none rounded-xl p-3 flex flex-col items-center gap-2"
-                :class="authStore.agentVariant === option.value
-                  ? 'border-[#3480f1] bg-cx-blue/10'
-                  : 'border-[#e8e6e1] bg-white/60 hover:border-[#3480f1]'"
-                @click="authStore.setAgentVariant(option.value)"
-              >
-                <AppPixelAgentAvatar
-                  :variant="option.value === 'female' ? 'female' : option.value === 'male' ? 'male' : authStore.resolvedAgentVariant"
-                  size="sm"
-                />
-                <div class="text-center">
-                  <div class="text-[12px] font-bold text-[#242426]">
-                    {{ option.label }}
-                  </div>
-                  <div class="text-[11px] text-cx-muted leading-tight mt-0.5">
-                    {{ option.desc }}
-                  </div>
-                </div>
-              </button>
             </div>
           </div>
 

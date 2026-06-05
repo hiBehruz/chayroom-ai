@@ -31,7 +31,8 @@ export default defineEventHandler(async (event) => {
     .limit(1)
 
   const now = new Date()
-  const hasSubscription = !!sub && sub.status === 'ACTIVE' && sub.expiresAt > now
+  const isAdmin = user.role === 'ADMIN'
+  const hasSubscription = isAdmin || (!!sub && sub.status === 'ACTIVE' && sub.expiresAt > now)
 
   return {
     user: {
@@ -40,7 +41,8 @@ export default defineEventHandler(async (event) => {
       firstName: user.firstName,
       lastName: user.lastName,
       username: user.username,
-      photoUrl: user.photoUrl
+      photoUrl: user.photoUrl,
+      role: user.role
     },
     hasSubscription,
     subscription: sub

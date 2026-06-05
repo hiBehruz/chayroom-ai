@@ -45,9 +45,9 @@ export default defineEventHandler(async (event) => {
 
   // Check subscription
   const [dbUser] = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1)
-  let hasSubscription = false
+  let hasSubscription = dbUser?.role === 'ADMIN'
 
-  if (dbUser) {
+  if (dbUser && !hasSubscription) {
     const [sub] = await db.select().from(subscriptions)
       .where(eq(subscriptions.userId, dbUser.id))
       .limit(1)

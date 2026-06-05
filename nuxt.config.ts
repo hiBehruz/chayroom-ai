@@ -34,6 +34,9 @@ export default defineNuxtConfig({
     r2PublicUrl: '',
     telegramBotToken: '',
     tributeApiKey: '',
+    adminTelegramIds: '',
+    adminSessionPassword: '',
+    adminCookieDomain: '',
     public: {
       telegramBotUsername: '',
       appUrl: 'https://chayroom.uz',

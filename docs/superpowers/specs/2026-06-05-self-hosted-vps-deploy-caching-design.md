@@ -15,7 +15,7 @@ The target server `72.62.3.239` (Ubuntu 24.04, 7.8 GB RAM, 2 GB swap, Docker 29 
 
 Key findings that reshape the task:
 
-1. **Live data is on Supabase, not the VPS.** Both the local and the server `.env` set `DATABASE_URL` to `aws-1-eu-central-1.pooler.supabase.com`. The running app reads/writes **Supabase**.
+1. **Live data is on Supabase, not the VPS.** Both the local and the server `.env` set `DATABASE_URL` to `aws-1-eu-central-1.pooler.supabase.com`. The running app reads/writes **Supabase**. **Pre-launch: there are no end users yet** — only author-created content (courses/guides). So the DB cutover is low-risk and downtime is not a concern; we still preserve the Supabase content and keep Supabase as backup.
 2. **The VPS postgres container is a stale orphan.** It was restored from `/app/backup.sql` (a full Supabase dump from ~June 2) and contains **0 courses, 1 guide, 2 users**, newest row June 2. The app does not use it. Migrating *from* it would lose all data since June 2.
 3. **Redis is running but completely unused** — no `REDIS_URL`, no caching code. This is the real gap.
 4. **Deployed code is an older branch** (`redesign/top-co-style` @ `e15bc6f`), not the current `dev`. It was deployed manually (local `nuxt build` + rsync of `.output`; Dockerfile only copies `.output`). The server working tree is dirty with manual edits.

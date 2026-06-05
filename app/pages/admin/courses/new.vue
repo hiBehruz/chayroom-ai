@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { Course, CourseModule } from '~/stores/courses'
 
-const authStore = useAuthStore()
+definePageMeta({ middleware: ['admin'] })
+
 const coursesStore = useCoursesStore()
 
 onMounted(() => {
   coursesStore.load()
-  if (!authStore.isOwner) navigateTo('/courses')
 })
 
 // ── Basic info ────────────────────────────────────────────

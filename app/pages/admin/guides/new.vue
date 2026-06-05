@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import JSZip from 'jszip'
 
-const authStore = useAuthStore()
+definePageMeta({ middleware: ['admin'] })
+
 const guidesStore = useGuidesStore()
 
 const DRAFT_KEY = 'guide-draft-new'
@@ -203,7 +204,6 @@ const previewImage = ref('')
 
 onMounted(() => {
   guidesStore.fetch()
-  if (!authStore.isOwner) navigateTo('/guides')
 
   try {
     const saved = localStorage.getItem(DRAFT_KEY)

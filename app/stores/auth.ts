@@ -13,6 +13,7 @@ export interface TelegramUser {
   last_name?: string
   username?: string
   photo_url?: string
+  role?: 'USER' | 'ADMIN'
   hash: string
 }
 
@@ -49,6 +50,8 @@ export const useAuthStore = defineStore('auth', () => {
   const isOwner = computed(() =>
     !!user.value && user.value.username === OWNER_USERNAME
   )
+
+  const isAdmin = computed(() => user.value?.role === 'ADMIN')
 
   const displayName = computed(() => {
     if (!user.value) return ''
@@ -124,7 +127,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!import.meta.client) return
     try {
       const res = await $fetch<{
-        user: TelegramUser | null
+        user: (TelegramUser & { role?: 'USER' | 'ADMIN' }) | null
         hasSubscription: boolean
         subscription: { period: string | null, expiresAt: string, cancelledAt: string | null } | null
       }>('/api/auth/me')
@@ -134,12 +137,14 @@ export const useAuthStore = defineStore('auth', () => {
         return
       }
 
-      if (res.hasSubscription && res.subscription) {
-        activateSubscription({
-          period: res.subscription.period,
-          expiresAt: res.subscription.expiresAt,
-          cancelledAt: res.subscription.cancelledAt
-        })
+      if (res.user.role && user.value) {
+        user.value = { ...user.value, role: res.user.role }
+      }
+
+      if (res.hasSubscription) {
+        activateSubscription(res.subscription
+          ? { period: res.subscription.period, expiresAt: res.subscription.expiresAt, cancelledAt: res.subscription.cancelledAt }
+          : undefined)
       } else {
         clearSubscription()
       }
@@ -252,6 +257,7 @@ export const useAuthStore = defineStore('auth', () => {
     daysLeft,
     tariffLabel,
     isOwner,
+    isAdmin,
     agentVariant,
     resolvedAgentVariant,
     displayName,

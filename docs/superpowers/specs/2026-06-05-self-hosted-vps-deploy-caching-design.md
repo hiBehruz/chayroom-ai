@@ -1,108 +1,97 @@
-# Self-Hosted VPS Deployment + Caching Design
+# Self-Hosted VPS Redeploy + DB Cutover + Caching Design
 
 **Date:** 2026-06-05
 **Status:** Draft — pending user review
-**Supersedes:** `2026-06-05-vercel-deployment-design.md` (Vercel + PgBouncer plan abandoned in favor of full self-host)
+**Supersedes:** `2026-06-05-vercel-deployment-design.md`
+
+## Context — actual server state (inspected, not assumed)
+
+The target server `72.62.3.239` (Ubuntu 24.04, 7.8 GB RAM, 2 GB swap, Docker 29 + Compose v5) is **already running the full stack** via Docker Compose in `/app` (project `app`):
+
+- `app-caddy-1` — serving :80/:443 (up ~2 days)
+- `app-nuxt-1` — the Nuxt app (up ~16h)
+- `app-postgres-1` — postgres:16-alpine on 127.0.0.1:5432 (up ~16h)
+- `app-redis-1` — redis:7-alpine (up ~3 days)
+
+Key findings that reshape the task:
+
+1. **Live data is on Supabase, not the VPS.** Both the local and the server `.env` set `DATABASE_URL` to `aws-1-eu-central-1.pooler.supabase.com`. The running app reads/writes **Supabase**.
+2. **The VPS postgres container is a stale orphan.** It was restored from `/app/backup.sql` (a full Supabase dump from ~June 2) and contains **0 courses, 1 guide, 2 users**, newest row June 2. The app does not use it. Migrating *from* it would lose all data since June 2.
+3. **Redis is running but completely unused** — no `REDIS_URL`, no caching code. This is the real gap.
+4. **Deployed code is an older branch** (`redesign/top-co-style` @ `e15bc6f`), not the current `dev`. It was deployed manually (local `nuxt build` + rsync of `.output`; Dockerfile only copies `.output`). The server working tree is dirty with manual edits.
 
 ## Goal
 
-Deploy the full Chayroom AI Nuxt 4 app (front-end + Nitro backend) to a single self-hosted Ubuntu VPS using Docker Compose, move the database from Supabase onto the VPS, and add three layers of caching (API responses via Redis, public pages via SWR, static assets via Caddy).
+Bring the live deployment up to date and complete it:
+1. **Redeploy** the current `dev` branch to the server, switching to a clean git-driven, build-on-server flow.
+2. **Cut the database over** from Supabase to the VPS Postgres container (fresh import of live Supabase data), keeping Supabase as rollback.
+3. **Add three caching layers** (Redis-backed API cache, SWR public pages, Caddy static assets).
 
-## Key Decisions (from brainstorming)
+## Decisions (from brainstorming, with corrected facts)
 
 | Decision | Choice |
 |---|---|
-| Deploy target | Own VPS via Docker Compose |
-| Server state | New / empty Ubuntu — full bootstrap needed |
-| Database | Move from Supabase → Postgres container on the VPS |
-| Caching | All three layers: API (Redis) + pages (SWR) + static (Caddy) |
-| Build/deploy | Build on server (multi-stage Dockerfile + `deploy.sh`), no registry/CD |
+| Deploy target | Existing VPS `72.62.3.239`, Docker Compose (keep project `app`, volumes, TLS) |
+| Deploy branch | `dev` (replaces `redesign/top-co-style`) |
+| Database | Migrate Supabase (live) → VPS Postgres container; switch `DATABASE_URL`; keep Supabase as backup |
+| Caching | All three: API (Redis) + pages (SWR) + static (Caddy) |
+| Build/deploy | Build on server (multi-stage Dockerfile + `deploy.sh`); 7.8 GB RAM is sufficient |
 
-### Assumptions to confirm at review
-- **Live data source of truth = Supabase.** Current `.env` `DATABASE_URL` points to `aws-1-eu-central-1.pooler.supabase.com`. Data is migrated **from Supabase**.
-- The target VPS is a **fresh** box. The old Vercel spec referenced a VPS at `72.62.3.239` with its own Postgres — that box is treated as **stale/abandoned**, not the data source. If `72.62.3.239` is actually the target server or holds newer data, the migration source must change.
-- We control DNS for `chayroom.uz` and can point A records to the new server IP.
+### Assumption confirmed at review
+- **Supabase is the source of truth for live data.** The VPS postgres container's contents are stale and will be **replaced**, not used as a source.
 
-## Architecture
+## Architecture (target)
 
 ```
-chayroom.uz, www.chayroom.uz   (DNS A → VPS IP)
+chayroom.uz, www.chayroom.uz   (DNS A → 72.62.3.239, already configured)
         │
-   Caddy  :80 / :443           — auto-HTTPS (Let's Encrypt), zstd/gzip,
-        │                         immutable cache headers for /_nuxt/*
-        └─→ Nuxt / Nitro :3000  — node-server preset, Docker container
-               ├─→ Postgres      — container, data restored from Supabase
+   Caddy  :80 / :443           — auto-HTTPS, zstd/gzip, immutable cache for /_nuxt/*
+        └─→ Nuxt / Nitro :3000  — node-server preset, multi-stage Docker build
+               ├─→ Postgres      — container, data imported from live Supabase
                └─→ Redis         — container, backs Nitro cache + SWR
 ```
 
-All services run via one `docker-compose.yml` on the VPS. Only Caddy exposes ports to the internet (80/443). Postgres and Redis are reachable only on the internal Docker network.
+Single `docker-compose.yml`, project `app`, unchanged volumes (`app_postgres_data` will be reset; `caddy_data` kept to avoid TLS re-issue).
 
 ## Components
 
-### 1. Server bootstrap (new Ubuntu)
-One-time host preparation, documented in `docs/deploy.md` and/or a `scripts/bootstrap-server.sh`:
-- `apt update && apt upgrade -y`
-- Install Docker Engine + Compose plugin (official `get.docker.com` script)
-- `ufw`: allow `22` (OpenSSH), `80`, `443`; deny everything else; enable
-- Create a **2–4 GB swapfile** (Nuxt build is memory-hungry; prevents OOM during `docker build`)
-- Create `/opt/chayroom`, clone the repo there, create the production `.env`
+### 1. Clean up the server deploy (git-driven)
+- In `/app`: fetch and switch to `dev` cleanly — `git fetch origin`, `git checkout dev`, `git reset --hard origin/dev`. `.env` is git-ignored and preserved.
+- Remove manual cruft no longer needed (`._.output`, `Caddyfile.old`, locally-built `.output`, `backup.sql` once cutover verified). Do not touch `.env`.
+- Keep the same compose **project name** (`app`) and the `caddy_data` volume so Let's Encrypt certs are not re-issued.
 
-### 2. Nitro preset + multi-stage Dockerfile
-- `nuxt.config.ts`: change `nitro.preset` from `'vercel'` → **`'node-server'`**. Output becomes `.output/server/index.mjs`, matching the container `CMD`.
-- Remove the `.vercel/` directory (no longer used).
-- Replace the current copy-only `Dockerfile` with a **multi-stage** build:
-
-```dockerfile
-# ---- build ----
-FROM node:22-alpine AS build
-WORKDIR /app
-RUN corepack enable
-ENV NODE_OPTIONS=--max-old-space-size=2048
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile
-COPY . .
-RUN pnpm run build
-
-# ---- runtime ----
-FROM node:22-alpine AS runtime
-WORKDIR /app
-ENV NODE_ENV=production
-COPY --from=build /app/.output ./.output
-EXPOSE 3000
-CMD ["node", ".output/server/index.mjs"]
-```
+### 2. Nitro preset + multi-stage Dockerfile (build on server)
+- `nuxt.config.ts` (in repo, `dev`): change `nitro.preset` from `'vercel'` → **`'node-server'`** so the multi-stage build produces `.output/server/index.mjs`.
+- Replace the copy-only `Dockerfile` with a **multi-stage** build (pnpm install + `nuxt build` → slim runtime). `NODE_OPTIONS=--max-old-space-size=2048`; keep `nitro.prerender.crawlLinks: false` (already set) to avoid the prior OOM.
+- Remove `.vercel/` from the repo.
 
 ### 3. docker-compose.yml updates
-- **postgres**: now actually used. Add a `healthcheck` (`pg_isready`); `POSTGRES_PASSWORD` from env; named volume for data; bound to internal network only.
-- **redis**: enable `--appendonly yes` and `--maxmemory-policy allkeys-lru`; named volume.
-- **nuxt**: `build: { context: ., target: runtime }`; `env_file: .env`; `depends_on` postgres + redis with `condition: service_healthy`.
-- **migrator** (new, `profiles: ["tools"]`): built from the `build` stage (has `drizzle-kit`), runs `pnpm db:migrate`. Used by `deploy.sh` to apply pending schema migrations. Not started in normal `up`.
-- **caddy**: unchanged service; Caddyfile updated (component 4c).
+- **postgres**: add `healthcheck` (`pg_isready`); `POSTGRES_PASSWORD` from `.env` (new known value — volume reset, see §5); keep `postgres_data` volume (reset once).
+- **redis**: `--appendonly yes --maxmemory-policy allkeys-lru`.
+- **nuxt**: `build: { context: ., target: runtime }`; `env_file: .env`; `depends_on` postgres + redis `condition: service_healthy`.
+- **migrator** (new, `profiles: ["tools"]`): from the `build` stage, runs `pnpm db:migrate`; invoked by `deploy.sh` for future schema changes.
+- **caddy**: unchanged service; Caddyfile updated (§4c).
 
 ### 4. Caching — three layers
 
 **(a) API responses — Redis-backed Nitro cache**
-- Configure `nitro.storage.cache` with the unstorage **redis** driver pointed at `REDIS_URL`. (Exact driver key/options verified against current Nitro docs via Context7 during implementation.)
-- Wrap public GET handlers with `defineCachedEventHandler` and a sensible `maxAge` + `getKey`:
-  - `server/api/courses/index.get.ts` — list, `maxAge` ~300s, keyed by query
-  - `server/api/courses/[slug].get.ts` — detail, ~300s, keyed by slug
-  - `server/api/guides/index.get.ts` — list, ~300s
-  - `server/api/guides/[slug].get.ts` — detail, ~300s
-  - `server/api/exchange-rate.get.ts` — ~3600s (external rate)
-  - **Not cached:** `server/api/auth/me.get.ts` (per-user).
-- **Invalidation:** after admin mutations, clear the relevant cached entries so edits show immediately:
-  - `courses/index.post.ts`, `courses/[slug].patch.ts` → clear courses cache keys
-  - `guides/index.post.ts`, `guides/[slug].patch.ts`, `guides/[slug].delete.ts` → clear guides cache keys
-  - A small `server/utils/cache.ts` helper centralizes key clearing (key namespace confirmed against Nitro docs).
+- Configure `nitro.storage.cache` with the unstorage **redis** driver from `REDIS_URL`. (Exact driver key/options confirmed against current Nitro docs via Context7 during implementation.)
+- Wrap public GET handlers with `defineCachedEventHandler` (+ `maxAge`, `getKey`):
+  - `courses/index.get.ts` (~300s), `courses/[slug].get.ts` (~300s)
+  - `guides/index.get.ts` (~300s), `guides/[slug].get.ts` (~300s)
+  - `exchange-rate.get.ts` (~3600s)
+  - **Not cached:** `auth/me.get.ts` (per-user).
+- **Invalidation** after admin mutations so edits show immediately, via a small `server/utils/cache.ts` helper:
+  - courses: `index.post.ts`, `[slug].patch.ts`
+  - guides: `index.post.ts`, `[slug].patch.ts`, `[slug].delete.ts`
 
 **(b) Public pages — SWR via `routeRules`**
-- Apply `swr` only to pages that render **no per-user data during SSR**:
+- `swr` only on pages with no per-user SSR data:
   - `/catalog`, `/community`, `/about-me`, `/rules` → `swr: 3600`
-  - `/guides`, `/guides/**` (list + detail) → `swr: 600`
-  - `/courses` (list) → `swr: 600`
-  - `/` stays `prerender: true` (current behavior)
-- Remain SSR (no SWR): `/dashboard`, `/profile`, `/admin/**`, `/login`, `/courses/*/lesson/*`, `/mini/**`.
-- ⚠️ `/courses/[slug]` detail: **verify before enabling SWR.** If it renders enrollment/purchase state during SSR, leave it SSR (a shared cached page must not leak one user's state to another). Enable SWR only if personalization is fully client-side.
+  - `/guides`, `/guides/**`, `/courses` (list) → `swr: 600`
+  - `/` stays `prerender: true`
+- Stay SSR (no SWR): `/dashboard`, `/profile`, `/admin/**`, `/login`, `/courses/*/lesson/*`, `/mini/**`.
+- ⚠️ `/courses/[slug]` detail: enable SWR **only after verifying** it renders no enrollment/purchase state during SSR (a shared cached page must not leak one user's state to another).
 
 **(c) Static assets — Caddy**
 ```caddyfile
@@ -113,60 +102,56 @@ chayroom.uz, www.chayroom.uz {
 	reverse_proxy nuxt:3000
 }
 ```
-Hashed `/_nuxt/*` assets get a 1-year immutable cache; everything else is proxied normally (HTML cache behavior governed by Nitro/SWR).
 
-### 5. Database migration: Supabase → VPS Postgres (one-time)
-- `scripts/migrate-db.sh`: run a dockerized `pg_dump` against Supabase (`--no-owner --no-privileges`) producing a single dump, then `psql`-restore it into the VPS `postgres` container.
-- ⚠️ `pg_dump` may require Supabase's **direct** connection string (not the transaction pooler currently in `.env`). Obtain the direct URL/password from the Supabase dashboard for the dump step.
-- Verify the Drizzle journal table (`__drizzle_migrations`) is included in the dump so future `db:migrate` runs are consistent.
-- **Keep Supabase intact** until the VPS deployment is fully verified — rollback = switch `DATABASE_URL` back to Supabase. Do not delete Supabase data during this change.
+### 5. Database cutover: Supabase → VPS Postgres (one-time, reversible)
+Order matters; Supabase stays untouched as rollback.
+1. **Set a known `POSTGRES_PASSWORD`** in the server `.env`.
+2. **Reset the stale postgres volume:** `docker compose stop postgres`, remove `app_postgres_data`, `docker compose up -d postgres` → fresh init with the known password and clean `chayroom` DB. (Safe: live data is on Supabase; the volume only holds the June-2 orphan.)
+3. **Dump live Supabase** — `public` schema only, `--no-owner --no-privileges` (we don't want Supabase `auth`/`storage` system schemas; the app uses Telegram auth + R2). May require Supabase's **direct** (non-pooler) connection string for `pg_dump` — obtain from the Supabase dashboard if the pooler refuses.
+4. **Restore** the dump into the VPS postgres `chayroom` DB. Ensure Drizzle's migration journal table is included so future `db:migrate` is consistent.
+5. **Verify parity** — compare row counts (courses, guides, users, subscriptions, categories, lessons, modules) between Supabase and the VPS DB.
+6. **Switch `DATABASE_URL`** in the server `.env` to `postgres://chayroom:${POSTGRES_PASSWORD}@postgres:5432/chayroom`; restart `nuxt`; smoke-test.
+7. **Keep Supabase intact**; rollback = point `DATABASE_URL` back.
 
-### 6. Secrets / environment
-- Add `.env.production.example` to the repo as a documented template (no secrets).
-- The real `.env` is created on the server only (already git-ignored).
-- Changes vs. the current dev `.env`:
-  - `DATABASE_URL=postgres://chayroom:${POSTGRES_PASSWORD}@postgres:5432/chayroom`
+### 6. Secrets / environment (server `.env`)
+- Add `.env.production.example` to the repo (documented template, no secrets).
+- Server `.env` changes:
+  - `DATABASE_URL` → local postgres (after §5 verification)
   - `REDIS_URL=redis://redis:6379`
   - `POSTGRES_PASSWORD=<strong>`
-  - `NUXT_PUBLIC_APP_URL=https://chayroom.uz`
   - `NODE_ENV=production`
-  - Keep existing R2, OpenAI, Telegram, Tribute, Sentry values.
-- ⚠️ External callbacks must point at the new domain:
-  - **Tribute** webhook → `https://chayroom.uz/api/tribute/webhook`
-  - **Telegram** bot domain / Mini App URL → `https://chayroom.uz`
+  - `NUXT_PUBLIC_APP_URL=https://chayroom.uz` (already set)
+- Note: the `dev` branch `.env`/runtimeConfig includes newer keys (Sentry server, Tribute tier URLs, Telegram web-app script) absent from the older deployed config — deploying `dev` brings these; confirm the server `.env` has the matching values.
+- ⚠️ External callbacks already on `chayroom.uz` (Tribute webhook, Telegram) — no change expected, verify after deploy.
 
-### 7. Deploy flow (`deploy.sh`)
+### 7. Deploy flow (`deploy.sh`, run on server in `/app`)
 ```sh
-git pull
+git fetch origin && git reset --hard origin/dev
 docker compose --profile tools run --rm migrator   # apply pending migrations
 docker compose up -d --build
 docker image prune -f
 ```
 
-### 8. DNS + TLS
-- Point `chayroom.uz` and `www.chayroom.uz` A records to the VPS IP.
-- Caddy provisions Let's Encrypt certificates automatically once DNS resolves and 80/443 are reachable. Ensure DNS has propagated before the first `docker compose up`.
-
 ## Risks & Rollback
 
 | Risk | Mitigation |
 |---|---|
-| Nuxt build OOM on small VPS | Swap file + `NODE_OPTIONS=--max-old-space-size` |
-| SWR leaks per-user data | Conservative page scoping; verify each SWR page renders no SSR user data |
-| DB migration failure / data loss | Supabase kept as live backup; `DATABASE_URL` revert is the rollback |
-| TLS not issued | Confirm DNS propagation + open 80/443 before `up` |
-| Wrong migration source (old VPS vs Supabase) | Confirmed at review: Supabase is source of truth |
+| DB cutover data loss | Supabase untouched; `DATABASE_URL` revert is instant rollback; verify parity before switch |
+| Dumping Supabase via pooler fails | Use Supabase direct connection string for `pg_dump` |
+| Build OOM | 7.8 GB RAM + swap + `NODE_OPTIONS`; prerender crawl already disabled |
+| SWR leaks per-user data | Conservative scoping; verify each SWR page renders no SSR user data |
+| TLS re-issue / downtime | Keep compose project `app` + `caddy_data` volume; deploy is rebuild-in-place |
+| `dev` config/env drift vs old deploy | Reconcile server `.env` keys against `dev` runtimeConfig before `up` |
 
 ## Out of Scope (keep it lean)
 - GitHub Actions CD / image registry (build-on-server chosen).
-- Additional monitoring/observability beyond existing Sentry.
-- Removing the local `postgres` container (it is now the production DB).
+- Monitoring beyond existing Sentry.
+- Migrating to a fresh server directory / new compose project (reuse `app`).
 
 ## Success Criteria
-- `docker compose up -d --build` brings up caddy + nuxt + postgres + redis; all healthy.
-- `https://chayroom.uz` serves the app with a valid Let's Encrypt certificate.
-- App reads/writes the VPS Postgres (data migrated from Supabase, parity verified).
-- Repeated requests to cached GET endpoints are served from Redis (cache HIT observable); admin edits invalidate and reflect immediately.
+- Server runs the current `dev` build; `https://chayroom.uz` serves it with a valid certificate.
+- App reads/writes the **VPS Postgres**; row counts match Supabase pre-cutover; Supabase retained as backup.
+- Cached GET endpoints serve from Redis on repeat (HIT observable); admin edits invalidate and reflect immediately.
 - SWR pages serve cached HTML and revalidate; no per-user data leaks across users.
-- `/_nuxt/*` responses carry `Cache-Control: public, max-age=31536000, immutable`; responses are compressed (zstd/gzip).
-- `deploy.sh` performs a full update (pull → migrate → rebuild) with no manual steps.
+- `/_nuxt/*` carry `Cache-Control: public, max-age=31536000, immutable`; responses compressed (zstd/gzip).
+- `deploy.sh` performs pull → migrate → rebuild with no manual steps.

@@ -62,3 +62,10 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 ## Renovate integration
 
 Install [Renovate GitHub app](https://github.com/apps/renovate/installations/select_target) on your repository and you are good to go.
+
+## Git workflow
+
+This project uses a `master` (production) + `dev` (integration) + short-lived `feature/*` branch model.
+
+- [BRANCHING_STRATEGY.md](./BRANCHING_STRATEGY.md) — which branches exist, naming conventions, and what belongs where.
+- [GIT_WORKFLOW.md](./GIT_WORKFLOW.md) — daily commands, commit conventions, PR rules, merge strategy, and releases.

@@ -15,8 +15,8 @@ export default defineEventHandler(async (event) => {
     endpoint: `https://${config.r2AccountId}.r2.cloudflarestorage.com`,
     credentials: {
       accessKeyId: config.r2AccessKeyId,
-      secretAccessKey: config.r2SecretAccessKey,
-    },
+      secretAccessKey: config.r2SecretAccessKey
+    }
   })
 
   const body = await readRawBody(event, false)
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     Bucket: config.r2BucketName,
     Key: key,
     Body: body,
-    ContentType: contentType,
+    ContentType: contentType
   }))
 
   return { publicUrl: `${config.r2PublicUrl}/${key}` }

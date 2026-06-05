@@ -3,14 +3,14 @@ const route = useRoute()
 
 const available = [
   {
-    label: "Qo'llanmalar",
+    label: 'Qo\'llanmalar',
     href: '/guides',
     icon: 'i-solar-notes-minimalistic-bold',
-    description: "Qisqa, foydali yozma materiallar. AI, vibe coding va no-code mavzularida.",
+    description: 'Qisqa, foydali yozma materiallar. AI, vibe coding va no-code mavzularida.',
     iconColor: '#f97316',
     iconBg: 'rgba(249,115,22,0.12)',
-    dim: false,
-  },
+    dim: false
+  }
 ]
 
 const soon = [
@@ -18,7 +18,7 @@ const soon = [
   { label: 'Skilllar', icon: 'i-ph-brain-fill', iconColor: '#eab308', iconBg: 'rgba(234,179,8,0.12)' },
   { label: 'Yuzkeyslar', icon: 'i-solar-bag-3-bold', iconColor: '#22c55e', iconBg: 'rgba(34,197,94,0.12)' },
   { label: 'Efirlar', icon: 'i-solar-video-frame-bold', iconColor: '#ec4899', iconBg: 'rgba(236,72,153,0.12)' },
-  { label: 'Vorkshoplar', icon: 'i-solar-users-group-rounded-bold', iconColor: '#06b6d4', iconBg: 'rgba(6,182,212,0.12)' },
+  { label: 'Vorkshoplar', icon: 'i-solar-users-group-rounded-bold', iconColor: '#06b6d4', iconBg: 'rgba(6,182,212,0.12)' }
 ]
 
 function isCurrentRoute(href: string) {
@@ -34,8 +34,21 @@ function isCurrentRoute(href: string) {
         <h1 class="font-inter-display text-[60px] max-md:text-[36px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#1a1a1a] mb-3">
           <span class="relative inline-block">
             Materiallar
-            <svg class="absolute -bottom-1 left-[-1%] w-[102%] overflow-visible" viewBox="0 0 600 18" preserveAspectRatio="none" fill="none" aria-hidden="true">
-              <path d="M10,12 C150,2 450,2 590,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="vector-effect:non-scaling-stroke" />
+            <svg
+              class="absolute -bottom-1 left-[-1%] w-[102%] overflow-visible"
+              viewBox="0 0 600 18"
+              preserveAspectRatio="none"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M10,12 C150,2 450,2 590,12"
+                stroke="#3480f1"
+                stroke-width="5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="vector-effect:non-scaling-stroke"
+              />
             </svg>
           </span>
         </h1>
@@ -46,7 +59,6 @@ function isCurrentRoute(href: string) {
     </div>
 
     <div class="mx-auto w-[1240px] max-w-[calc(100vw-40px)] py-10 max-md:py-8">
-
       <!-- All formats in one grid -->
       <div class="grid grid-cols-4 max-md:grid-cols-1 gap-4">
         <NuxtLink
@@ -100,7 +112,11 @@ function isCurrentRoute(href: string) {
             class="w-16 h-16 rounded-2xl flex items-center justify-center"
             :style="{ background: item.iconBg }"
           >
-            <UIcon :name="item.icon" class="size-8" :style="{ color: item.iconColor }" />
+            <UIcon
+              :name="item.icon"
+              class="size-8"
+              :style="{ color: item.iconColor }"
+            />
           </div>
           <div class="flex items-center justify-between">
             <span class="text-[20px] font-bold text-[#14161f]">{{ item.label }}</span>
@@ -108,7 +124,6 @@ function isCurrentRoute(href: string) {
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>

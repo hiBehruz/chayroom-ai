@@ -76,7 +76,7 @@ export const useAuthStore = defineStore('auth', () => {
   const tariffLabel = computed(() => {
     if (!subscriptionPeriod.value) return null
     const map: Record<string, string> = {
-      monthly: 'AI Room Club — 1 oy',
+      'monthly': 'AI Room Club — 1 oy',
       '3month': 'AI Room Club — 3 oy',
       '6month': 'AI Room Club — 6 oy'
     }

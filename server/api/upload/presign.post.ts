@@ -22,8 +22,8 @@ export default defineEventHandler(async (event) => {
     endpoint: `https://${config.r2AccountId}.r2.cloudflarestorage.com`,
     credentials: {
       accessKeyId: config.r2AccessKeyId,
-      secretAccessKey: config.r2SecretAccessKey,
-    },
+      secretAccessKey: config.r2SecretAccessKey
+    }
   })
 
   const folder = contentType.startsWith('image/') ? 'images' : 'lessons'
@@ -32,13 +32,13 @@ export default defineEventHandler(async (event) => {
   const command = new PutObjectCommand({
     Bucket: config.r2BucketName,
     Key: key,
-    ContentType: contentType,
+    ContentType: contentType
   })
 
   const uploadUrl = await getSignedUrl(client, command, { expiresIn: 900 })
 
   return {
     uploadUrl,
-    publicUrl: `${config.r2PublicUrl}/${key}`,
+    publicUrl: `${config.r2PublicUrl}/${key}`
   }
 })

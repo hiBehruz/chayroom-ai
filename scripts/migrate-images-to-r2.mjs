@@ -12,7 +12,7 @@ const sql = postgres(DATABASE_URL)
 const s3 = new S3Client({
   region: 'auto',
   endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: { accessKeyId: R2_ACCESS_KEY_ID, secretAccessKey: R2_SECRET_ACCESS_KEY },
+  credentials: { accessKeyId: R2_ACCESS_KEY_ID, secretAccessKey: R2_SECRET_ACCESS_KEY }
 })
 
 function base64ToBuffer(dataUrl) {
@@ -29,7 +29,7 @@ async function uploadToR2(buffer, mime, ext, index) {
     Bucket: R2_BUCKET_NAME,
     Key: key,
     Body: buffer,
-    ContentType: mime,
+    ContentType: mime
   }))
   return `${R2_PUBLIC_URL}/${key}`
 }

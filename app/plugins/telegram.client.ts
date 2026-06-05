@@ -1,4 +1,4 @@
-const DEV_MOCK: typeof window.Telegram = {
+const DEV_MOCK = {
   WebApp: {
     initData: 'test',
     initDataUnsafe: {
@@ -8,8 +8,8 @@ const DEV_MOCK: typeof window.Telegram = {
     expand: () => {},
     BackButton: { show: () => {}, hide: () => {}, onClick: () => {}, offClick: () => {} },
     MainButton: { show: () => {}, hide: () => {}, setText: () => {}, onClick: () => {}, offClick: () => {} }
-  } as any
-}
+  }
+} as unknown as typeof window.Telegram
 
 export default defineNuxtPlugin(() => {
   const port = window.location.port

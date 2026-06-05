@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 
-const error = useError()
+useError()
 
 function goHome() {
   clearError({ redirect: '/' })

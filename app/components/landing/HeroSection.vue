@@ -4,7 +4,7 @@ import gsap from 'gsap'
 
 const keywords = [
   'Amaliy vositalar',
-  "Kurslar va qo'llanmalar",
+  'Kurslar va qo\'llanmalar',
   'Yopiq chat AI Room Club',
   'AI olamidan yangi trendlar',
   'Jonli efirlar va workshoplar',
@@ -27,16 +27,19 @@ onMounted(() => {
 
 onUnmounted(() => clearInterval(keywordInterval))
 
-function scrollToPricing()  { document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' }) }
-function scrollToFeatures() { document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth' }) }
+function scrollToFeatures() {
+  document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth' })
+}
 </script>
 
 <template>
   <section class="hero-section pt-0 pb-0">
     <div class="relative z-10 w-310 max-w-[calc(100vw-40px)] mx-auto px-0 max-md:px-4">
-
       <!-- Centered text -->
-      <div ref="heroText" class="relative z-10 flex flex-col items-center text-center gap-5 py-24 max-[734px]:py-12">
+      <div
+        ref="heroText"
+        class="relative z-10 flex flex-col items-center text-center gap-5 py-24 max-[734px]:py-12"
+      >
         <h1 class="hero-title flex flex-col items-center text-[80px] max-[734px]:text-[24px] font-semibold font-inter-display leading-22 tracking-[-1.6px] max-[734px]:leading-[1.1] max-[734px]:tracking-[-0.03em]">
           <span class="hero-title-line flex items-baseline justify-center gap-[0.16em]">
             <span class="hero-title-lockup relative inline-block max-[734px]:shrink-0 max-[734px]:whitespace-nowrap">
@@ -50,7 +53,14 @@ function scrollToFeatures() { document.querySelector('#features')?.scrollIntoVie
                 fill="none"
                 aria-hidden="true"
               >
-                <path class="hero-underline-path" d="M10,12 C150,2 450,2 590,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  class="hero-underline-path"
+                  d="M10,12 C150,2 450,2 590,12"
+                  stroke="#3480f1"
+                  stroke-width="5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </span>
             <span class="hero-title-gradient max-[734px]:shrink-0 max-[734px]:whitespace-nowrap">sun'iy intellekt</span>
@@ -59,12 +69,21 @@ function scrollToFeatures() { document.querySelector('#features')?.scrollIntoVie
         </h1>
 
         <div class="mt-8 grid min-h-8 grid-cols-[auto_320px] items-center justify-center gap-x-8 gap-y-2 max-[734px]:mt-5 max-[734px]:grid-cols-1">
-          <button class="hero-link-btn hero-link-btn--blue ml-3 max-[734px]:ml-0" @click="scrollToFeatures">
-            <UIcon name="i-lucide-sparkles" class="size-4.5 shrink-0" />
+          <button
+            class="hero-link-btn hero-link-btn--blue ml-3 max-[734px]:ml-0"
+            @click="scrollToFeatures"
+          >
+            <UIcon
+              name="i-lucide-sparkles"
+              class="size-4.5 shrink-0"
+            />
             Meni nima kutadi →
           </button>
           <div class="flex items-center justify-center overflow-hidden">
-            <Transition name="keyword" mode="out-in">
+            <Transition
+              name="keyword"
+              mode="out-in"
+            >
               <span
                 :key="keywords[currentKeyword]"
                 class="keyword-pill"
@@ -75,7 +94,6 @@ function scrollToFeatures() { document.querySelector('#features')?.scrollIntoVie
           </div>
         </div>
       </div>
-
     </div>
   </section>
 </template>

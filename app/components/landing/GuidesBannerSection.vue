@@ -20,15 +20,29 @@ onMounted(() => {
   >
     <!-- Top arch -->
     <div class="absolute top-0 left-0 right-0 pointer-events-none select-none">
-      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" class="w-full h-20">
-        <path d="M0,80 Q720,0 1440,80 L1440,0 L0,0 Z" fill="#fffdf9"/>
+      <svg
+        viewBox="0 0 1440 80"
+        preserveAspectRatio="none"
+        class="w-full h-20"
+      >
+        <path
+          d="M0,80 Q720,0 1440,80 L1440,0 L0,0 Z"
+          fill="#fffdf9"
+        />
       </svg>
     </div>
 
     <!-- Bottom arch -->
     <div class="absolute bottom-0 left-0 right-0 pointer-events-none select-none">
-      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" class="w-full h-20">
-        <path d="M0,0 Q720,80 1440,0 L1440,80 L0,80 Z" fill="#fffdf9"/>
+      <svg
+        viewBox="0 0 1440 80"
+        preserveAspectRatio="none"
+        class="w-full h-20"
+      >
+        <path
+          d="M0,0 Q720,80 1440,0 L1440,80 L0,80 Z"
+          fill="#fffdf9"
+        />
       </svg>
     </div>
 

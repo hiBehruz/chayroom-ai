@@ -8,49 +8,19 @@ const { isMiniApp } = useTelegramApp()
 authStore.restoreFromStorage()
 
 const user = computed(() => authStore.user)
-const hasSubscription = computed(() => authStore.hasSubscription)
 const hasCourseAccess = computed(() => Boolean(user.value))
 const isAccessModalOpen = ref(false)
-
-const stats = [
-  { label: 'Kurslar', value: '2', icon: 'i-lucide-book-open', iconColor: 'text-cx-blue' },
-  { label: "O'tilgan darslar", value: '31 / 38', icon: 'i-lucide-circle-check', iconColor: 'text-green-500' },
-  { label: "O'qish soatlari", value: '8h', icon: 'i-lucide-clock', iconColor: 'text-yellow-500' },
-  { label: 'Sertifikatlar', value: '0', icon: 'i-lucide-timer', iconColor: 'text-purple-500' },
-]
-
-const courses = [
-  {
-    title: 'Hermes asosida AI agent yaratish va sozlash',
-    desc: "Bu kursda biz noldan agent yaratamiz, unga ko'nikmalar va yaxshilanishlar qo'shamiz.",
-    tags: ['AI', 'AI agent', 'Hermes'],
-    slug: 'hermes-ai-agent',
-    bg: '#3480f1',
-    dark: false,
-    accentColor: '#3480f1',
-    progress: 0,
-  },
-  {
-    title: 'Vibe coding noldan',
-    desc: "Kod bilmasdan kerakli digital yechimlar: saytlar, vositalar va ilovalarni yaratish.",
-    tags: ['Vibe coding'],
-    slug: 'vibe-coding',
-    bg: '#0d1117',
-    dark: true,
-    accentColor: '#f97316',
-    progress: 100,
-  },
-]
-
 
 useSeoMeta({ title: 'Panel — Chayroom AI' })
 </script>
 
 <template>
   <MiniAppDashboard v-if="isMiniApp" />
-  <div v-else class="min-h-screen bg-cx-surface">
+  <div
+    v-else
+    class="min-h-screen bg-cx-surface"
+  >
     <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 py-8 max-md:px-4">
-
       <!-- Paywall CTA — tepada, obuna yo'q bo'lganda -->
       <div
         v-if="!user"
@@ -77,7 +47,10 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
             to="/login"
             class="hero-link-btn hero-link-btn--blue paywall-btn max-md:self-center"
           >
-            <UIcon name="i-lucide-sparkles" class="size-4.5 shrink-0" />
+            <UIcon
+              name="i-lucide-sparkles"
+              class="size-4.5 shrink-0"
+            />
             To'liq kirish huquqini olish
           </NuxtLink>
           <p class="mt-3 text-[13px] text-cx-muted">
@@ -88,86 +61,149 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
 
       <!-- Dashboard content — deactive when no subscription -->
       <div :class="!hasCourseAccess ? 'opacity-40 grayscale pointer-events-none select-none' : ''">
+        <!-- Welcome -->
+        <div class="mb-7 text-center">
+          <h1 class="font-inter-display text-[60px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#1a1a1a] max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px]">
+            <span class="relative inline-block">Привет,<svg
+              class="absolute -bottom-1 left-[-1%] w-[102%] overflow-visible"
+              viewBox="0 0 600 18"
+              preserveAspectRatio="none"
+              fill="none"
+              aria-hidden="true"
+            ><path
+              d="M10,12 C150,2 450,2 590,12"
+              stroke="#3480f1"
+              stroke-width="5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="vector-effect:non-scaling-stroke"
+            /></svg></span> {{ user?.first_name }} 👋🏻
+          </h1>
+          <p class="text-[15px] text-cx-muted mt-3">
+            Bu yerda kurslar, qo'llanmalar va hamjamiyatingiz — barchasi bir joyda.
+          </p>
+        </div>
 
-      <!-- Welcome -->
-      <div class="mb-7 text-center">
-        <h1 class="font-inter-display text-[60px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#1a1a1a] max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px]">
-          <span class="relative inline-block">Привет,<svg class="absolute -bottom-1 left-[-1%] w-[102%] overflow-visible" viewBox="0 0 600 18" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M10,12 C150,2 450,2 590,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="vector-effect:non-scaling-stroke"/></svg></span> {{ user?.first_name }} 👋🏻
-        </h1>
-        <p class="text-[15px] text-cx-muted mt-3">Bu yerda kurslar, qo'llanmalar va hamjamiyatingiz — barchasi bir joyda.</p>
-      </div>
+        <div class="h-px bg-[#e8e6e1] mb-10 max-md:mb-8" />
 
-      <div class="h-px bg-[#e8e6e1] mb-10 max-md:mb-8" />
-
-      <!-- Main grid: Telegram + Courses + Progress -->
-      <div class="grid grid-cols-4 gap-5 mb-8 max-md:grid-cols-1">
-
-        <!-- Про наше сообщество -->
-        <NuxtLink to="/community" class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer">
-          <div class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl" style="background:rgba(52,128,241,0.15)">
-            <UIcon name="i-solar-users-group-rounded-bold" class="icon-bounce size-8" style="color:#3480f1" />
-          </div>
-          <div>
-            <div class="flex items-start justify-between gap-2 mb-1">
-              <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
-                Bizning club
-              </h2>
-              <UIcon name="i-lucide-arrow-right" class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200" />
+        <!-- Main grid: Telegram + Courses + Progress -->
+        <div class="grid grid-cols-4 gap-5 mb-8 max-md:grid-cols-1">
+          <!-- Про наше сообщество -->
+          <NuxtLink
+            to="/community"
+            class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer"
+          >
+            <div
+              class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl"
+              style="background:rgba(52,128,241,0.15)"
+            >
+              <UIcon
+                name="i-solar-users-group-rounded-bold"
+                class="icon-bounce size-8"
+                style="color:#3480f1"
+              />
             </div>
-            <p class="text-[13px] text-cx-muted leading-snug">Klub qanday ishlashi va nimalar borligini bilib oling.</p>
-          </div>
-        </NuxtLink>
-
-        <!-- Наши правила -->
-        <NuxtLink to="/rules" class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer">
-          <div class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl" style="background:rgba(34,197,94,0.15)">
-            <UIcon name="i-solar-shield-bold" class="icon-bounce size-8" style="color:#22c55e" />
-          </div>
-          <div>
-            <div class="flex items-start justify-between gap-2 mb-1">
-              <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
-                Qoidalar
-              </h2>
-              <UIcon name="i-lucide-arrow-right" class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200" />
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
+                  Bizning club
+                </h2>
+                <UIcon
+                  name="i-lucide-arrow-right"
+                  class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200"
+                />
+              </div>
+              <p class="text-[13px] text-cx-muted leading-snug">Klub qanday ishlashi va nimalar borligini bilib oling.</p>
             </div>
-            <p class="text-[13px] text-cx-muted leading-snug">Jamoatchilik qoidalari, ikki daqiqada o'qiladi.</p>
-          </div>
-        </NuxtLink>
+          </NuxtLink>
 
-        <!-- Расскажите о себе -->
-        <NuxtLink to="/about-me" class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer">
-          <div class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl" style="background:rgba(20,184,166,0.12)">
-            <UIcon name="i-solar-user-speak-bold" class="icon-bounce size-8" style="color:#14b8a6" />
-          </div>
-          <div>
-            <div class="flex items-start justify-between gap-2 mb-1">
-              <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
-                O'zingiz haqingizda
-              </h2>
-              <UIcon name="i-lucide-arrow-right" class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200" />
+          <!-- Наши правила -->
+          <NuxtLink
+            to="/rules"
+            class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer"
+          >
+            <div
+              class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl"
+              style="background:rgba(34,197,94,0.15)"
+            >
+              <UIcon
+                name="i-solar-shield-bold"
+                class="icon-bounce size-8"
+                style="color:#22c55e"
+              />
             </div>
-            <p class="text-[13px] text-cx-muted leading-snug">Maqsadlaringizni ko'rsating, mos materiallar topamiz.</p>
-          </div>
-        </NuxtLink>
-
-        <!-- Первый материал -->
-        <NuxtLink to="/materials" class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer">
-          <div class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl" style="background:rgba(245,158,11,0.12)">
-            <UIcon name="i-solar-notes-minimalistic-bold" class="icon-bounce size-8" style="color:#f59e0b" />
-          </div>
-          <div>
-            <div class="flex items-start justify-between gap-2 mb-1">
-              <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
-                Birinchi material
-              </h2>
-              <UIcon name="i-lucide-arrow-right" class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200" />
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
+                  Qoidalar
+                </h2>
+                <UIcon
+                  name="i-lucide-arrow-right"
+                  class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200"
+                />
+              </div>
+              <p class="text-[13px] text-cx-muted leading-snug">Jamoatchilik qoidalari, ikki daqiqada o'qiladi.</p>
             </div>
-            <p class="text-[13px] text-cx-muted leading-snug">Boshlash uchun tavsiya etilgan qo'llanma.</p>
-          </div>
-        </NuxtLink>
+          </NuxtLink>
 
-      </div>
+          <!-- Расскажите о себе -->
+          <NuxtLink
+            to="/about-me"
+            class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer"
+          >
+            <div
+              class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl"
+              style="background:rgba(20,184,166,0.12)"
+            >
+              <UIcon
+                name="i-solar-user-speak-bold"
+                class="icon-bounce size-8"
+                style="color:#14b8a6"
+              />
+            </div>
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
+                  O'zingiz haqingizda
+                </h2>
+                <UIcon
+                  name="i-lucide-arrow-right"
+                  class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200"
+                />
+              </div>
+              <p class="text-[13px] text-cx-muted leading-snug">Maqsadlaringizni ko'rsating, mos materiallar topamiz.</p>
+            </div>
+          </NuxtLink>
 
+          <!-- Первый материал -->
+          <NuxtLink
+            to="/materials"
+            class="group rounded-2xl bg-[#f7f5ef] p-6 flex flex-col justify-between border border-transparent hover:border-[#e8e6e1] hover:shadow-[0_4px_24px_rgba(52,128,241,0.09)] transition-all duration-200 h-66 max-md:h-auto max-md:gap-6 cursor-pointer"
+          >
+            <div
+              class="icon-wrap w-16 h-16 flex items-center justify-center rounded-2xl"
+              style="background:rgba(245,158,11,0.12)"
+            >
+              <UIcon
+                name="i-solar-notes-minimalistic-bold"
+                class="icon-bounce size-8"
+                style="color:#f59e0b"
+              />
+            </div>
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <h2 class="font-inter-display text-[20px] font-semibold leading-[1.1] tracking-[-0.01em] text-[#14161f] group-hover:text-[#3480f1] transition-colors duration-200">
+                  Birinchi material
+                </h2>
+                <UIcon
+                  name="i-lucide-arrow-right"
+                  class="size-5 shrink-0 mt-1 text-[#bbb] group-hover:text-[#3480f1] group-hover:translate-x-0.5 transition-all duration-200"
+                />
+              </div>
+              <p class="text-[13px] text-cx-muted leading-snug">Boshlash uchun tavsiya etilgan qo'llanma.</p>
+            </div>
+          </NuxtLink>
+        </div>
       </div><!-- end dashboard content -->
     </div>
 

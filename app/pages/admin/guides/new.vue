@@ -8,15 +8,15 @@ const DRAFT_KEY = 'guide-draft-new'
 
 const title = ref('')
 const desc = ref('')
-const badge = ref("qo'llanma")
+const badge = ref('qo\'llanma')
 const category = ref('Claude')
 const free = ref(false)
 const level = ref('Yangi boshlagan')
 const levelOptions = [
-  { label: 'Yangi boshlagan', color: '#10b981', icon: 'i-lucide-sprout',      desc: 'Faqat tanishishni boshlamoqda' },
-  { label: "O'rta",           color: '#f59e0b', icon: 'i-lucide-bar-chart-2', desc: 'Vositalarni biladi, vaqti-vaqti bilan ishlatadi' },
-  { label: 'Tajribali',       color: '#8b5cf6', icon: 'i-lucide-flame',       desc: 'Muntazam ishlaydi, loyihalarga tatbiq etadi' },
-  { label: 'Professional',    color: '#8b5cf6', icon: 'i-lucide-rocket',      desc: "O'z yechimlarini yaratadi va avtomatlashtiradi" },
+  { label: 'Yangi boshlagan', color: '#10b981', icon: 'i-lucide-sprout', desc: 'Faqat tanishishni boshlamoqda' },
+  { label: 'O\'rta', color: '#f59e0b', icon: 'i-lucide-bar-chart-2', desc: 'Vositalarni biladi, vaqti-vaqti bilan ishlatadi' },
+  { label: 'Tajribali', color: '#8b5cf6', icon: 'i-lucide-flame', desc: 'Muntazam ishlaydi, loyihalarga tatbiq etadi' },
+  { label: 'Professional', color: '#8b5cf6', icon: 'i-lucide-rocket', desc: 'O\'z yechimlarini yaratadi va avtomatlashtiradi' }
 ]
 const content = ref('')
 const contentTab = ref<'editor' | 'notion'>('editor')
@@ -44,7 +44,7 @@ async function onZipPick(e: Event) {
     const htmlFile = Object.values(zip.files).find(
       f => !f.dir && f.name.endsWith('.html') && !f.name.includes('/')
     )
-    if (!htmlFile) throw new Error("HTML fayl topilmadi. Notion 'HTML' formatida eksport qiling.")
+    if (!htmlFile) throw new Error('HTML fayl topilmadi. Notion \'HTML\' formatida eksport qiling.')
 
     const htmlText = await htmlFile.async('text')
 
@@ -54,21 +54,27 @@ async function onZipPick(e: Event) {
 
     // Replace all relative img src with base64 data URLs
     const imgEls = Array.from(doc.querySelectorAll('img'))
-    await Promise.all(imgEls.map(async img => {
+    await Promise.all(imgEls.map(async (img) => {
       const src = img.getAttribute('src') ?? ''
       if (src.startsWith('data:') || src.startsWith('http')) return
 
       // Decode URI and find in zip (path may be like "PageName/image.png")
       const decoded = decodeURIComponent(src)
       const zipEntry = zip.file(decoded) ?? zip.file(src)
-      if (!zipEntry) { img.remove(); return }
+      if (!zipEntry) {
+        img.remove()
+        return
+      }
 
       const blob = await zipEntry.async('uint8array')
       const ext = src.split('.').pop()?.toLowerCase() ?? 'png'
-      const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg'
-        : ext === 'gif' ? 'image/gif'
-        : ext === 'webp' ? 'image/webp'
-        : 'image/png'
+      const mime = ext === 'jpg' || ext === 'jpeg'
+        ? 'image/jpeg'
+        : ext === 'gif'
+          ? 'image/gif'
+          : ext === 'webp'
+            ? 'image/webp'
+            : 'image/png'
       const b64 = btoa(String.fromCharCode(...blob))
       img.setAttribute('src', `data:${mime};base64,${b64}`)
       img.removeAttribute('class')
@@ -85,7 +91,10 @@ async function onZipPick(e: Event) {
 
     zipStatus.value = 'success'
     zipMessage.value = `${imgEls.length} rasm bilan import qilindi`
-    setTimeout(() => { contentTab.value = 'editor'; zipStatus.value = 'idle' }, 2000)
+    setTimeout(() => {
+      contentTab.value = 'editor'
+      zipStatus.value = 'idle'
+    }, 2000)
   } catch (err: unknown) {
     zipStatus.value = 'error'
     zipMessage.value = err instanceof Error ? err.message : 'Xatolik yuz berdi'
@@ -112,19 +121,19 @@ function cleanNotionHtml(html: string): string {
       h2: i => `<h2>${i}</h2>\n`,
       h3: i => `<h3>${i}</h3>\n`,
       h4: i => `<h4>${i}</h4>\n`,
-      p:  i => i.trim() ? `<p>${i}</p>\n` : '',
+      p: i => i.trim() ? `<p>${i}</p>\n` : '',
       ul: i => `<ul>\n${i}</ul>\n`,
       ol: i => `<ol>\n${i}</ol>\n`,
       li: i => `  <li>${i}</li>\n`,
       strong: i => `<strong>${i}</strong>`,
-      b:      i => `<strong>${i}</strong>`,
+      b: i => `<strong>${i}</strong>`,
       em: i => `<em>${i}</em>`,
-      i:  i => `<em>${i}</em>`,
+      i: i => `<em>${i}</em>`,
       code: i => `<code>${i}</code>`,
-      pre:  i => `<pre><code>${i.replace(/<[^>]+>/g, '')}</code></pre>\n`,
+      pre: i => `<pre><code>${i.replace(/<[^>]+>/g, '')}</code></pre>\n`,
       blockquote: i => `<blockquote>${i}</blockquote>\n`,
       br: () => `<br>`,
-      a:  (i, e) => `<a href="${e.getAttribute('href') ?? ''}">${i}</a>`,
+      a: (i, e) => `<a href="${e.getAttribute('href') ?? ''}">${i}</a>`
     }
 
     if (keep[tag]) return keep[tag](inner, el)
@@ -166,8 +175,6 @@ function onNotionPaste(e: ClipboardEvent) {
   }, 1800)
 }
 
-const categories = ['Claude', 'ChatGPT', 'AI-agentlar', 'Kontent']
-
 const slug = computed(() =>
   title.value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-')
 )
@@ -175,15 +182,14 @@ const slugError = computed(() =>
   slug.value && guidesStore.slugExists(slug.value) ? 'Bu slug allaqachon mavjud' : ''
 )
 
-
 const accent = ref('#e8b97a')
 const bgPresets = [
   { label: 'Sariq', value: '#f5ede0', dark: false },
   { label: 'Moviy', value: '#3480f1', dark: false },
   { label: 'Yashil', value: '#f0fdf4', dark: false },
   { label: 'Qora', value: '#111111', dark: true },
-  { label: "To'q ko'k", value: '#0d1117', dark: true },
-  { label: "To'q yashil", value: '#0d1f1a', dark: true },
+  { label: 'To\'q ko\'k', value: '#0d1117', dark: true },
+  { label: 'To\'q yashil', value: '#0d1f1a', dark: true }
 ]
 const defaultBg = bgPresets[0]?.value ?? '#f5ede0'
 const bg = ref(defaultBg)
@@ -215,7 +221,9 @@ onMounted(() => {
       if (typeof d.bgDark === 'boolean') bgDark.value = d.bgDark
       if (d.previewImage) previewImage.value = d.previewImage
     }
-  } catch {}
+  } catch {
+    return
+  }
 })
 
 watch(
@@ -228,7 +236,9 @@ watch(
         accent: accent.value, bg: bg.value,
         bgDark: bgDark.value, previewImage: previewImage.value
       }))
-    } catch {}
+    } catch {
+      return
+    }
   },
   { deep: true }
 )
@@ -253,7 +263,7 @@ async function onImagePick(e: Event) {
     const res = await fetch('/api/upload/image', {
       method: 'POST',
       body: file,
-      headers: { 'Content-Type': file.type || 'image/jpeg', 'X-Filename': name },
+      headers: { 'Content-Type': file.type || 'image/jpeg', 'X-Filename': name }
     })
     if (!res.ok) throw new Error(await res.text() || `Server xatosi: ${res.status}`)
     const { publicUrl } = await res.json()
@@ -266,7 +276,10 @@ async function onImagePick(e: Event) {
 }
 
 function removeImage() {
-  if (localObjectUrl.value) { URL.revokeObjectURL(localObjectUrl.value); localObjectUrl.value = '' }
+  if (localObjectUrl.value) {
+    URL.revokeObjectURL(localObjectUrl.value)
+    localObjectUrl.value = ''
+  }
   previewImage.value = ''
   if (imageInputRef.value) imageInputRef.value.value = ''
 }
@@ -308,7 +321,7 @@ async function save() {
     await guidesStore.fetch(true)
     navigateTo(`/guides/${(result as { slug: string }).slug}`)
   } catch (e: unknown) {
-    const msg = (e as { data?: { message?: string }; message?: string })?.data?.message
+    const msg = (e as { data?: { message?: string }, message?: string })?.data?.message
       ?? (e as { message?: string })?.message
       ?? 'Saqlashda xatolik yuz berdi'
     errors.value = [msg]
@@ -318,12 +331,11 @@ async function save() {
   }
 }
 
-useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
+useSeoMeta({ title: 'Qo\'llanma qo\'shish — Admin' })
 </script>
 
 <template>
   <div class="min-h-screen bg-white">
-
     <!-- Top bar -->
     <div class="sticky top-0 z-30 bg-white border-b border-cx-line">
       <div class="w-310 max-w-[calc(100vw-40px)] mx-auto px-0 h-14 flex items-center justify-between">
@@ -332,11 +344,17 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
             to="/guides"
             class="grid size-8 place-items-center rounded-lg border border-cx-line text-cx-muted hover:text-cx-ink hover:border-cx-ink transition-colors"
           >
-            <UIcon name="i-lucide-arrow-left" class="size-4" />
+            <UIcon
+              name="i-lucide-arrow-left"
+              class="size-4"
+            />
           </NuxtLink>
           <div class="h-4 w-px bg-cx-line" />
           <div class="flex items-center gap-2 text-[13px]">
-            <NuxtLink to="/guides" class="text-cx-muted hover:text-cx-ink transition-colors">Qo'llanmalar</NuxtLink>
+            <NuxtLink
+              to="/guides"
+              class="text-cx-muted hover:text-cx-ink transition-colors"
+            >Qo'llanmalar</NuxtLink>
             <span class="text-cx-faint">/</span>
             <span class="text-cx-ink font-semibold">Yangi qo'llanma</span>
           </div>
@@ -353,8 +371,16 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
             :disabled="saving"
             @click="save"
           >
-            <UIcon v-if="saving" name="i-lucide-loader-circle" class="size-4 animate-spin" />
-            <UIcon v-else name="i-lucide-cloud-upload" class="size-4" />
+            <UIcon
+              v-if="saving"
+              name="i-lucide-loader-circle"
+              class="size-4 animate-spin"
+            />
+            <UIcon
+              v-else
+              name="i-lucide-cloud-upload"
+              class="size-4"
+            />
             {{ saving ? 'Saqlanmoqda...' : 'Nashr qilish' }}
           </button>
         </div>
@@ -362,30 +388,45 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
     </div>
 
     <div class="w-310 max-w-[calc(100vw-40px)] mx-auto px-0 py-8">
-
       <!-- Page heading -->
       <div class="mb-7">
-        <h1 class="text-[50px] font-extrabold tracking-tight text-[#1a1a1a]">Yangi qo'llanma qo'shish</h1>
-        <p class="text-cx-muted text-[13px] mt-1">Barcha maydonlarni to'ldiring — qo'llanma darhol saytda ko'rinadi.</p>
+        <h1 class="text-[50px] font-extrabold tracking-tight text-[#1a1a1a]">
+          Yangi qo'llanma qo'shish
+        </h1>
+        <p class="text-cx-muted text-[13px] mt-1">
+          Barcha maydonlarni to'ldiring — qo'llanma darhol saytda ko'rinadi.
+        </p>
       </div>
 
       <!-- Errors -->
-      <div v-if="errors.length" class="mb-6 rounded-2xl bg-red-50 border border-red-200 p-4">
+      <div
+        v-if="errors.length"
+        class="mb-6 rounded-2xl bg-red-50 border border-red-200 p-4"
+      >
         <div class="flex items-start gap-2.5">
-          <UIcon name="i-lucide-circle-alert" class="size-4 text-red-500 shrink-0 mt-0.5" />
+          <UIcon
+            name="i-lucide-circle-alert"
+            class="size-4 text-red-500 shrink-0 mt-0.5"
+          />
           <div>
-            <p class="text-[13px] font-bold text-red-600 mb-1.5">Xatoliklarni to'g'rilang:</p>
+            <p class="text-[13px] font-bold text-red-600 mb-1.5">
+              Xatoliklarni to'g'rilang:
+            </p>
             <ul class="flex flex-col gap-1">
-              <li v-for="e in errors" :key="e" class="text-[12px] text-red-500">— {{ e }}</li>
+              <li
+                v-for="e in errors"
+                :key="e"
+                class="text-[12px] text-red-500"
+              >
+                — {{ e }}
+              </li>
             </ul>
           </div>
         </div>
       </div>
 
       <div class="grid grid-cols-[1fr_320px] gap-6 items-start">
-
         <div class="flex flex-col gap-4">
-
           <!-- 01 · Basic info -->
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-6 py-4 border-b border-cx-line flex items-center gap-3">
@@ -393,7 +434,6 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
               <span class="text-[14px] font-bold text-[#1a1a1a]">Asosiy ma'lumotlar</span>
             </div>
             <div class="p-6 flex flex-col gap-5">
-
               <!-- Title -->
               <div>
                 <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2">Sarlavha *</label>
@@ -402,12 +442,21 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                   type="text"
                   placeholder="Masalan: ChatGPT bilan professional ishlash"
                   class="w-full px-4 py-3 rounded-xl border border-cx-line bg-white text-[15px] font-semibold text-[#1a1a1a] placeholder:text-cx-faint placeholder:font-normal focus:outline-none focus:border-cx-blue transition-colors"
-                />
-                <div v-if="slug" class="mt-2 flex items-center gap-1.5 text-[11px]">
-                  <UIcon name="i-lucide-link" class="size-3 text-cx-muted" />
+                >
+                <div
+                  v-if="slug"
+                  class="mt-2 flex items-center gap-1.5 text-[11px]"
+                >
+                  <UIcon
+                    name="i-lucide-link"
+                    class="size-3 text-cx-muted"
+                  />
                   <span class="text-cx-muted">chayroom.ai/guides/</span>
                   <span class="font-mono font-bold text-cx-blue">{{ slug }}</span>
-                  <span v-if="slugError" class="text-red-500 font-semibold">· {{ slugError }}</span>
+                  <span
+                    v-if="slugError"
+                    class="text-red-500 font-semibold"
+                  >· {{ slugError }}</span>
                 </div>
               </div>
 
@@ -424,7 +473,6 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
 
               <!-- Category + Badge + Free -->
               <div class="grid grid-cols-[auto_1fr_auto] gap-5">
-
                 <!-- Category -->
                 <div>
                   <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2">Kategoriya *</label>
@@ -434,7 +482,7 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                         { label: 'Claude', icon: 'i-lucide-zap' },
                         { label: 'ChatGPT', icon: 'i-lucide-bot' },
                         { label: 'AI-agentlar', icon: 'i-lucide-brain' },
-                        { label: 'Kontent', icon: 'i-lucide-pen-line' },
+                        { label: 'Kontent', icon: 'i-lucide-pen-line' }
                       ]"
                       :key="cat.label"
                       class="flex items-center gap-2 px-3.5 py-2 rounded-xl border-2 text-[12px] font-semibold transition-all duration-150 whitespace-nowrap"
@@ -443,7 +491,10 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                         : 'border-cx-line bg-white text-cx-muted hover:border-[#c0c0bc] hover:text-cx-ink'"
                       @click="category = cat.label"
                     >
-                      <UIcon :name="cat.icon" class="size-3.5 shrink-0" />
+                      <UIcon
+                        :name="cat.icon"
+                        class="size-3.5 shrink-0"
+                      />
                       {{ cat.label }}
                     </button>
                   </div>
@@ -458,7 +509,7 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                       type="text"
                       placeholder="qo'llanma, start..."
                       class="w-full px-4 py-2.5 rounded-xl border border-cx-line bg-white text-[14px] text-[#1a1a1a] placeholder:text-cx-faint focus:outline-none focus:border-cx-blue transition-colors"
-                    />
+                    >
                   </div>
                   <div>
                     <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2">Kirish</label>
@@ -470,7 +521,10 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                           : 'border-cx-line bg-white text-cx-muted hover:border-[#c0c0bc]'"
                         @click="free = true"
                       >
-                        <UIcon name="i-lucide-unlock" class="size-3.5 shrink-0" />
+                        <UIcon
+                          name="i-lucide-unlock"
+                          class="size-3.5 shrink-0"
+                        />
                         Bepul
                       </button>
                       <button
@@ -480,7 +534,10 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                           : 'border-cx-line bg-white text-cx-muted hover:border-[#c0c0bc]'"
                         @click="free = false"
                       >
-                        <UIcon name="i-lucide-lock" class="size-3.5 shrink-0" />
+                        <UIcon
+                          name="i-lucide-lock"
+                          class="size-3.5 shrink-0"
+                        />
                         Obuna kerak
                       </button>
                     </div>
@@ -489,7 +546,6 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
 
                 <div />
               </div>
-
             </div>
           </div>
 
@@ -512,13 +568,29 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                   class="size-11 rounded-2xl flex items-center justify-center shrink-0"
                   :style="{ background: opt.color + (level === opt.label ? '20' : '12') }"
                 >
-                  <UIcon :name="opt.icon" class="size-5" :style="{ color: opt.color }" />
+                  <UIcon
+                    :name="opt.icon"
+                    class="size-5"
+                    :style="{ color: opt.color }"
+                  />
                 </div>
                 <div>
-                  <div class="text-[15px] font-bold" :style="level === opt.label ? { color: opt.color } : { color: '#14161f' }">{{ opt.label }}</div>
-                  <div class="text-[12px] text-cx-muted mt-0.5">{{ opt.desc }}</div>
+                  <div
+                    class="text-[15px] font-bold"
+                    :style="level === opt.label ? { color: opt.color } : { color: '#14161f' }"
+                  >
+                    {{ opt.label }}
+                  </div>
+                  <div class="text-[12px] text-cx-muted mt-0.5">
+                    {{ opt.desc }}
+                  </div>
                 </div>
-                <UIcon v-if="level === opt.label" name="i-lucide-check-circle-2" class="ml-auto size-5 shrink-0" :style="{ color: opt.color }" />
+                <UIcon
+                  v-if="level === opt.label"
+                  name="i-lucide-check-circle-2"
+                  class="ml-auto size-5 shrink-0"
+                  :style="{ color: opt.color }"
+                />
               </button>
             </div>
           </div>
@@ -537,7 +609,10 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                   :class="contentTab === 'editor' ? 'bg-white text-cx-ink shadow-sm' : 'text-cx-muted hover:text-cx-ink'"
                   @click="contentTab = 'editor'"
                 >
-                  <UIcon name="i-lucide-pencil-line" class="size-3.5" />
+                  <UIcon
+                    name="i-lucide-pencil-line"
+                    class="size-3.5"
+                  />
                   Vizual
                 </button>
                 <button
@@ -545,14 +620,16 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                   :class="contentTab === 'notion' ? 'bg-white text-cx-ink shadow-sm' : 'text-cx-muted hover:text-cx-ink'"
                   @click="contentTab = 'notion'; notionPasted = false"
                 >
-                  <UIcon name="i-lucide-clipboard-paste" class="size-3.5" />
+                  <UIcon
+                    name="i-lucide-clipboard-paste"
+                    class="size-3.5"
+                  />
                   Notion paste
                 </button>
               </div>
             </div>
 
             <div class="p-5">
-
               <!-- Visual editor tab -->
               <ClientOnly v-if="contentTab === 'editor'">
                 <GuidesEditor v-model="content" />
@@ -566,14 +643,24 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                   class="flex flex-col items-center justify-center gap-3 py-16 rounded-xl border-2 border-green-300 bg-green-50"
                 >
                   <div class="grid size-12 place-items-center rounded-full bg-green-100">
-                    <UIcon name="i-lucide-check" class="size-6 text-green-600" />
+                    <UIcon
+                      name="i-lucide-check"
+                      class="size-6 text-green-600"
+                    />
                   </div>
-                  <p class="text-[14px] font-bold text-green-700">Muvaffaqiyatli import qilindi!</p>
-                  <p class="text-[12px] text-green-600">Vizual editorga o'tilmoqda...</p>
+                  <p class="text-[14px] font-bold text-green-700">
+                    Muvaffaqiyatli import qilindi!
+                  </p>
+                  <p class="text-[12px] text-green-600">
+                    Vizual editorga o'tilmoqda...
+                  </p>
                 </div>
 
                 <!-- Paste zone -->
-                <div v-else class="rounded-xl border-2 border-dashed border-cx-line overflow-hidden">
+                <div
+                  v-else
+                  class="rounded-xl border-2 border-dashed border-cx-line overflow-hidden"
+                >
                   <div class="px-4 py-3 bg-[#fafafa] border-b border-cx-line flex items-center gap-2">
                     <div class="size-5 rounded flex items-center justify-center bg-[#1a1a1a]">
                       <span class="text-white font-bold text-[10px]">N</span>
@@ -611,65 +698,76 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                     data-placeholder="Bu yerga Notion kontentini paste qiling (Ctrl+V)..."
                     @paste="onNotionPaste"
                   >
-                    <span class="select-none text-cx-faint pointer-events-none" v-if="!notionPasted">
+                    <span
+                      v-if="!notionPasted"
+                      class="select-none text-cx-faint pointer-events-none"
+                    >
                       Bu yerga Notion kontentini paste qiling (Ctrl+V)...
                     </span>
                   </div>
                 </div>
 
                 <p class="mt-3 text-[11px] text-cx-muted flex items-center gap-1.5">
-                  <UIcon name="i-lucide-info" class="size-3 shrink-0" />
+                  <UIcon
+                    name="i-lucide-info"
+                    class="size-3 shrink-0"
+                  />
                   H1–H3, paragraf, ro'yxat, kod bloklari, qalin va kursiv matn avtomatik HTML ga aylanadi.
                 </p>
               </div>
 
               <div v-if="false">
-                  <div class="rounded-xl border border-cx-line overflow-hidden mb-4">
-                    <div class="px-4 py-3 bg-[#fafafa] border-b border-cx-line flex items-center gap-2">
-                      <div class="size-5 rounded flex items-center justify-center bg-[#1a1a1a]">
-                        <span class="text-white font-bold text-[10px]">N</span>
-                      </div>
-                      <span class="text-[12px] font-bold text-cx-ink">Notion HTML eksport (.zip)</span>
+                <div class="rounded-xl border border-cx-line overflow-hidden mb-4">
+                  <div class="px-4 py-3 bg-[#fafafa] border-b border-cx-line flex items-center gap-2">
+                    <div class="size-5 rounded flex items-center justify-center bg-[#1a1a1a]">
+                      <span class="text-white font-bold text-[10px]">N</span>
                     </div>
-                    <div class="px-5 py-4 bg-[#fafafa]">
-                      <ol class="flex flex-col gap-1.5">
-                        <li class="flex items-start gap-2 text-[12px] text-cx-muted">
-                          <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
-                          Notion sahifasini oching → <strong class="text-cx-ink">···</strong> → <strong class="text-cx-ink">Export</strong>
-                        </li>
-                        <li class="flex items-start gap-2 text-[12px] text-cx-muted">
-                          <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
-                          Format: <strong class="text-cx-ink">HTML</strong> tanlang
-                        </li>
-                        <li class="flex items-start gap-2 text-[12px] text-cx-muted">
-                          <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
-                          Yuklab olingan <strong class="text-cx-ink">.zip</strong> faylni quyida tanlang
-                        </li>
-                      </ol>
-                    </div>
+                    <span class="text-[12px] font-bold text-cx-ink">Notion HTML eksport (.zip)</span>
                   </div>
+                  <div class="px-5 py-4 bg-[#fafafa]">
+                    <ol class="flex flex-col gap-1.5">
+                      <li class="flex items-start gap-2 text-[12px] text-cx-muted">
+                        <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                        Notion sahifasini oching → <strong class="text-cx-ink">···</strong> → <strong class="text-cx-ink">Export</strong>
+                      </li>
+                      <li class="flex items-start gap-2 text-[12px] text-cx-muted">
+                        <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                        Format: <strong class="text-cx-ink">HTML</strong> tanlang
+                      </li>
+                      <li class="flex items-start gap-2 text-[12px] text-cx-muted">
+                        <span class="size-4 rounded-full bg-cx-blue/10 text-cx-blue text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                        Yuklab olingan <strong class="text-cx-ink">.zip</strong> faylni quyida tanlang
+                      </li>
+                    </ol>
+                  </div>
+                </div>
 
-                  <label class="flex flex-col items-center justify-center gap-3 h-40 rounded-xl border-2 border-dashed border-cx-line bg-white hover:border-cx-blue hover:bg-cx-blue/10 transition-all cursor-pointer">
-                    <input ref="zipInputRef" type="file" accept=".zip" class="sr-only" @change="onZipPick" />
-                    <div class="grid size-12 place-items-center rounded-xl bg-cx-blue/10">
-                      <UIcon name="i-lucide-file-archive" class="size-6 text-cx-blue" />
-                    </div>
-                    <div class="text-center">
-                      <p class="text-[14px] font-semibold text-cx-ink">ZIP fayl yuklash</p>
-                      <p class="text-[12px] text-cx-muted mt-0.5">Notion eksport ZIP — rasmlar avtomatik saqlanadi</p>
-                    </div>
-                  </label>
-
+                <label class="flex flex-col items-center justify-center gap-3 h-40 rounded-xl border-2 border-dashed border-cx-line bg-white hover:border-cx-blue hover:bg-cx-blue/10 transition-all cursor-pointer">
+                  <input
+                    ref="zipInputRef"
+                    type="file"
+                    accept=".zip"
+                    class="sr-only"
+                    @change="onZipPick"
+                  >
+                  <div class="grid size-12 place-items-center rounded-xl bg-cx-blue/10">
+                    <UIcon
+                      name="i-lucide-file-archive"
+                      class="size-6 text-cx-blue"
+                    />
+                  </div>
+                  <div class="text-center">
+                    <p class="text-[14px] font-semibold text-cx-ink">ZIP fayl yuklash</p>
+                    <p class="text-[12px] text-cx-muted mt-0.5">Notion eksport ZIP — rasmlar avtomatik saqlanadi</p>
+                  </div>
+                </label>
               </div>
-
             </div>
           </div>
-
         </div><!-- end left column -->
 
         <!-- ── RIGHT COLUMN ────────────────────────────── -->
         <div class="sticky top-20 flex flex-col gap-4 max-h-[calc(100vh-5.5rem)] overflow-y-auto pb-2 pr-0.5">
-
           <!-- 04 · Visual -->
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-5 py-3.5 border-b border-cx-line flex items-center gap-3">
@@ -677,7 +775,6 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
               <span class="text-[14px] font-bold text-[#1a1a1a]">Ko'rinish</span>
             </div>
             <div class="p-5 flex flex-col gap-5">
-
               <!-- BG -->
               <div>
                 <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2.5">Fon rangi</label>
@@ -694,7 +791,11 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                       class="absolute inset-0 flex items-center justify-center text-[10px] font-bold"
                       :style="{ color: preset.dark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.35)' }"
                     >{{ preset.label }}</span>
-                    <UIcon v-if="bg === preset.value" name="i-lucide-check" class="absolute bottom-1 right-1.5 size-3 text-cx-blue" />
+                    <UIcon
+                      v-if="bg === preset.value"
+                      name="i-lucide-check"
+                      class="absolute bottom-1 right-1.5 size-3 text-cx-blue"
+                    />
                   </button>
                 </div>
               </div>
@@ -704,12 +805,23 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                 <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2.5">Accent rangi</label>
                 <div class="flex items-center gap-3">
                   <div class="relative">
-                    <input v-model="accent" type="color" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer rounded-xl" />
-                    <div class="size-10 rounded-xl border-2 border-cx-line cursor-pointer" :style="{ backgroundColor: accent }" />
+                    <input
+                      v-model="accent"
+                      type="color"
+                      class="absolute inset-0 opacity-0 w-full h-full cursor-pointer rounded-xl"
+                    >
+                    <div
+                      class="size-10 rounded-xl border-2 border-cx-line cursor-pointer"
+                      :style="{ backgroundColor: accent }"
+                    />
                   </div>
                   <div>
-                    <div class="text-[13px] font-mono font-bold text-[#1a1a1a]">{{ accent }}</div>
-                    <div class="text-[11px] text-cx-muted">Badge va gradient uchun</div>
+                    <div class="text-[13px] font-mono font-bold text-[#1a1a1a]">
+                      {{ accent }}
+                    </div>
+                    <div class="text-[11px] text-cx-muted">
+                      Badge va gradient uchun
+                    </div>
                   </div>
                 </div>
               </div>
@@ -717,13 +829,23 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
               <!-- Image -->
               <div>
                 <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2.5">Muqova rasmi</label>
-                <div v-if="previewImage" class="relative rounded-xl overflow-hidden border border-cx-line bg-[#f7f7f5]">
-                  <img :src="previewImage" alt="cover" class="w-full h-auto block" />
+                <div
+                  v-if="previewImage"
+                  class="relative rounded-xl overflow-hidden border border-cx-line bg-[#f7f7f5]"
+                >
+                  <img
+                    :src="previewImage"
+                    alt="cover"
+                    class="w-full h-auto block"
+                  >
                   <button
                     class="absolute top-2 right-2 grid size-7 place-items-center rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
                     @click="removeImage"
                   >
-                    <UIcon name="i-lucide-x" class="size-3.5" />
+                    <UIcon
+                      name="i-lucide-x"
+                      class="size-3.5"
+                    />
                   </button>
                 </div>
                 <label
@@ -731,18 +853,33 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                   class="flex flex-col items-center justify-center gap-2.5 h-36 rounded-xl border-2 border-dashed border-cx-line bg-white hover:border-cx-blue hover:bg-cx-blue/10 transition-all cursor-pointer"
                   :class="{ 'opacity-60 pointer-events-none': imageUploading }"
                 >
-                  <input ref="imageInputRef" type="file" accept="image/*" class="sr-only" :disabled="imageUploading" @change="onImagePick" />
+                  <input
+                    ref="imageInputRef"
+                    type="file"
+                    accept="image/*"
+                    class="sr-only"
+                    :disabled="imageUploading"
+                    @change="onImagePick"
+                  >
                   <div class="grid size-10 place-items-center rounded-xl bg-cx-blue/10">
-                    <UIcon :name="imageUploading ? 'i-lucide-loader-2' : 'i-lucide-image-plus'" class="size-5 text-cx-blue" :class="{ 'animate-spin': imageUploading }" />
+                    <UIcon
+                      :name="imageUploading ? 'i-lucide-loader-2' : 'i-lucide-image-plus'"
+                      class="size-5 text-cx-blue"
+                      :class="{ 'animate-spin': imageUploading }"
+                    />
                   </div>
                   <div class="text-center">
                     <p class="text-[13px] font-semibold text-cx-ink">{{ imageUploading ? 'Yuklanmoqda...' : 'Rasm yuklash' }}</p>
                     <p class="text-[11px] text-cx-muted mt-0.5">PNG, JPG — karta muqovasi</p>
                   </div>
                 </label>
-                <p v-if="imageError" class="mt-2 text-[11px] text-red-500 font-semibold">{{ imageError }}</p>
+                <p
+                  v-if="imageError"
+                  class="mt-2 text-[11px] text-red-500 font-semibold"
+                >
+                  {{ imageError }}
+                </p>
               </div>
-
             </div>
           </div>
 
@@ -755,8 +892,17 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
             <div class="p-4">
               <div class="rounded-xl overflow-hidden border border-cx-line">
                 <!-- Preview header -->
-                <div class="relative overflow-hidden" style="aspect-ratio:397/264" :style="{ backgroundColor: bg }">
-                  <img v-if="previewImage" :src="previewImage" alt="" class="absolute inset-0 w-full h-full object-contain" />
+                <div
+                  class="relative overflow-hidden"
+                  style="aspect-ratio:397/264"
+                  :style="{ backgroundColor: bg }"
+                >
+                  <img
+                    v-if="previewImage"
+                    :src="previewImage"
+                    alt=""
+                    class="absolute inset-0 w-full h-full object-contain"
+                  >
                   <div
                     class="absolute inset-0 opacity-35"
                     :style="{ background: `radial-gradient(ellipse at 95% 105%, ${accent} 0%, transparent 60%)` }"
@@ -786,7 +932,10 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
                       class="text-[10px] font-semibold px-2 py-0.5 rounded-md"
                       :style="{ backgroundColor: (levelOptions.find(o => o.label === level)?.color ?? '#22c55e') + '20', color: levelOptions.find(o => o.label === level)?.color ?? '#22c55e' }"
                     >{{ level }}</span>
-                    <span class="text-[10px] font-medium" :class="free ? 'text-green-600' : 'text-amber-500'">
+                    <span
+                      class="text-[10px] font-medium"
+                      :class="free ? 'text-green-600' : 'text-amber-500'"
+                    >
                       {{ free ? '✓ Bepul' : '🔒 Obuna' }}
                     </span>
                   </div>
@@ -794,12 +943,8 @@ useSeoMeta({ title: "Qo'llanma qo'shish — Admin" })
               </div>
             </div>
           </div>
-
         </div>
-
-
       </div>
     </div>
   </div>
-
 </template>

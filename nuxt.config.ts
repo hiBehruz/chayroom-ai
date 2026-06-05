@@ -3,20 +3,10 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
-    '@pinia/nuxt',
+    '@pinia/nuxt'
   ],
 
-  nitro: {
-    preset: 'vercel',
-    prerender: {
-      crawlLinks: false,
-      routes: [],
-    },
-  },
-
   devtools: { enabled: true },
-
-  css: ['~/assets/css/main.css'],
 
   app: {
     head: {
@@ -26,6 +16,8 @@ export default defineNuxtConfig({
       ]
     }
   },
+
+  css: ['~/assets/css/main.css'],
 
   colorMode: {
     preference: 'light',
@@ -57,14 +49,21 @@ export default defineNuxtConfig({
     '/': { prerender: true }
   },
 
+  compatibilityDate: '2025-01-15',
+
+  nitro: {
+    preset: 'vercel',
+    prerender: {
+      crawlLinks: false,
+      routes: []
+    }
+  },
 
   vite: {
     server: {
       allowedHosts: ['handcart-garage-creatable.ngrok-free.dev']
     }
   },
-
-  compatibilityDate: '2025-01-15',
 
   eslint: {
     config: {

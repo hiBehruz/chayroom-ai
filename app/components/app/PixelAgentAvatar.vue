@@ -19,7 +19,14 @@ withDefaults(defineProps<{
       fill="none"
       aria-hidden="true"
     >
-      <rect x="8" y="7" width="16" height="18" rx="3" fill="#f8d8b8" />
+      <rect
+        x="8"
+        y="7"
+        width="16"
+        height="18"
+        rx="3"
+        fill="#f8d8b8"
+      />
       <rect
         v-if="variant === 'female'"
         x="7"
@@ -56,9 +63,30 @@ withDefaults(defineProps<{
         rx="1"
         fill="#2a1a13"
       />
-      <rect x="12" y="15" width="3" height="3" rx="0.5" fill="#111827" />
-      <rect x="17" y="15" width="3" height="3" rx="0.5" fill="#111827" />
-      <rect x="14" y="21" width="5" height="2" rx="1" fill="#b45309" />
+      <rect
+        x="12"
+        y="15"
+        width="3"
+        height="3"
+        rx="0.5"
+        fill="#111827"
+      />
+      <rect
+        x="17"
+        y="15"
+        width="3"
+        height="3"
+        rx="0.5"
+        fill="#111827"
+      />
+      <rect
+        x="14"
+        y="21"
+        width="5"
+        height="2"
+        rx="1"
+        fill="#b45309"
+      />
       <rect
         v-if="variant === 'female'"
         x="11"
@@ -77,8 +105,22 @@ withDefaults(defineProps<{
         rx="1"
         fill="#3480f1"
       />
-      <rect x="6" y="13" width="3" height="5" rx="1" fill="#f2c59f" />
-      <rect x="23" y="13" width="3" height="5" rx="1" fill="#f2c59f" />
+      <rect
+        x="6"
+        y="13"
+        width="3"
+        height="5"
+        rx="1"
+        fill="#f2c59f"
+      />
+      <rect
+        x="23"
+        y="13"
+        width="3"
+        height="5"
+        rx="1"
+        fill="#f2c59f"
+      />
     </svg>
   </div>
 </template>

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     const lessonRows = await db.select().from(lessons).where(eq(lessons.moduleId, mod.id)).orderBy(asc(lessons.order))
     return {
       ...mod,
-      lessons: lessonRows,
+      lessons: lessonRows
     }
   }))
 

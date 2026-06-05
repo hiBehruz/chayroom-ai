@@ -95,7 +95,10 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
       class="mb-10 flex items-center gap-2.5 transition-opacity duration-200 hover:opacity-70"
     >
       <span class="grid size-8 place-items-center rounded-xl bg-[#14161f]">
-        <UIcon name="i-ph-brain-fill" class="size-[17px] text-white" />
+        <UIcon
+          name="i-ph-brain-fill"
+          class="size-[17px] text-white"
+        />
       </span>
       <span class="text-[20px] font-extrabold tracking-tight text-[#14161f]">Chayroom AI Club</span>
     </NuxtLink>
@@ -160,7 +163,10 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
         </div>
 
         <!-- Dev login -->
-        <div v-if="isDev" class="mt-5 text-center">
+        <div
+          v-if="isDev"
+          class="mt-5 text-center"
+        >
           <p class="mb-2 text-[11px] font-semibold uppercase tracking-widest text-[#c0c0c8]">
             dev only
           </p>

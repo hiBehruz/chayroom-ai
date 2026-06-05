@@ -43,10 +43,12 @@ export default defineEventHandler(async (event) => {
       photoUrl: user.photoUrl
     },
     hasSubscription,
-    subscription: sub ? {
-      period: sub.period,
-      expiresAt: sub.expiresAt.toISOString(),
-      cancelledAt: sub.cancelledAt ? sub.cancelledAt.toISOString() : null
-    } : null
+    subscription: sub
+      ? {
+          period: sub.period,
+          expiresAt: sub.expiresAt.toISOString(),
+          cancelledAt: sub.cancelledAt ? sub.cancelledAt.toISOString() : null
+        }
+      : null
   }
 })

@@ -8,13 +8,13 @@ onMounted(async () => {
   if (!videoRef.value) return
   const [{ default: Plyr }] = await Promise.all([
     import('plyr'),
-    import('plyr/dist/plyr.css'),
+    import('plyr/dist/plyr.css')
   ])
   player = new Plyr(videoRef.value, {
     controls: ['play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
     settings: ['speed'],
     speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
-    captions: { active: false },
+    captions: { active: false }
   })
 })
 
@@ -26,8 +26,11 @@ onUnmounted(() => {
 
 <template>
   <div class="video-player-wrap rounded-2xl overflow-hidden">
-    <video ref="videoRef" playsinline>
-      <source :src="props.src" />
+    <video
+      ref="videoRef"
+      playsinline
+    >
+      <source :src="props.src">
     </video>
   </div>
 </template>

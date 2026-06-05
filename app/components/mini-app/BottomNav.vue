@@ -2,8 +2,8 @@
 const route = useRoute()
 
 const tabs = [
-  { to: '/dashboard', icon: 'i-solar-home-bold',    label: 'Asosiy' },
-  { to: '/catalog',   icon: 'i-solar-library-bold', label: 'Materiallar' },
+  { to: '/dashboard', icon: 'i-solar-home-bold', label: 'Asosiy' },
+  { to: '/catalog', icon: 'i-solar-library-bold', label: 'Materiallar' }
 ]
 
 const isProfileActive = computed(() => route.path === '/profile')
@@ -27,7 +27,10 @@ const isProfileActive = computed(() => route.path === '/profile')
         :class="route.path === tab.to ? 'nav-tab--active' : ''"
       >
         <!-- White bg layer — animates independently -->
-        <span class="nav-bg" :class="route.path === tab.to ? 'nav-bg--visible' : ''" />
+        <span
+          class="nav-bg"
+          :class="route.path === tab.to ? 'nav-bg--visible' : ''"
+        />
 
         <!-- Content -->
         <span class="nav-content">
@@ -36,7 +39,10 @@ const isProfileActive = computed(() => route.path === '/profile')
             class="nav-icon size-6"
             :class="route.path === tab.to ? 'nav-icon--active' : ''"
           />
-          <span v-if="route.path === tab.to" class="nav-label">{{ tab.label }}</span>
+          <span
+            v-if="route.path === tab.to"
+            class="nav-label"
+          >{{ tab.label }}</span>
         </span>
       </NuxtLink>
 
@@ -46,14 +52,20 @@ const isProfileActive = computed(() => route.path === '/profile')
         class="nav-tab"
         :class="isProfileActive ? 'nav-tab--active' : ''"
       >
-        <span class="nav-bg" :class="isProfileActive ? 'nav-bg--visible' : ''" />
+        <span
+          class="nav-bg"
+          :class="isProfileActive ? 'nav-bg--visible' : ''"
+        />
         <span class="nav-content">
           <UIcon
             name="i-solar-user-bold"
             class="nav-icon size-6"
             :class="isProfileActive ? 'nav-icon--active' : ''"
           />
-          <span v-if="isProfileActive" class="nav-label">Profil</span>
+          <span
+            v-if="isProfileActive"
+            class="nav-label"
+          >Profil</span>
         </span>
       </NuxtLink>
     </div>

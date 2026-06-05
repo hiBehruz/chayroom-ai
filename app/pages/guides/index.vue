@@ -3,23 +3,19 @@ const authStore = useAuthStore()
 
 const LEVEL_COLORS: Record<string, string> = {
   'Yangi boshlagan': '#10b981',
-  "O'rta": '#f59e0b',
+  'O\'rta': '#f59e0b',
   'Tajribali': '#8b5cf6',
-  'Professional': '#8b5cf6',
+  'Professional': '#8b5cf6'
 }
-const LEVEL_ICONS: Record<string, string> = {
-  'Yangi boshlagan': 'i-lucide-sprout',
-  "O'rta": 'i-lucide-bar-chart-2',
-  'Tajribali': 'i-lucide-flame',
-  'Professional': 'i-lucide-rocket',
+
+function levelColor(l: string | null) {
+  return LEVEL_COLORS[l ?? ''] ?? '#3480f1'
 }
-function levelColor(l: string | null) { return LEVEL_COLORS[l ?? ''] ?? '#3480f1' }
-function levelIcon(l: string | null) { return LEVEL_ICONS[l ?? ''] ?? 'i-lucide-award' }
 function levelLabel(l: string | null) {
-  if (l === 'Yangi boshlagan') return "Boshlangich"
-  if (l === "O'rta") return "O'rta daraja"
-  if (l === 'Tajribali' || l === 'Professional') return "Pro"
-  return l ?? "Boshlangich"
+  if (l === 'Yangi boshlagan') return 'Boshlangich'
+  if (l === 'O\'rta') return 'O\'rta daraja'
+  if (l === 'Tajribali' || l === 'Professional') return 'Pro'
+  return l ?? 'Boshlangich'
 }
 const isOwner = computed(() => authStore.isOwner)
 
@@ -53,7 +49,6 @@ function guideTrackIcon(guide: { category: string | null, tags?: string[] | null
   return 'i-solar-tag-bold'
 }
 
-
 const { isMiniApp } = useTelegramApp()
 
 const guidesStore = useGuidesStore()
@@ -79,17 +74,32 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
 
 <template>
   <!-- ── MINI-APP layout ── -->
-  <div v-if="isMiniApp" style="background:#efefef; min-height:100vh">
+  <div
+    v-if="isMiniApp"
+    style="background:#efefef; min-height:100vh"
+  >
     <div class="w-full">
-
       <!-- Header -->
       <div class="px-4 pt-7 pb-4">
-        <h1 class="text-[26px] font-black tracking-tight leading-tight" style="color:#14161f">Qo'llanmalar</h1>
-        <p class="text-[14px] mt-1" style="color:#70707a">Amaliy qo'llanmalar va bosqichma-bosqich ko'rsatmalar.</p>
+        <h1
+          class="text-[26px] font-black tracking-tight leading-tight"
+          style="color:#14161f"
+        >
+          Qo'llanmalar
+        </h1>
+        <p
+          class="text-[14px] mt-1"
+          style="color:#70707a"
+        >
+          Amaliy qo'llanmalar va bosqichma-bosqich ko'rsatmalar.
+        </p>
       </div>
 
       <!-- Category pills -->
-      <div class="flex gap-2 px-4 pb-4 overflow-x-auto" style="scrollbar-width:none">
+      <div
+        class="flex gap-2 px-4 pb-4 overflow-x-auto"
+        style="scrollbar-width:none"
+      >
         <button
           v-for="cat in categories"
           :key="cat.value"
@@ -98,7 +108,9 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
             ? 'background:#3480f1; color:#ffffff'
             : 'background:#ffffff; color:#14161f; border:1px solid #e8e6e0'"
           @click="selectCategory(cat.value)"
-        >{{ cat.label }}</button>
+        >
+          {{ cat.label }}
+        </button>
       </div>
 
       <!-- Guide list -->
@@ -124,8 +136,14 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
 
           <!-- Info -->
           <div class="flex-1 min-w-0">
-            <h3 class="text-[14px] font-bold leading-snug mb-1 line-clamp-2" style="color:#14161f">{{ guide.title }}</h3>
-            <p class="text-[12px] leading-snug line-clamp-2 mb-2" style="color:#70707a">{{ guide.description }}</p>
+            <h3
+              class="text-[14px] font-bold leading-snug mb-1 line-clamp-2"
+              style="color:#14161f"
+            >{{ guide.title }}</h3>
+            <p
+              class="text-[12px] leading-snug line-clamp-2 mb-2"
+              style="color:#70707a"
+            >{{ guide.description }}</p>
             <div class="flex flex-wrap gap-1">
               <span
                 v-for="tag in (guide.tags || []).slice(0, 2)"
@@ -137,28 +155,63 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
           </div>
 
           <!-- Arrow -->
-          <svg class="flex-none" width="8" height="14" viewBox="0 0 8 14" fill="none">
-            <path d="M1 1l6 6-6 6" stroke="#c0c0c8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            class="flex-none"
+            width="8"
+            height="14"
+            viewBox="0 0 8 14"
+            fill="none"
+          >
+            <path
+              d="M1 1l6 6-6 6"
+              stroke="#c0c0c8"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </NuxtLink>
 
-        <div v-if="!filtered.length" class="py-12 text-center">
-          <p class="text-[15px] font-semibold" style="color:#a0a0a8">Bu kategoriyada qo'llanmalar hali yo'q</p>
+        <div
+          v-if="!filtered.length"
+          class="py-12 text-center"
+        >
+          <p
+            class="text-[15px] font-semibold"
+            style="color:#a0a0a8"
+          >
+            Bu kategoriyada qo'llanmalar hali yo'q
+          </p>
         </div>
       </div>
-
     </div>
   </div>
 
   <!-- ── DESKTOP layout ── -->
-  <div v-else class="guides-page min-h-screen bg-[var(--bg)]">
+  <div
+    v-else
+    class="guides-page min-h-screen bg-[var(--bg)]"
+  >
     <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 pb-20 pt-0 max-md:w-full max-md:max-w-none max-md:mx-0 max-md:px-0 max-md:pt-0">
       <section class="guides-hero relative mx-auto flex max-w-310 flex-col items-center justify-center overflow-hidden text-center py-10 border-b border-[#e8e6e1] max-md:pt-5 max-md:pb-4 max-md:px-6 max-md:border-none">
         <h1 class="guides-title relative z-10 text-(--text) text-[48px]! leading-[52.8px]! tracking-[-0.96px]! max-[734px]:text-[28px]! max-[734px]:leading-[30.8px]! max-[734px]:tracking-[-0.56px]!">
           <span class="relative inline-block pb-2 max-md:pb-0">
             Qo'llanmalar
-            <svg class="absolute -bottom-1 left-[-3%] w-[106%] overflow-visible" viewBox="0 0 600 18" preserveAspectRatio="none" fill="none" aria-hidden="true">
-              <path d="M10,12 C150,2 450,2 590,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="vector-effect:non-scaling-stroke"/>
+            <svg
+              class="absolute -bottom-1 left-[-3%] w-[106%] overflow-visible"
+              viewBox="0 0 600 18"
+              preserveAspectRatio="none"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M10,12 C150,2 450,2 590,12"
+                stroke="#3480f1"
+                stroke-width="5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="vector-effect:non-scaling-stroke"
+              />
             </svg>
           </span>
         </h1>
@@ -182,7 +235,11 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
             ]"
             @click="selectCategory(cat.value)"
           >
-            <UIcon v-if="cat.icon && cat.value !== 'all'" :name="cat.icon" class="guides-filter-icon size-5 max-md:size-4" />
+            <UIcon
+              v-if="cat.icon && cat.value !== 'all'"
+              :name="cat.icon"
+              class="guides-filter-icon size-5 max-md:size-4"
+            />
             {{ cat.label }}
           </button>
         </div>
@@ -237,9 +294,12 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
               :src="guide.coverUrl"
               class="absolute inset-0 w-full h-full object-cover block"
               alt=""
-            />
+            >
 
-            <div v-if="!guide.coverUrl" class="guide-card-art absolute inset-0">
+            <div
+              v-if="!guide.coverUrl"
+              class="guide-card-art absolute inset-0"
+            >
               <span class="guide-art-star guide-art-star-1" />
               <span class="guide-art-star guide-art-star-2" />
               <span class="guide-art-line guide-art-line-1" />
@@ -251,7 +311,6 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
               />
               <span class="guide-art-hand" />
             </div>
-
           </div>
 
           <div class="guide-card-body px-2 pt-6 max-md:px-0 max-md:pt-3">
@@ -263,17 +322,39 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
                 {{ levelLabel(guide.level) }}
               </span>
               <span class="guide-meta-chip inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-[#f7f5ef] text-[#14161f] max-md:text-[14px] max-md:leading-5">
-                <UIcon :name="guideTrackIcon(guide)" class="size-4 shrink-0" />
+                <UIcon
+                  :name="guideTrackIcon(guide)"
+                  class="size-4 shrink-0"
+                />
                 {{ guideTrack(guide) }}
               </span>
-              <span v-if="guide.isFree" class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-[#86efac] bg-[#f0fdf4] text-[#16a34a]">
-                <svg class="size-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+              <span
+                v-if="guide.isFree"
+                class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-[#86efac] bg-[#f0fdf4] text-[#16a34a]"
+              >
+                <svg
+                  class="size-3 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+                  />
                 </svg>
                 Bepul
               </span>
-              <span v-else class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-red-200 bg-red-50 text-red-500">
-                <UIcon name="i-lucide-lock" class="size-3.5 shrink-0" />
+              <span
+                v-else
+                class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-red-200 bg-red-50 text-red-500"
+              >
+                <UIcon
+                  name="i-lucide-lock"
+                  class="size-3.5 shrink-0"
+                />
                 По подписке
               </span>
             </div>
@@ -290,9 +371,14 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
         class="flex min-h-105 flex-col items-center justify-center gap-3 text-cx-muted max-md:px-4"
       >
         <div class="grid size-16 place-items-center rounded-2xl bg-[#1a1a1a]">
-          <UIcon name="i-solar-document-text-bold" class="size-8 text-white" />
+          <UIcon
+            name="i-solar-document-text-bold"
+            class="size-8 text-white"
+          />
         </div>
-        <p class="text-[18px] font-semibold text-[#1a1a1a]">Bu kategoriyada qo'llanmalar hali yo'q</p>
+        <p class="text-[18px] font-semibold text-[#1a1a1a]">
+          Bu kategoriyada qo'llanmalar hali yo'q
+        </p>
       </div>
     </div>
   </div>
@@ -475,7 +561,6 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
   flex-shrink: 0;
   aspect-ratio: 16 / 9;
 }
-
 
 @media (max-width: 734px) {
   .guide-preview {

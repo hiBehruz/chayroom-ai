@@ -3,12 +3,12 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const features = [
-  { icon: "i-solar-settings-minimalistic-bold", title: "Amaliy vositalar", body: "AI bozoridagi eng dolzarb vositalarni turli maqsad va vazifalar bo’yicha tahlil qilamiz, joriy qilish uchun chek-listlar beramiz.", href: '/materials' },
-  { icon: "i-solar-book-bookmark-bold", title: "Kurslar va gaidlar", body: "Biznes, ish, kontent va kundalik hayot uchun noldan boshlab qadam-baqadam yo‘riqnomalar. Faqat nazariya emas, aniq amaliy qo‘llanmalar." },
-  { icon: "i-solar-chat-dots-bold", title: "Yopiq chat AI Room Club", body: "Hayot va biznesda AIni ustunlikka aylantirishni istagan fikrdoshlar bilan muloqot." },
-  { icon: "i-solar-earth-bold", title: "AI olamidan yangi trendlar", body: "Sun‘iy intellekt sohasidagi so‘nggi yangiliklarni birinchilardan bilasiz va eng qiziqarli vositalarni sinab ko‘rasiz." },
-  { icon: "i-solar-microphone-bold", title: "Jonli efirlar va workshoplar", body: "Savol-javoblar, jonli uchrashuvlar va birgalikda amaliy ish qilinadigan workshoplar." },
-  { icon: "i-solar-widget-bold", title: "Tayyor bog‘lamlar", body: "Har kuni turli yechimlarni sinab ko‘ramiz va eng foydali natijalarni Telegram yopiq kanalda ulashamiz." }
+  { icon: 'i-solar-settings-minimalistic-bold', title: 'Amaliy vositalar', body: 'AI bozoridagi eng dolzarb vositalarni turli maqsad va vazifalar bo’yicha tahlil qilamiz, joriy qilish uchun chek-listlar beramiz.', href: '/materials' },
+  { icon: 'i-solar-book-bookmark-bold', title: 'Kurslar va gaidlar', body: 'Biznes, ish, kontent va kundalik hayot uchun noldan boshlab qadam-baqadam yo‘riqnomalar. Faqat nazariya emas, aniq amaliy qo‘llanmalar.' },
+  { icon: 'i-solar-chat-dots-bold', title: 'Yopiq chat AI Room Club', body: 'Hayot va biznesda AIni ustunlikka aylantirishni istagan fikrdoshlar bilan muloqot.' },
+  { icon: 'i-solar-earth-bold', title: 'AI olamidan yangi trendlar', body: 'Sun‘iy intellekt sohasidagi so‘nggi yangiliklarni birinchilardan bilasiz va eng qiziqarli vositalarni sinab ko‘rasiz.' },
+  { icon: 'i-solar-microphone-bold', title: 'Jonli efirlar va workshoplar', body: 'Savol-javoblar, jonli uchrashuvlar va birgalikda amaliy ish qilinadigan workshoplar.' },
+  { icon: 'i-solar-widget-bold', title: 'Tayyor bog‘lamlar', body: 'Har kuni turli yechimlarni sinab ko‘ramiz va eng foydali natijalarni Telegram yopiq kanalda ulashamiz.' }
 ]
 
 const NuxtLinkComponent = resolveComponent('NuxtLink')
@@ -49,7 +49,19 @@ onMounted(() => {
       <div class="text-center mb-12">
         <h2 class="font-inter-display text-[48px] font-semibold leading-[1.1] tracking-[-0.02em] text-(--text) max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px]">
           Chayroom AI ichida nimalar bor?<br>
-          Va nega biz bilan <span class="what-inside-underline">rivojlanish<svg viewBox="0 0 220 18" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M8,12 C60,2 160,2 212,12" stroke="#3480f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="vector-effect:non-scaling-stroke"/></svg></span> to'g'ri tanlov
+          Va nega biz bilan <span class="what-inside-underline">rivojlanish<svg
+            viewBox="0 0 220 18"
+            preserveAspectRatio="none"
+            fill="none"
+            aria-hidden="true"
+          ><path
+            d="M8,12 C60,2 160,2 212,12"
+            stroke="#3480f1"
+            stroke-width="5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="vector-effect:non-scaling-stroke"
+          /></svg></span> to'g'ri tanlov
         </h2>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4.5">
@@ -115,5 +127,4 @@ onMounted(() => {
   height: 18px;
   overflow: visible;
 }
-
 </style>

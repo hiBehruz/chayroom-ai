@@ -6,7 +6,7 @@ const accessFeatures = [
   'Закрытый чат AI Room Club',
   'Разборы AI-инструментов',
   'Пошаговые инструкции',
-  'Доступ к новым материалам',
+  'Доступ к новым материалам'
 ]
 
 const config = useRuntimeConfig()
@@ -61,7 +61,10 @@ const featuredTierUrl = computed(() => tiers.find(tier => tier.highlight)?.url ?
             aria-label="Modalni yopish"
             @click="open = false"
           >
-            <UIcon name="i-lucide-x" class="size-4.5" />
+            <UIcon
+              name="i-lucide-x"
+              class="size-4.5"
+            />
           </button>
 
           <div class="mb-7 flex justify-center">
@@ -142,7 +145,10 @@ const featuredTierUrl = computed(() => tiers.find(tier => tier.highlight)?.url ?
           </div>
 
           <div class="mb-5 text-center">
-            <h2 id="access-modal-title" class="text-[22px] font-extrabold leading-tight tracking-tight text-[#202023]">
+            <h2
+              id="access-modal-title"
+              class="text-[22px] font-extrabold leading-tight tracking-tight text-[#202023]"
+            >
               Получи доступ
             </h2>
             <p class="mt-2 text-[15px] leading-tight text-[#707073]">
@@ -156,7 +162,10 @@ const featuredTierUrl = computed(() => tiers.find(tier => tier.highlight)?.url ?
               :key="feature"
               class="flex items-center gap-3 text-[15px] leading-tight text-[#515154]"
             >
-              <UIcon name="i-lucide-check" class="size-4.5 shrink-0 text-[#00c853]" />
+              <UIcon
+                name="i-lucide-check"
+                class="size-4.5 shrink-0 text-[#00c853]"
+              />
               <span>{{ feature }}</span>
             </li>
           </ul>
@@ -168,7 +177,10 @@ const featuredTierUrl = computed(() => tiers.find(tier => tier.highlight)?.url ?
             class="modal-buy-btn mb-2"
           >
             Купить в Telegram
-            <UIcon name="i-lucide-arrow-right" class="size-4 shrink-0" />
+            <UIcon
+              name="i-lucide-arrow-right"
+              class="size-4 shrink-0"
+            />
           </a>
 
           <p class="text-center text-[13px] leading-tight text-[#737376]">

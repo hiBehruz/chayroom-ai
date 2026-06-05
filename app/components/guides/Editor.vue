@@ -57,9 +57,9 @@ const VideoBlock = Node.create({
     return [
       'div',
       { 'data-video-block': '' },
-      ['video', { src: HTMLAttributes.src, controls: '', playsinline: '' }],
+      ['video', { src: HTMLAttributes.src, controls: '', playsinline: '' }]
     ]
-  },
+  }
 })
 
 const props = defineProps<{ modelValue: string }>()
@@ -99,7 +99,7 @@ const editor = useEditor({
       fetch('/api/upload/image', {
         method: 'POST',
         body: file,
-        headers: { 'Content-Type': file.type, 'X-Filename': encodeURIComponent(filename) },
+        headers: { 'Content-Type': file.type, 'X-Filename': encodeURIComponent(filename) }
       })
         .then(res => res.json())
         .then(({ publicUrl }) => {
@@ -147,7 +147,7 @@ const fontWeights = [
   { label: 'Semibold', value: '600' },
   { label: 'Bold', value: '700' },
   { label: 'Heavy', value: '800' },
-  { label: 'Black', value: '900' },
+  { label: 'Black', value: '900' }
 ]
 
 function currentFontWeight() {
@@ -163,7 +163,7 @@ const fonts = [
   { label: 'SF Pro', value: '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
   { label: 'Inter', value: 'Inter, sans-serif' },
   { label: 'Georgia', value: 'Georgia, serif' },
-  { label: 'Mono', value: '"SF Mono", "Fira Code", monospace' },
+  { label: 'Mono', value: '"SF Mono", "Fira Code", monospace' }
 ]
 const defaultFontValue = fonts[0]?.value ?? '"SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
 
@@ -199,16 +199,22 @@ async function translateToUzbek() {
 
 const colorPickerOpen = ref(false)
 const colorPickerRef = ref<HTMLElement | null>(null)
-onClickOutside(colorPickerRef, () => { colorPickerOpen.value = false })
+onClickOutside(colorPickerRef, () => {
+  colorPickerOpen.value = false
+})
 
 const bubbleColorPickerOpen = ref(false)
 const bubbleColorPickerRef = ref<HTMLElement | null>(null)
-onClickOutside(bubbleColorPickerRef, () => { bubbleColorPickerOpen.value = false })
+onClickOutside(bubbleColorPickerRef, () => {
+  bubbleColorPickerOpen.value = false
+})
 
 const bubbleLinkOpen = ref(false)
 const bubbleLinkRef = ref<HTMLElement | null>(null)
 const bubbleLinkInput = ref('')
-onClickOutside(bubbleLinkRef, () => { bubbleLinkOpen.value = false })
+onClickOutside(bubbleLinkRef, () => {
+  bubbleLinkOpen.value = false
+})
 
 function openLinkInput() {
   bubbleLinkInput.value = editor.value?.getAttributes('link').href ?? ''
@@ -245,11 +251,11 @@ const textColors = [
   { label: 'Blue', value: '#2563eb' },
   { label: 'Purple', value: '#9333ea' },
   { label: 'Pink', value: '#db2777' },
-  { label: 'Red', value: '#dc2626' },
+  { label: 'Red', value: '#dc2626' }
 ]
 
 const bgColors = [
-  { label: "Yo'q", value: null },
+  { label: 'Yo\'q', value: null },
   { label: 'Oltin', value: '#fef08a' },
   { label: 'Shaftoli', value: '#fed7aa' },
   { label: 'Pushti', value: '#fecdd3' },
@@ -258,7 +264,7 @@ const bgColors = [
   { label: 'Yashil', value: '#bbf7d0' },
   { label: 'Champagne', value: '#fde8c8' },
   { label: 'Kumush', value: '#dde3ec' },
-  { label: 'Zangori', value: '#c7f2fa' },
+  { label: 'Zangori', value: '#c7f2fa' }
 ]
 
 function setTextColor(color: string | null) {
@@ -283,7 +289,7 @@ async function insertVideo(file: File) {
   if (!editor.value) return
   videoUploading.value = true
   try {
-    const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string; publicUrl: string }>(
+    const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string, publicUrl: string }>(
       '/api/upload/presign',
       { method: 'POST', body: { filename: file.name, contentType: file.type } }
     )
@@ -302,21 +308,39 @@ const tools = [
   { label: '•', action: () => editor.value?.chain().focus().toggleBulletList().run(), active: () => editor.value?.isActive('bulletList') },
   { label: '1.', action: () => editor.value?.chain().focus().toggleOrderedList().run(), active: () => editor.value?.isActive('orderedList') },
   { label: '<>', action: () => editor.value?.chain().focus().toggleCodeBlock().run(), active: () => editor.value?.isActive('codeBlock'), class: 'font-mono text-[11px]' },
-  { label: '❝', action: () => editor.value?.chain().focus().toggleBlockquote().run(), active: () => editor.value?.isActive('blockquote') },
+  { label: '❝', action: () => editor.value?.chain().focus().toggleBlockquote().run(), active: () => editor.value?.isActive('blockquote') }
 ]
 </script>
 
 <template>
   <div class="rounded-xl border border-cx-line overflow-visible bg-white">
     <div class="flex flex-wrap items-center gap-1 px-3 py-2 border-b border-cx-line bg-[#f7f7f5] rounded-t-xl">
-
       <!-- Font section: icon + family + weight -->
       <div class="flex items-center gap-0.5">
         <!-- Font icon -->
         <span class="flex items-center justify-center w-6 h-7 text-cx-muted">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <text x="1" y="11" font-family="Georgia, serif" font-size="12" font-style="italic" fill="currentColor">T</text>
-            <text x="7" y="13" font-family="Georgia, serif" font-size="8" fill="currentColor">T</text>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <text
+              x="1"
+              y="11"
+              font-family="Georgia, serif"
+              font-size="12"
+              font-style="italic"
+              fill="currentColor"
+            >T</text>
+            <text
+              x="7"
+              y="13"
+              font-family="Georgia, serif"
+              font-size="8"
+              fill="currentColor"
+            >T</text>
           </svg>
         </span>
         <!-- Font family -->
@@ -325,7 +349,13 @@ const tools = [
           :value="currentFont()"
           @change="setFont(fonts.find(f => f.label === ($event.target as HTMLSelectElement).value)?.value ?? defaultFontValue)"
         >
-          <option v-for="f in fonts" :key="f.label" :value="f.label">{{ f.label }}</option>
+          <option
+            v-for="f in fonts"
+            :key="f.label"
+            :value="f.label"
+          >
+            {{ f.label }}
+          </option>
         </select>
         <!-- Font weight -->
         <select
@@ -333,7 +363,13 @@ const tools = [
           :value="fontWeights.find(w => w.value === currentFontWeight())?.label ?? 'Regular'"
           @change="setFontWeight(fontWeights.find(w => w.label === ($event.target as HTMLSelectElement).value)?.value ?? '400')"
         >
-          <option v-for="w in fontWeights" :key="w.value" :value="w.label">{{ w.label }}</option>
+          <option
+            v-for="w in fontWeights"
+            :key="w.value"
+            :value="w.label"
+          >
+            {{ w.label }}
+          </option>
         </select>
       </div>
 
@@ -343,8 +379,21 @@ const tools = [
       <div class="flex items-center gap-0.5">
         <!-- Size icon -->
         <span class="flex items-center justify-center w-6 h-7 text-cx-muted">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <text x="0" y="13" font-family="Georgia, serif" font-size="14" font-style="italic" fill="currentColor">T</text>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <text
+              x="0"
+              y="13"
+              font-family="Georgia, serif"
+              font-size="14"
+              font-style="italic"
+              fill="currentColor"
+            >T</text>
           </svg>
         </span>
         <!-- Font size -->
@@ -353,7 +402,13 @@ const tools = [
           :value="currentFontSize()"
           @change="setFontSize(($event.target as HTMLSelectElement).value)"
         >
-          <option v-for="size in fontSizes" :key="size" :value="size">{{ size }} pt</option>
+          <option
+            v-for="size in fontSizes"
+            :key="size"
+            :value="size"
+          >
+            {{ size }} pt
+          </option>
         </select>
       </div>
 
@@ -379,7 +434,10 @@ const tools = [
       <div class="w-px h-4 bg-cx-line mx-0.5" />
 
       <!-- Color picker trigger -->
-      <div ref="colorPickerRef" class="relative">
+      <div
+        ref="colorPickerRef"
+        class="relative"
+      >
         <button
           type="button"
           class="min-w-7 h-7 px-2 rounded-lg text-[13px] font-black transition-colors text-cx-muted hover:bg-[#ebebea] hover:text-cx-ink"
@@ -395,7 +453,9 @@ const tools = [
           class="absolute left-0 top-9 z-50 w-64 rounded-xl border border-cx-line bg-white shadow-lg p-3 flex flex-col gap-3"
         >
           <div>
-            <p class="text-[10px] font-bold text-cx-muted uppercase tracking-wider mb-2">Matn rangi</p>
+            <p class="text-[10px] font-bold text-cx-muted uppercase tracking-wider mb-2">
+              Matn rangi
+            </p>
             <div class="grid grid-cols-5 gap-1.5">
               <button
                 v-for="c in textColors"
@@ -411,7 +471,9 @@ const tools = [
             </div>
           </div>
           <div>
-            <p class="text-[10px] font-bold text-cx-muted uppercase tracking-wider mb-2">Fon rangi</p>
+            <p class="text-[10px] font-bold text-cx-muted uppercase tracking-wider mb-2">
+              Fon rangi
+            </p>
             <div class="grid grid-cols-5 gap-1.5">
               <button
                 v-for="c in bgColors"
@@ -448,20 +510,29 @@ const tools = [
           class="hidden"
           :disabled="videoUploading"
           @change="e => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) insertVideo(f); (e.target as HTMLInputElement).value = '' }"
-        />
+        >
       </label>
 
       <!-- Translate button -->
       <div class="ml-auto flex items-center gap-2">
-        <span v-if="translateError" class="text-[11px] text-red-500 max-w-48 truncate" :title="translateError">{{ translateError }}</span>
+        <span
+          v-if="translateError"
+          class="text-[11px] text-red-500 max-w-48 truncate"
+          :title="translateError"
+        >{{ translateError }}</span>
         <button
           type="button"
           :disabled="translating"
           class="flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-[12px] font-semibold transition-colors text-cx-muted hover:bg-[#ebebea] hover:text-cx-ink disabled:opacity-50"
           @click="translateToUzbek"
         >
-          <span v-if="translating" class="inline-block size-3 border-2 border-cx-muted border-t-cx-blue rounded-full animate-spin" />
-          <template v-else>RU→UZ Tarjima</template>
+          <span
+            v-if="translating"
+            class="inline-block size-3 border-2 border-cx-muted border-t-cx-blue rounded-full animate-spin"
+          />
+          <template v-else>
+            RU→UZ Tarjima
+          </template>
         </button>
       </div>
     </div>
@@ -479,7 +550,13 @@ const tools = [
         :value="currentFontSize()"
         @change="setFontSize(($event.target as HTMLSelectElement).value)"
       >
-        <option v-for="size in fontSizes" :key="size" :value="size">{{ size }} pt</option>
+        <option
+          v-for="size in fontSizes"
+          :key="size"
+          :value="size"
+        >
+          {{ size }} pt
+        </option>
       </select>
 
       <!-- Font weight -->
@@ -488,7 +565,13 @@ const tools = [
         :value="fontWeights.find(w => w.value === currentFontWeight())?.label ?? 'Regular'"
         @change="setFontWeight(fontWeights.find(w => w.label === ($event.target as HTMLSelectElement).value)?.value ?? '400')"
       >
-        <option v-for="w in [{ label: 'Regular', value: '400' }, { label: 'Bold', value: '700' }, { label: 'Heavy', value: '800' }, { label: 'Black', value: '900' }]" :key="w.value" :value="w.label">{{ w.label }}</option>
+        <option
+          v-for="w in [{ label: 'Regular', value: '400' }, { label: 'Bold', value: '700' }, { label: 'Heavy', value: '800' }, { label: 'Black', value: '900' }]"
+          :key="w.value"
+          :value="w.label"
+        >
+          {{ w.label }}
+        </option>
       </select>
 
       <div class="w-px h-4 bg-cx-line mx-0.5" />
@@ -501,7 +584,9 @@ const tools = [
           editor.isActive('bold') ? 'bg-cx-blue text-white' : 'text-cx-muted hover:bg-[#ebebea] hover:text-cx-ink'
         ]"
         @click="editor.chain().focus().toggleBold().run()"
-      >B</button>
+      >
+        B
+      </button>
 
       <!-- Italic -->
       <button
@@ -511,12 +596,17 @@ const tools = [
           editor.isActive('italic') ? 'bg-cx-blue text-white' : 'text-cx-muted hover:bg-[#ebebea] hover:text-cx-ink'
         ]"
         @click="editor.chain().focus().toggleItalic().run()"
-      >I</button>
+      >
+        I
+      </button>
 
       <div class="w-px h-4 bg-cx-line mx-0.5" />
 
       <!-- Link -->
-      <div ref="bubbleLinkRef" class="relative">
+      <div
+        ref="bubbleLinkRef"
+        class="relative"
+      >
         <button
           type="button"
           :class="[
@@ -525,14 +615,25 @@ const tools = [
           ]"
           @click="openLinkInput"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
         </button>
 
         <div
           v-if="bubbleLinkOpen"
           class="absolute left-1/2 -translate-x-1/2 top-9 z-50 w-72 rounded-xl border border-cx-line bg-white shadow-lg p-3 flex flex-col gap-2"
         >
-          <p class="text-[10px] font-bold text-cx-muted uppercase tracking-wider">Link URL</p>
+          <p class="text-[10px] font-bold text-cx-muted uppercase tracking-wider">
+            Link URL
+          </p>
           <input
             v-model="bubbleLinkInput"
             type="url"
@@ -540,19 +641,23 @@ const tools = [
             class="w-full px-3 py-2 rounded-lg border border-cx-line text-[13px] text-cx-ink placeholder:text-cx-faint focus:outline-none focus:border-cx-blue transition-colors"
             @keydown.enter.prevent="applyLink"
             @keydown.esc.prevent="bubbleLinkOpen = false"
-          />
+          >
           <div class="flex gap-2">
             <button
               type="button"
               class="flex-1 py-1.5 rounded-lg bg-cx-blue text-white text-[12px] font-semibold hover:bg-cx-blue/90 transition-colors"
               @click="applyLink"
-            >Saqlash</button>
+            >
+              Saqlash
+            </button>
             <button
               v-if="editor.isActive('link')"
               type="button"
               class="py-1.5 px-3 rounded-lg border border-red-200 text-red-500 text-[12px] font-semibold hover:bg-red-50 transition-colors"
               @click="removeLink"
-            >O'chirish</button>
+            >
+              O'chirish
+            </button>
           </div>
         </div>
       </div>
@@ -560,20 +665,27 @@ const tools = [
       <div class="w-px h-4 bg-cx-line mx-0.5" />
 
       <!-- Color picker -->
-      <div ref="bubbleColorPickerRef" class="relative">
+      <div
+        ref="bubbleColorPickerRef"
+        class="relative"
+      >
         <button
           type="button"
           class="min-w-7 h-7 px-2 rounded-lg text-[13px] font-black transition-colors text-cx-muted hover:bg-[#ebebea] hover:text-cx-ink"
           :style="{ color: editor.getAttributes('textStyle').color ?? undefined }"
           @click="bubbleColorPickerOpen = !bubbleColorPickerOpen"
-        >A</button>
+        >
+          A
+        </button>
 
         <div
           v-if="bubbleColorPickerOpen"
           class="absolute left-1/2 -translate-x-1/2 top-9 z-50 w-64 rounded-xl border border-cx-line bg-white shadow-lg p-3 flex flex-col gap-3"
         >
           <div>
-            <p class="text-[10px] font-bold text-cx-muted uppercase tracking-wider mb-2">Matn rangi</p>
+            <p class="text-[10px] font-bold text-cx-muted uppercase tracking-wider mb-2">
+              Matn rangi
+            </p>
             <div class="grid grid-cols-5 gap-1.5">
               <button
                 v-for="c in textColors"
@@ -583,11 +695,15 @@ const tools = [
                 :style="c.value ? { color: c.value } : {}"
                 :title="c.label"
                 @click="setTextColor(c.value)"
-              >A</button>
+              >
+                A
+              </button>
             </div>
           </div>
           <div>
-            <p class="text-[10px] font-bold text-cx-muted uppercase tracking-wider mb-2">Fon rangi</p>
+            <p class="text-[10px] font-bold text-cx-muted uppercase tracking-wider mb-2">
+              Fon rangi
+            </p>
             <div class="grid grid-cols-5 gap-1.5">
               <button
                 v-for="c in bgColors"

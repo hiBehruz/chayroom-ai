@@ -41,8 +41,13 @@ function goToPage(page: number) {
   currentPage.value = page
 }
 
-function prev() { if (currentPage.value > 0) goToPage(currentPage.value - 1) }
-function next() { if (currentPage.value < totalPages.value - 1) goToPage(currentPage.value + 1) }
+function prev() {
+  if (currentPage.value > 0) goToPage(currentPage.value - 1)
+}
+
+function next() {
+  if (currentPage.value < totalPages.value - 1) goToPage(currentPage.value + 1)
+}
 
 function skillsForPage(page: number) {
   return skills.slice(page * itemsPerPage.value, page * itemsPerPage.value + itemsPerPage.value)
@@ -114,7 +119,11 @@ onMounted(() => {
           </button>
         </template>
 
-        <div class="flex-1 overflow-hidden" @touchstart="onTouchStart" @touchend="onTouchEnd">
+        <div
+          class="flex-1 overflow-hidden"
+          @touchstart="onTouchStart"
+          @touchend="onTouchEnd"
+        >
           <div
             ref="trackRef"
             class="flex"
@@ -146,7 +155,10 @@ onMounted(() => {
         </div>
 
         <!-- Dots (mobile only) -->
-        <div v-if="totalPages > 1" class="flex gap-1.5 justify-center mt-5">
+        <div
+          v-if="totalPages > 1"
+          class="flex gap-1.5 justify-center mt-5"
+        >
           <button
             v-for="i in totalPages"
             :key="i"

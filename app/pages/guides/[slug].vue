@@ -11,22 +11,22 @@ const freeGuideCtaFeatures = [
     icon: 'i-solar-book-bookmark-bold',
     color: '#8b5cf6',
     bg: 'rgba(139,92,246,0.12)',
-    title: "Barcha kurs va qo'llanmalar",
-    description: "Nazariyadan amaliyotgacha bo'lgan barcha materiallar bitta obunada"
+    title: 'Barcha kurs va qo\'llanmalar',
+    description: 'Nazariyadan amaliyotgacha bo\'lgan barcha materiallar bitta obunada'
   },
   {
     icon: 'i-ph-telegram-logo-fill',
     color: '#3480f1',
     bg: 'rgba(52,128,241,0.12)',
     title: 'Yopiq Telegram hamjamiyati',
-    description: "Savol berish, tajriba almashish va tezkor fikr olish uchun"
+    description: 'Savol berish, tajriba almashish va tezkor fikr olish uchun'
   },
   {
     icon: 'i-lucide-users',
     color: '#22c55e',
     bg: 'rgba(34,197,94,0.12)',
     title: 'Jonli efirlar va netvorking',
-    description: "Yangi vositalar, real misollar va bir xil yo'nalishdagi odamlar bilan aloqa"
+    description: 'Yangi vositalar, real misollar va bir xil yo\'nalishdagi odamlar bilan aloqa'
   }
 ]
 
@@ -56,9 +56,9 @@ const editBg = ref('')
 
 const levelOptions = [
   { label: 'Yangi boshlagan', color: '#10b981', icon: 'i-lucide-sprout' },
-  { label: "O'rta",           color: '#f59e0b', icon: 'i-lucide-bar-chart-2' },
-  { label: 'Tajribali',       color: '#8b5cf6', icon: 'i-lucide-flame' },
-  { label: 'Professional',    color: '#8b5cf6', icon: 'i-lucide-rocket' },
+  { label: 'O\'rta', color: '#f59e0b', icon: 'i-lucide-bar-chart-2' },
+  { label: 'Tajribali', color: '#8b5cf6', icon: 'i-lucide-flame' },
+  { label: 'Professional', color: '#8b5cf6', icon: 'i-lucide-rocket' }
 ]
 const editAccent = ref('')
 const editCategory = ref('')
@@ -66,7 +66,6 @@ const editImage = ref('')
 const imageInputRef = ref<HTMLInputElement | null>(null)
 const imageUploading = ref(false)
 const imageError = ref('')
-
 
 const localObjectUrl = ref('')
 
@@ -84,7 +83,7 @@ async function onImagePick(e: Event) {
     const res = await fetch('/api/upload/image', {
       method: 'POST',
       body: file,
-      headers: { 'Content-Type': file.type || 'image/jpeg', 'X-Filename': name },
+      headers: { 'Content-Type': file.type || 'image/jpeg', 'X-Filename': name }
     })
     if (!res.ok) throw new Error(await res.text() || `Server xatosi: ${res.status}`)
     const { publicUrl } = await res.json()
@@ -97,7 +96,10 @@ async function onImagePick(e: Event) {
 }
 
 function removeImage() {
-  if (localObjectUrl.value) { URL.revokeObjectURL(localObjectUrl.value); localObjectUrl.value = '' }
+  if (localObjectUrl.value) {
+    URL.revokeObjectURL(localObjectUrl.value)
+    localObjectUrl.value = ''
+  }
   editImage.value = ''
   if (imageInputRef.value) imageInputRef.value.value = ''
 }
@@ -158,7 +160,9 @@ async function saveEdit() {
 }
 
 const coverError = ref(false)
-watch(() => guide.value?.coverUrl, () => { coverError.value = false })
+watch(() => guide.value?.coverUrl, () => {
+  coverError.value = false
+})
 
 function addEditTag() {
   const t = editTagInput.value.trim()
@@ -197,9 +201,18 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
 </script>
 
 <template>
-  <div class="min-h-screen" :class="isMiniApp ? 'bg-[#fffdf9]' : 'bg-cx-surface'">
-    <div class="mx-auto" :class="isMiniApp ? 'px-4 py-5 max-w-full' : 'w-[1240px] max-w-[calc(100vw-40px)] px-0 py-20 max-md:px-4 max-md:py-10'">
-      <div v-if="guideLoading" class="flex items-center justify-center py-32">
+  <div
+    class="min-h-screen"
+    :class="isMiniApp ? 'bg-[#fffdf9]' : 'bg-cx-surface'"
+  >
+    <div
+      class="mx-auto"
+      :class="isMiniApp ? 'px-4 py-5 max-w-full' : 'w-[1240px] max-w-[calc(100vw-40px)] px-0 py-20 max-md:px-4 max-md:py-10'"
+    >
+      <div
+        v-if="guideLoading"
+        class="flex items-center justify-center py-32"
+      >
         <span class="inline-block size-8 border-2 border-cx-line border-t-cx-blue rounded-full animate-spin" />
       </div>
 
@@ -208,7 +221,10 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
         class="guide-detail mx-auto max-w-full"
         :class="isMiniApp ? 'guide-detail--mini' : 'w-[882px]'"
       >
-        <div v-if="!isMiniApp" class="mb-8 flex items-center justify-between gap-4 max-md:flex-col max-md:items-stretch">
+        <div
+          v-if="!isMiniApp"
+          class="mb-8 flex items-center justify-between gap-4 max-md:flex-col max-md:items-stretch"
+        >
           <NuxtLink
             to="/guides"
             class="guide-pill-button"
@@ -220,29 +236,53 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
             Qo'llanmalarga qaytish
           </NuxtLink>
 
-          <div v-if="isOwner && isEditing" class="flex items-center gap-2">
-            <button class="guide-pill-button max-md:justify-center" @click="cancelEdit">
-              <UIcon name="i-lucide-x" class="size-5" />
+          <div
+            v-if="isOwner && isEditing"
+            class="flex items-center gap-2"
+          >
+            <button
+              class="guide-pill-button max-md:justify-center"
+              @click="cancelEdit"
+            >
+              <UIcon
+                name="i-lucide-x"
+                class="size-5"
+              />
               Bekor qilish
             </button>
-            <button class="guide-pill-button guide-pill-button--dark max-md:justify-center" @click="saveEdit">
-              <UIcon name="i-lucide-check" class="size-5" />
+            <button
+              class="guide-pill-button guide-pill-button--dark max-md:justify-center"
+              @click="saveEdit"
+            >
+              <UIcon
+                name="i-lucide-check"
+                class="size-5"
+              />
               Saqlash
             </button>
           </div>
-          <div v-else-if="isOwner" class="flex items-center gap-2">
+          <div
+            v-else-if="isOwner"
+            class="flex items-center gap-2"
+          >
             <button
               class="guide-pill-button max-md:justify-center"
               @click="startEdit"
             >
-              <UIcon name="i-lucide-pencil" class="size-5" />
+              <UIcon
+                name="i-lucide-pencil"
+                class="size-5"
+              />
               Redaktirovat
             </button>
             <button
               class="guide-pill-button max-md:justify-center text-red-500 hover:bg-red-50"
               @click="deleteConfirmOpen = true"
             >
-              <UIcon name="i-lucide-trash-2" class="size-5" />
+              <UIcon
+                name="i-lucide-trash-2"
+                class="size-5"
+              />
               O'chirish
             </button>
           </div>
@@ -251,7 +291,10 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
             class="guide-pill-button max-md:justify-center"
             @click="copyGuideLink"
           >
-            <UIcon name="i-lucide-link" class="size-5" />
+            <UIcon
+              name="i-lucide-link"
+              class="size-5"
+            />
             Copy Link
           </button>
         </div>
@@ -298,51 +341,60 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
               </div>
             </div>
             <div class="flex items-start gap-6 flex-wrap">
-            <div>
-              <label class="block text-[16px] font-bold text-cx-muted uppercase tracking-wider mb-2">Badge</label>
-              <input
-                v-model="editBadge"
-                type="text"
-                class="w-32 px-3 py-1.5 rounded-xl border border-cx-line bg-[#f7f5ef] text-[12px] text-cx-ink focus:outline-none focus:border-cx-blue transition-colors"
-              >
-            </div>
-            <div>
-              <label class="block text-[16px] font-bold text-cx-muted uppercase tracking-wider mb-2">Kirish</label>
-              <div class="flex gap-1.5">
-                <button
-                  class="guide-pill-button min-h-0! text-[16px]! px-5! py-2.5! gap-2"
-                  :class="editFree ? 'guide-pill-button--dark' : ''"
-                  @click="editFree = true"
+              <div>
+                <label class="block text-[16px] font-bold text-cx-muted uppercase tracking-wider mb-2">Badge</label>
+                <input
+                  v-model="editBadge"
+                  type="text"
+                  class="w-32 px-3 py-1.5 rounded-xl border border-cx-line bg-[#f7f5ef] text-[12px] text-cx-ink focus:outline-none focus:border-cx-blue transition-colors"
                 >
-                  <UIcon name="i-lucide-unlock" class="size-4" />
-                  Bepul
-                </button>
-                <button
-                  class="guide-pill-button min-h-0! text-[16px]! px-5! py-2.5! gap-2"
-                  :class="!editFree ? 'guide-pill-button--dark' : ''"
-                  @click="editFree = false"
-                >
-                  <UIcon name="i-lucide-lock" class="size-4" />
-                  Obuna
-                </button>
               </div>
-            </div>
-            <div>
-              <label class="block text-[16px] font-bold text-cx-muted uppercase tracking-wider mb-2">Daraja</label>
-              <div class="flex flex-wrap gap-1.5">
-                <button
-                  v-for="opt in levelOptions"
-                  :key="opt.label"
-                  class="flex items-center gap-2 px-3.5 py-2 rounded-xl border-2 text-[13px] font-semibold transition-all duration-150"
-                  :class="editLevel === opt.label ? 'border-current' : 'border-cx-line bg-[#f7f5ef] text-cx-muted hover:border-[#c0c0bc]'"
-                  :style="editLevel === opt.label ? { borderColor: opt.color, background: opt.color + '15', color: opt.color } : {}"
-                  @click="editLevel = opt.label"
-                >
-                  <UIcon :name="opt.icon" class="size-3.5 shrink-0" />
-                  {{ opt.label }}
-                </button>
+              <div>
+                <label class="block text-[16px] font-bold text-cx-muted uppercase tracking-wider mb-2">Kirish</label>
+                <div class="flex gap-1.5">
+                  <button
+                    class="guide-pill-button min-h-0! text-[16px]! px-5! py-2.5! gap-2"
+                    :class="editFree ? 'guide-pill-button--dark' : ''"
+                    @click="editFree = true"
+                  >
+                    <UIcon
+                      name="i-lucide-unlock"
+                      class="size-4"
+                    />
+                    Bepul
+                  </button>
+                  <button
+                    class="guide-pill-button min-h-0! text-[16px]! px-5! py-2.5! gap-2"
+                    :class="!editFree ? 'guide-pill-button--dark' : ''"
+                    @click="editFree = false"
+                  >
+                    <UIcon
+                      name="i-lucide-lock"
+                      class="size-4"
+                    />
+                    Obuna
+                  </button>
+                </div>
               </div>
-            </div>
+              <div>
+                <label class="block text-[16px] font-bold text-cx-muted uppercase tracking-wider mb-2">Daraja</label>
+                <div class="flex flex-wrap gap-1.5">
+                  <button
+                    v-for="opt in levelOptions"
+                    :key="opt.label"
+                    class="flex items-center gap-2 px-3.5 py-2 rounded-xl border-2 text-[13px] font-semibold transition-all duration-150"
+                    :class="editLevel === opt.label ? 'border-current' : 'border-cx-line bg-[#f7f5ef] text-cx-muted hover:border-[#c0c0bc]'"
+                    :style="editLevel === opt.label ? { borderColor: opt.color, background: opt.color + '15', color: opt.color } : {}"
+                    @click="editLevel = opt.label"
+                  >
+                    <UIcon
+                      :name="opt.icon"
+                      class="size-3.5 shrink-0"
+                    />
+                    {{ opt.label }}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -375,7 +427,10 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
                   class="guide-pill-button min-h-0! text-[13px]! px-3! py-2! guide-pill-button--dark"
                   @click="addEditTag"
                 >
-                  <UIcon name="i-lucide-plus" class="size-4" />
+                  <UIcon
+                    name="i-lucide-plus"
+                    class="size-4"
+                  />
                 </button>
               </span>
             </div>
@@ -415,13 +470,23 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
           <!-- Image -->
           <div>
             <label class="block text-[16px] font-bold text-cx-muted uppercase tracking-wider mb-2">Rasm</label>
-            <div v-if="editImage" class="relative rounded-xl overflow-hidden border border-cx-line">
-              <img :src="editImage" alt="cover" class="w-full h-auto block" />
+            <div
+              v-if="editImage"
+              class="relative rounded-xl overflow-hidden border border-cx-line"
+            >
+              <img
+                :src="editImage"
+                alt="cover"
+                class="w-full h-auto block"
+              >
               <button
                 class="absolute top-2 right-2 grid size-7 place-items-center rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
                 @click="removeImage"
               >
-                <UIcon name="i-lucide-x" class="size-3.5" />
+                <UIcon
+                  name="i-lucide-x"
+                  class="size-3.5"
+                />
               </button>
             </div>
             <label
@@ -429,16 +494,32 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
               class="flex flex-col items-center justify-center gap-2.5 h-36 rounded-xl border-2 border-dashed border-cx-line bg-[#f7f5ef] hover:border-cx-blue hover:bg-cx-blue/10 transition-all cursor-pointer"
               :class="{ 'opacity-60 pointer-events-none': imageUploading }"
             >
-              <input ref="imageInputRef" type="file" accept="image/*" class="sr-only" :disabled="imageUploading" @change="onImagePick" />
+              <input
+                ref="imageInputRef"
+                type="file"
+                accept="image/*"
+                class="sr-only"
+                :disabled="imageUploading"
+                @change="onImagePick"
+              >
               <div class="grid size-10 place-items-center rounded-xl bg-cx-blue/10">
-                <UIcon :name="imageUploading ? 'i-lucide-loader-2' : 'i-lucide-image-plus'" class="size-5 text-cx-blue" :class="{ 'animate-spin': imageUploading }" />
+                <UIcon
+                  :name="imageUploading ? 'i-lucide-loader-2' : 'i-lucide-image-plus'"
+                  class="size-5 text-cx-blue"
+                  :class="{ 'animate-spin': imageUploading }"
+                />
               </div>
               <div class="text-center">
                 <p class="text-[14px] font-semibold text-cx-ink">{{ imageUploading ? 'Yuklanmoqda...' : 'Rasm yuklash' }}</p>
                 <p class="text-[12px] text-cx-muted mt-0.5">PNG, JPG</p>
               </div>
             </label>
-            <p v-if="imageError" class="mt-2 text-[12px] text-red-500 font-semibold">{{ imageError }}</p>
+            <p
+              v-if="imageError"
+              class="mt-2 text-[12px] text-red-500 font-semibold"
+            >
+              {{ imageError }}
+            </p>
           </div>
 
           <!-- Content -->
@@ -450,15 +531,23 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
           </div>
         </div>
 
-
         <!-- Cover image -->
-        <div v-if="guide.coverUrl && !coverError" class="mb-8 rounded-2xl overflow-hidden" :style="isMiniApp ? 'width:100%;height:200px' : 'width:882px;max-width:100%;height:400px'">
-          <img :src="guide.coverUrl" alt="" class="w-full h-full object-cover block" @error="coverError = true" />
+        <div
+          v-if="guide.coverUrl && !coverError"
+          class="mb-8 rounded-2xl overflow-hidden"
+          :style="isMiniApp ? 'width:100%;height:200px' : 'width:882px;max-width:100%;height:400px'"
+        >
+          <img
+            :src="guide.coverUrl"
+            alt=""
+            class="w-full h-full object-cover block"
+            @error="coverError = true"
+          >
         </div>
 
         <!-- Tags + access badge -->
         <div class="mb-5 flex flex-wrap items-center gap-2">
-<span
+          <span
             v-for="tag in guide.tags"
             :key="tag"
             class="guide-meta-chip"
@@ -488,8 +577,19 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
             class="guide-meta-chip"
             style="background: #f0fdf4; color: #16a34a;"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-3" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              class="size-3"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+              />
             </svg>
             По подписке
           </span>
@@ -522,7 +622,10 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
           class="flex flex-col items-center text-center py-12 px-8"
         >
           <div class="w-14 h-14 rounded-full bg-[#f0f0f0] flex items-center justify-center mb-5">
-            <UIcon name="i-lucide-lock" class="size-6 text-[#6f6f72]" />
+            <UIcon
+              name="i-lucide-lock"
+              class="size-6 text-[#6f6f72]"
+            />
           </div>
           <h2 class="text-[28px] font-extrabold text-[#1a1a1a] mb-2">
             Гайд доступен по подписке
@@ -539,11 +642,13 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
         </div>
 
         <!-- Content block -->
+        <!-- eslint-disable vue/no-v-html -->
         <div
           v-else
           class="rich-content prose max-w-none text-[#14161f]"
           v-html="guide.content"
         />
+        <!-- eslint-enable vue/no-v-html -->
 
         <section
           v-if="guide.isFree && !hasSubscription"
@@ -553,7 +658,10 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
             <div class="grid grid-cols-[minmax(0,1.25fr)_minmax(280px,0.85fr)] max-md:grid-cols-1">
               <div class="px-8 py-8 max-md:px-5 max-md:py-6">
                 <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-[#14161f]/8 px-3 py-1 text-[12px] font-semibold text-[#14161f]">
-                  <UIcon name="i-lucide-sparkles" class="size-3.5" />
+                  <UIcon
+                    name="i-lucide-sparkles"
+                    class="size-3.5"
+                  />
                   Chayroom AI Club
                 </div>
 
@@ -575,7 +683,11 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
                       class="mt-0.5 grid size-10 shrink-0 place-items-center rounded-xl"
                       :style="{ background: feature.bg }"
                     >
-                      <UIcon :name="feature.icon" class="size-4.5" :style="{ color: feature.color }" />
+                      <UIcon
+                        :name="feature.icon"
+                        class="size-4.5"
+                        :style="{ color: feature.color }"
+                      />
                     </div>
                     <div class="min-w-0">
                       <p class="text-[15px] font-semibold text-[#1a1a1a]">
@@ -615,7 +727,10 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
                     @click="isAccessModalOpen = true"
                   >
                     Club'ga qo'shilish
-                    <UIcon name="i-solar-alt-arrow-right-bold" class="size-4.5" />
+                    <UIcon
+                      name="i-solar-alt-arrow-right-bold"
+                      class="size-4.5"
+                    />
                   </button>
 
                   <p class="text-center text-[13px] text-cx-muted">
@@ -630,42 +745,52 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
     </div>
 
     <AppAccessModal v-model="isAccessModalOpen" />
-  </div>
 
-  <Teleport to="body">
-    <div
-      v-if="deleteConfirmOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-      @click.self="deleteConfirmOpen = false"
-    >
-      <div class="bg-white rounded-2xl p-6 shadow-2xl w-[360px]">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="grid size-10 place-items-center rounded-xl bg-red-50 text-red-500 shrink-0">
-            <UIcon name="i-lucide-trash-2" class="size-5" />
+    <Teleport to="body">
+      <div
+        v-if="deleteConfirmOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        @click.self="deleteConfirmOpen = false"
+      >
+        <div class="bg-white rounded-2xl p-6 shadow-2xl w-[360px]">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="grid size-10 place-items-center rounded-xl bg-red-50 text-red-500 shrink-0">
+              <UIcon
+                name="i-lucide-trash-2"
+                class="size-5"
+              />
+            </div>
+            <h3 class="text-[16px] font-bold text-cx-ink">
+              Qo'llanmani o'chirish
+            </h3>
           </div>
-          <h3 class="text-[16px] font-bold text-cx-ink">Qo'llanmani o'chirish</h3>
-        </div>
-        <p class="text-[14px] text-cx-muted mb-6">Ushbu qo'llanma butunlay o'chiriladi. Bu amalni qaytarib bo'lmaydi.</p>
-        <div class="flex gap-2.5">
-          <button
-            class="flex-1 px-4 py-2.5 rounded-xl border border-cx-line text-[13px] font-semibold text-cx-muted hover:text-cx-ink transition-colors"
-            @click="deleteConfirmOpen = false"
-          >
-            Bekor qilish
-          </button>
-          <button
-            class="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-[13px] font-semibold hover:bg-red-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
-            :disabled="deleting"
-            @click="deleteGuide"
-          >
-            <UIcon v-if="deleting" name="i-lucide-loader-circle" class="size-4 animate-spin" />
-            {{ deleting ? 'O\'chirilmoqda...' : 'O\'chirish' }}
-          </button>
+          <p class="text-[14px] text-cx-muted mb-6">
+            Ushbu qo'llanma butunlay o'chiriladi. Bu amalni qaytarib bo'lmaydi.
+          </p>
+          <div class="flex gap-2.5">
+            <button
+              class="flex-1 px-4 py-2.5 rounded-xl border border-cx-line text-[13px] font-semibold text-cx-muted hover:text-cx-ink transition-colors"
+              @click="deleteConfirmOpen = false"
+            >
+              Bekor qilish
+            </button>
+            <button
+              class="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-[13px] font-semibold hover:bg-red-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+              :disabled="deleting"
+              @click="deleteGuide"
+            >
+              <UIcon
+                v-if="deleting"
+                name="i-lucide-loader-circle"
+                class="size-4 animate-spin"
+              />
+              {{ deleting ? 'O\'chirilmoqda...' : 'O\'chirish' }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  </Teleport>
-
+    </Teleport>
+  </div>
 </template>
 
 <style scoped>
@@ -771,7 +896,6 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
   line-height: 32px;
 }
 
-
 @media (max-width: 734px) {
   .guide-detail-title {
     font-size: 28px;
@@ -783,7 +907,6 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
     font-size: 20px;
     line-height: 28px;
   }
-
 
   .guide-visual {
     border-radius: 20px;

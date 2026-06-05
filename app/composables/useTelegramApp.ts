@@ -29,15 +29,36 @@ export function useTelegramApp() {
         btn.setText(text)
         btn.show()
       },
-      hide() { if (!isMiniApp.value) return; wa()?.MainButton.hide() },
-      onClick(fn: () => void) { if (!isMiniApp.value) return; wa()?.MainButton.onClick(fn) },
-      offClick(fn: () => void) { if (!isMiniApp.value) return; wa()?.MainButton.offClick(fn) }
+      hide() {
+        if (!isMiniApp.value) return
+        wa()?.MainButton.hide()
+      },
+      onClick(fn: () => void) {
+        if (!isMiniApp.value) return
+        wa()?.MainButton.onClick(fn)
+      },
+      offClick(fn: () => void) {
+        if (!isMiniApp.value) return
+        wa()?.MainButton.offClick(fn)
+      }
     },
     backButton: {
-      show() { if (!isMiniApp.value) return; wa()?.BackButton.show() },
-      hide() { if (!isMiniApp.value) return; wa()?.BackButton.hide() },
-      onClick(fn: () => void) { if (!isMiniApp.value) return; wa()?.BackButton.onClick(fn) },
-      offClick(fn: () => void) { if (!isMiniApp.value) return; wa()?.BackButton.offClick(fn) }
+      show() {
+        if (!isMiniApp.value) return
+        wa()?.BackButton.show()
+      },
+      hide() {
+        if (!isMiniApp.value) return
+        wa()?.BackButton.hide()
+      },
+      onClick(fn: () => void) {
+        if (!isMiniApp.value) return
+        wa()?.BackButton.onClick(fn)
+      },
+      offClick(fn: () => void) {
+        if (!isMiniApp.value) return
+        wa()?.BackButton.offClick(fn)
+      }
     }
   }
 }

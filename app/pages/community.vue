@@ -9,7 +9,7 @@ const spaces = [
     link: null,
     linkLabel: null,
     iconColor: '#f59e0b',
-    iconBg: 'rgba(245,158,11,0.12)',
+    iconBg: 'rgba(245,158,11,0.12)'
   },
   {
     icon: 'i-solar-chat-round-dots-bold',
@@ -18,7 +18,7 @@ const spaces = [
     link: '#',
     linkLabel: 'Chatni ochish',
     iconColor: '#3480f1',
-    iconBg: 'rgba(52,128,241,0.12)',
+    iconBg: 'rgba(52,128,241,0.12)'
   },
   {
     icon: 'i-solar-monitor-smartphone-bold',
@@ -27,7 +27,7 @@ const spaces = [
     link: '/courses',
     linkLabel: 'Web-versiya',
     iconColor: '#8b5cf6',
-    iconBg: 'rgba(139,92,246,0.12)',
+    iconBg: 'rgba(139,92,246,0.12)'
   },
   {
     icon: 'i-solar-headphones-round-bold',
@@ -36,8 +36,8 @@ const spaces = [
     link: '#',
     linkLabel: 'Yozish',
     iconColor: '#14b8a6',
-    iconBg: 'rgba(20,184,166,0.12)',
-  },
+    iconBg: 'rgba(20,184,166,0.12)'
+  }
 ]
 
 const contents = [
@@ -46,7 +46,7 @@ const contents = [
   { icon: 'i-solar-lightning-bold', title: 'Skilllar', soon: true, iconColor: '#eab308', iconBg: 'rgba(234,179,8,0.12)' },
   { icon: 'i-solar-folder-with-files-bold', title: 'Yuzkeyslar', soon: true, iconColor: '#22c55e', iconBg: 'rgba(34,197,94,0.12)' },
   { icon: 'i-solar-videocamera-bold', title: 'Efirlar', soon: true, iconColor: '#ec4899', iconBg: 'rgba(236,72,153,0.12)' },
-  { icon: 'i-solar-hammer-bold', title: 'Vorkshoplar', soon: true, iconColor: '#06b6d4', iconBg: 'rgba(6,182,212,0.12)' },
+  { icon: 'i-solar-hammer-bold', title: 'Vorkshoplar', soon: true, iconColor: '#06b6d4', iconBg: 'rgba(6,182,212,0.12)' }
 ]
 
 const steps = [
@@ -54,20 +54,20 @@ const steps = [
     title: 'O\'zingiz haqingizda ayting',
     desc: 'Maqsad va darajangizga mos materiallar tanlaymiz.',
     link: null,
-    linkLabel: null,
+    linkLabel: null
   },
   {
     title: 'Qoidalarni o\'qing',
     desc: 'Bir-ikki daqiqa, va bizda hamma narsa qanday ishlashini tushunasiz.',
     link: null,
-    linkLabel: null,
+    linkLabel: null
   },
   {
     title: 'Katalogni oching',
     desc: 'Platforma materiallarining hammasi bir joyda.',
     link: '/courses',
-    linkLabel: 'Katalogga o\'tish',
-  },
+    linkLabel: 'Katalogga o\'tish'
+  }
 ]
 
 const tags = ['AI-agentlar', 'Vibe coding', 'Avtomatlashtirish', 'Shaxsiy assistentlar', 'Neyrotarmoqlar']
@@ -76,7 +76,6 @@ const tags = ['AI-agentlar', 'Vibe coding', 'Avtomatlashtirish', 'Shaxsiy assist
 <template>
   <div class="min-h-screen bg-cx-surface">
     <div class="w-[780px] max-w-[calc(100vw-40px)] mx-auto py-14 max-md:py-10 max-md:px-4">
-
       <!-- Hero -->
       <div class="mb-14 max-md:mb-10">
         <span class="inline-block text-[13px] font-semibold tracking-widest uppercase text-cx-blue mb-4 max-md:mb-3">
@@ -112,19 +111,33 @@ const tags = ['AI-agentlar', 'Vibe coding', 'Avtomatlashtirish', 'Shaxsiy assist
             :key="space.title"
             class="rounded-2xl bg-[#f7f5ef] border border-transparent hover:border-[#e8e6e1] transition-colors duration-200 p-5 flex gap-4 items-start"
           >
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5" :style="{ background: space.iconBg }">
-              <UIcon :name="space.icon" class="size-5" :style="{ color: space.iconColor }" />
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+              :style="{ background: space.iconBg }"
+            >
+              <UIcon
+                :name="space.icon"
+                class="size-5"
+                :style="{ color: space.iconColor }"
+              />
             </div>
             <div class="min-w-0">
-              <div class="text-[15px] font-semibold text-[#14161f] mb-1">{{ space.title }}</div>
-              <div class="text-[14px] text-cx-muted leading-snug mb-2">{{ space.desc }}</div>
+              <div class="text-[15px] font-semibold text-[#14161f] mb-1">
+                {{ space.title }}
+              </div>
+              <div class="text-[14px] text-cx-muted leading-snug mb-2">
+                {{ space.desc }}
+              </div>
               <NuxtLink
                 v-if="space.link"
                 :to="space.link"
                 class="inline-flex items-center gap-1 text-[13px] font-semibold text-cx-blue hover:opacity-75 transition-opacity"
               >
                 {{ space.linkLabel }}
-                <UIcon name="i-lucide-arrow-right" class="size-3.5" />
+                <UIcon
+                  name="i-lucide-arrow-right"
+                  class="size-3.5"
+                />
               </NuxtLink>
             </div>
           </div>
@@ -149,8 +162,15 @@ const tags = ['AI-agentlar', 'Vibe coding', 'Avtomatlashtirish', 'Shaxsiy assist
                 : 'bg-[#f7f5ef] border-transparent hover:border-[#e8e6e1]'
             ]"
           >
-            <div class="w-9 h-9 rounded-xl flex items-center justify-center" :style="{ background: item.iconBg }">
-              <UIcon :name="item.icon" class="size-4.5" :style="{ color: item.iconColor }" />
+            <div
+              class="w-9 h-9 rounded-xl flex items-center justify-center"
+              :style="{ background: item.iconBg }"
+            >
+              <UIcon
+                :name="item.icon"
+                class="size-4.5"
+                :style="{ color: item.iconColor }"
+              />
             </div>
             <div class="flex items-center gap-2 flex-wrap">
               <span class="text-[15px] font-semibold text-[#14161f]">{{ item.title }}</span>
@@ -182,21 +202,27 @@ const tags = ['AI-agentlar', 'Vibe coding', 'Avtomatlashtirish', 'Shaxsiy assist
               <span class="text-[13px] font-bold text-cx-blue">{{ i + 1 }}</span>
             </div>
             <div>
-              <div class="text-[16px] font-semibold text-[#14161f] mb-1">{{ step.title }}</div>
-              <div class="text-[14px] text-cx-muted leading-snug mb-2">{{ step.desc }}</div>
+              <div class="text-[16px] font-semibold text-[#14161f] mb-1">
+                {{ step.title }}
+              </div>
+              <div class="text-[14px] text-cx-muted leading-snug mb-2">
+                {{ step.desc }}
+              </div>
               <NuxtLink
                 v-if="step.link"
                 :to="step.link"
                 class="inline-flex items-center gap-1 text-[13px] font-semibold text-cx-blue hover:opacity-75 transition-opacity"
               >
                 {{ step.linkLabel }}
-                <UIcon name="i-lucide-arrow-right" class="size-3.5" />
+                <UIcon
+                  name="i-lucide-arrow-right"
+                  class="size-3.5"
+                />
               </NuxtLink>
             </div>
           </div>
         </div>
       </section>
-
     </div>
   </div>
 </template>

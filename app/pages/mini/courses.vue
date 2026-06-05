@@ -1,12 +1,18 @@
 <script setup lang="ts">
 const router = useRouter()
-const { data: allCourses, pending } = useAsyncData('mini-courses', () => $fetch<any[]>('/api/courses'))
+interface MiniCourse {
+  title: string
+  slug: string
+  description?: string | null
+}
+
+const { data: allCourses, pending } = useAsyncData<MiniCourse[]>('mini-courses', () => $fetch('/api/courses'))
 
 const chips = [
-  { label: 'Hammasi',     value: 'all',         icon: null },
+  { label: 'Hammasi', value: 'all', icon: null },
   { label: 'Vibe coding', value: 'vibe-coding', icon: 'i-solar-code-circle-bold' },
-  { label: 'AI agentlar', value: 'ai-agents',   icon: 'i-solar-command-bold' },
-  { label: 'Neyrolar',    value: 'neural',       icon: 'i-solar-atom-bold' },
+  { label: 'AI agentlar', value: 'ai-agents', icon: 'i-solar-command-bold' },
+  { label: 'Neyrolar', value: 'neural', icon: 'i-solar-atom-bold' }
 ]
 const activeChip = ref('all')
 const filterRef = ref<HTMLElement | null>(null)
@@ -29,11 +35,17 @@ function updateIndicator() {
 
 function selectChip(value: string) {
   activeChip.value = value
-  nextTick(() => { updateIndicator(); requestAnimationFrame(updateIndicator) })
+  nextTick(() => {
+    updateIndicator()
+    requestAnimationFrame(updateIndicator)
+  })
 }
 
 onMounted(() => {
-  nextTick(() => { updateIndicator(); requestAnimationFrame(updateIndicator) })
+  nextTick(() => {
+    updateIndicator()
+    requestAnimationFrame(updateIndicator)
+  })
   document.fonts?.ready.then(updateIndicator)
 })
 
@@ -44,7 +56,6 @@ useSeoMeta({ title: 'Kurslar' })
 
 <template>
   <div style="background:#fffdf9;min-height:100vh;font-family:inherit">
-
     <!-- Header -->
     <div class="flex items-center gap-3 px-5 pt-4 pb-2">
       <button
@@ -52,17 +63,35 @@ useSeoMeta({ title: 'Kurslar' })
         style="width:36px;height:36px;border-radius:50%;background:#f7f5ef;border:none"
         @click="router.back()"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0f1115" stroke-width="2.5" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#0f1115"
+          stroke-width="2.5"
+          stroke-linecap="round"
+        ><path d="M15 6l-6 6 6 6" /></svg>
       </button>
       <div>
-        <h1 style="font-size:26px;font-weight:800;letter-spacing:-0.03em;color:#0f1115;margin:0">Kurslar</h1>
+        <h1 style="font-size:26px;font-weight:800;letter-spacing:-0.03em;color:#0f1115;margin:0">
+          Kurslar
+        </h1>
       </div>
     </div>
-    <p style="font-size:13px;color:#6b7280;font-weight:500;margin:0;padding:0 20px 14px">AI agentlar, neyrotarmoqlar va vibe coding.</p>
+    <p style="font-size:13px;color:#6b7280;font-weight:500;margin:0;padding:0 20px 14px">
+      AI agentlar, neyrotarmoqlar va vibe coding.
+    </p>
 
     <!-- Chip filters -->
-    <div class="overflow-x-auto" style="padding:0 20px 14px;scrollbar-width:none">
-      <div ref="filterRef" class="relative inline-flex items-center gap-2 whitespace-nowrap">
+    <div
+      class="overflow-x-auto"
+      style="padding:0 20px 14px;scrollbar-width:none"
+    >
+      <div
+        ref="filterRef"
+        class="relative inline-flex items-center gap-2 whitespace-nowrap"
+      >
         <span
           class="absolute inset-y-0 rounded-full bg-[#262831] pointer-events-none"
           style="transition:left 250ms cubic-bezier(0.23,1,0.32,1),width 250ms cubic-bezier(0.23,1,0.32,1),opacity 150ms ease"
@@ -76,31 +105,55 @@ useSeoMeta({ title: 'Kurslar' })
           :style="activeChip === chip.value ? 'color:#fffdf9;background:transparent' : 'color:#262831;background:#f7f5f0'"
           @click="selectChip(chip.value)"
         >
-          <UIcon v-if="chip.icon" :name="chip.icon" class="size-4" />
+          <UIcon
+            v-if="chip.icon"
+            :name="chip.icon"
+            class="size-4"
+          />
           {{ chip.label }}
         </button>
       </div>
     </div>
 
     <!-- Skeleton -->
-    <div v-if="pending" class="flex flex-col gap-3" style="padding:0 20px 24px">
+    <div
+      v-if="pending"
+      class="flex flex-col gap-3"
+      style="padding:0 20px 24px"
+    >
       <div
         v-for="i in 3"
         :key="i"
         class="flex items-center gap-3"
         style="background:#f7f5ef;border-radius:20px;padding:14px"
       >
-        <div class="skeleton flex-none" style="width:96px;height:96px;border-radius:16px" />
+        <div
+          class="skeleton flex-none"
+          style="width:96px;height:96px;border-radius:16px"
+        />
         <div class="flex-1 flex flex-col gap-2">
-          <div class="skeleton" style="height:11px;width:35%;border-radius:8px" />
-          <div class="skeleton" style="height:14px;width:85%;border-radius:8px" />
-          <div class="skeleton" style="height:11px;width:55%;border-radius:8px" />
+          <div
+            class="skeleton"
+            style="height:11px;width:35%;border-radius:8px"
+          />
+          <div
+            class="skeleton"
+            style="height:14px;width:85%;border-radius:8px"
+          />
+          <div
+            class="skeleton"
+            style="height:11px;width:55%;border-radius:8px"
+          />
         </div>
       </div>
     </div>
 
     <!-- Courses list -->
-    <div v-else class="flex flex-col gap-3" style="padding:0 20px 24px">
+    <div
+      v-else
+      class="flex flex-col gap-3"
+      style="padding:0 20px 24px"
+    >
       <NuxtLink
         v-for="(course, i) in courses"
         :key="course.slug"
@@ -113,10 +166,31 @@ useSeoMeta({ title: 'Kurslar' })
           class="flex-none grid place-items-center overflow-hidden"
           style="width:96px;height:96px;border-radius:16px;background:#4c6ef0"
         >
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-            <circle cx="20" cy="20" r="14" stroke="#fff" stroke-width="1.8"/>
-            <circle cx="20" cy="20" r="6" fill="#fff"/>
-            <path d="M20 6v8M20 26v8M6 20h8M26 20h8" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+          >
+            <circle
+              cx="20"
+              cy="20"
+              r="14"
+              stroke="#fff"
+              stroke-width="1.8"
+            />
+            <circle
+              cx="20"
+              cy="20"
+              r="6"
+              fill="#fff"
+            />
+            <path
+              d="M20 6v8M20 26v8M6 20h8M26 20h8"
+              stroke="#fff"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
           </svg>
         </div>
 
@@ -133,10 +207,21 @@ useSeoMeta({ title: 'Kurslar' })
           >{{ course.description }}</p>
         </div>
 
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4c8d2" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#c4c8d2"
+          stroke-width="2"
+        ><path d="M9 6l6 6-6 6" /></svg>
       </NuxtLink>
 
-      <div v-if="!courses.length" class="flex items-center justify-center" style="padding:48px 0;color:#9aa0a8;font-size:14px;font-weight:500">
+      <div
+        v-if="!courses.length"
+        class="flex items-center justify-center"
+        style="padding:48px 0;color:#9aa0a8;font-size:14px;font-weight:500"
+      >
         Kurslar topilmadi
       </div>
     </div>

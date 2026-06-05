@@ -42,6 +42,46 @@ export interface Course {
   free: boolean
 }
 
+interface CourseApiLesson {
+  id?: number
+  title: string
+  type?: 'Nazariy' | 'Amaliy' | null
+  duration?: string | null
+  free?: boolean | null
+  videoUrl?: string | null
+  content?: string | null
+}
+
+interface CourseApiModule {
+  id?: number
+  title: string
+  subtitle?: string | null
+  duration?: string | null
+  lessons?: CourseApiLesson[] | null
+}
+
+interface CourseApiRow {
+  id?: number
+  slug: string
+  title: string
+  description?: string | null
+  tags?: string[] | null
+  level?: string | null
+  levelColor?: string | null
+  rating?: number | null
+  participants?: number | null
+  duration?: string | null
+  modulesList?: CourseApiModule[] | null
+  bg?: string | null
+  dark?: boolean | null
+  badge?: string | null
+  accentTitle?: string[] | null
+  accentColor?: string | null
+  coverUrl?: string | null
+  content?: string | null
+  isFree?: boolean | null
+}
+
 export const useCoursesStore = defineStore('courses', () => {
   const courses = ref<Course[]>([])
   const pending = ref(false)
@@ -50,7 +90,7 @@ export const useCoursesStore = defineStore('courses', () => {
     if (courses.value.length && !force) return
     pending.value = true
     try {
-      const rows = await $fetch<any[]>('/api/courses')
+      const rows = await $fetch<CourseApiRow[]>('/api/courses')
       courses.value = rows.map(normalizeFromApi)
     } finally {
       pending.value = false
@@ -60,7 +100,7 @@ export const useCoursesStore = defineStore('courses', () => {
   async function addCourse(course: Course) {
     const result = await $fetch<{ slug: string }>('/api/courses', {
       method: 'POST',
-      body: course,
+      body: course
     })
     await load(true)
     return result
@@ -75,7 +115,7 @@ export const useCoursesStore = defineStore('courses', () => {
   return { all, courses, pending, load, addCourse, slugExists }
 })
 
-function normalizeFromApi(row: any): Course {
+function normalizeFromApi(row: CourseApiRow): Course {
   return {
     id: row.id,
     slug: row.slug,
@@ -88,21 +128,21 @@ function normalizeFromApi(row: any): Course {
     participants: row.participants ?? 0,
     duration: row.duration ?? '',
     modules: row.modulesList?.length ?? 0,
-    lessons: row.modulesList?.reduce((s: number, m: any) => s + (m.lessons?.length ?? 0), 0) ?? 0,
-    modulesList: (row.modulesList ?? []).map((m: any) => ({
+    lessons: row.modulesList?.reduce((s, m) => s + (m.lessons?.length ?? 0), 0) ?? 0,
+    modulesList: (row.modulesList ?? []).map(m => ({
       id: m.id,
       title: m.title,
       subtitle: m.subtitle ?? '',
       duration: m.duration ?? '',
-      lessons: (m.lessons ?? []).map((l: any) => ({
+      lessons: (m.lessons ?? []).map(l => ({
         id: l.id,
         title: l.title,
         type: l.type ?? 'Nazariy',
         duration: l.duration ?? '',
         free: l.free ?? false,
         videoUrl: l.videoUrl ?? undefined,
-        content: l.content ?? undefined,
-      })),
+        content: l.content ?? undefined
+      }))
     })),
     bg: row.bg ?? '#3480f1',
     dark: row.dark ?? false,
@@ -111,6 +151,6 @@ function normalizeFromApi(row: any): Course {
     accentColor: row.accentColor ?? '#3480f1',
     image: row.coverUrl ?? undefined,
     content: row.content ?? undefined,
-    free: row.isFree ?? false,
+    free: row.isFree ?? false
   }
 }

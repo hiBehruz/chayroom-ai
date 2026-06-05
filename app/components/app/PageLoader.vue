@@ -19,14 +19,23 @@ onMounted(() => {
       class="fixed inset-0 z-200 bg-white flex flex-col items-center justify-center gap-5 select-none"
     >
       <div class="relative w-48 h-48">
-        <span class="loader-steam-puff loader-steam-puff-1" aria-hidden="true" />
-        <span class="loader-steam-puff loader-steam-puff-2" aria-hidden="true" />
-        <span class="loader-steam-puff loader-steam-puff-3" aria-hidden="true" />
+        <span
+          class="loader-steam-puff loader-steam-puff-1"
+          aria-hidden="true"
+        />
+        <span
+          class="loader-steam-puff loader-steam-puff-2"
+          aria-hidden="true"
+        />
+        <span
+          class="loader-steam-puff loader-steam-puff-3"
+          aria-hidden="true"
+        />
         <img
           :src="teapotHero"
           alt="Chayroom AI"
           class="loader-teapot relative z-10 w-full h-full object-contain select-none"
-        />
+        >
       </div>
       <div class="flex flex-col items-center gap-4">
         <p class="loader-text text-[18px] font-extrabold tracking-tight text-[#0a0a0b]">

@@ -76,8 +76,14 @@
             © 2026 All rights reserved
           </p>
           <div class="flex items-center gap-9">
-            <a href="#" class="footer-legal">Terms of use</a>
-            <a href="#" class="footer-legal">Privacy Policy</a>
+            <a
+              href="#"
+              class="footer-legal"
+            >Terms of use</a>
+            <a
+              href="#"
+              class="footer-legal"
+            >Privacy Policy</a>
           </div>
         </div>
       </div>

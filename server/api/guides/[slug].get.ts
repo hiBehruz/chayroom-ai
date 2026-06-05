@@ -1,6 +1,6 @@
 import { db } from '../../db'
 import { guides, categories } from '../../db/schema'
-import { eq, isNotNull } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')!

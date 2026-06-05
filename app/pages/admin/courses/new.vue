@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Course, CourseModule, Lesson } from '~/stores/courses'
+import type { Course, CourseModule } from '~/stores/courses'
 
 const authStore = useAuthStore()
 const coursesStore = useCoursesStore()
@@ -14,13 +14,13 @@ const title = ref('')
 const desc = ref('')
 const badge = ref('kurs')
 const duration = ref('')
-const level = ref("Boshlang'ich")
+const level = ref('Boshlang\'ich')
 const levelColor = ref('#10b981')
 
 const levelOptions = [
-  { label: "Boshlang'ich", color: '#10b981' },
-  { label: "O'rta", color: '#f59e0b' },
-  { label: "Ilg'or", color: '#8b5cf6' },
+  { label: 'Boshlang\'ich', color: '#10b981' },
+  { label: 'O\'rta', color: '#f59e0b' },
+  { label: 'Ilg\'or', color: '#8b5cf6' }
 ]
 
 const slug = computed(() =>
@@ -47,6 +47,12 @@ function addTag() {
   tagInput.value = ''
 }
 
+function onTagKeydown(event: KeyboardEvent) {
+  if (event.key !== ',') return
+  event.preventDefault()
+  addTag()
+}
+
 function removeTag(i: number) {
   tags.value.splice(i, 1)
 }
@@ -61,7 +67,9 @@ function onImagePick(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
   const reader = new FileReader()
-  reader.onload = () => { previewImage.value = reader.result as string }
+  reader.onload = () => {
+    previewImage.value = reader.result as string
+  }
   reader.readAsDataURL(file)
 }
 
@@ -74,8 +82,8 @@ const bgPresets = [
   { label: 'Sariq', value: '#fffbeb', dark: false },
   { label: 'Yashil', value: '#f0fdf4', dark: false },
   { label: 'Qora', value: '#0d1117', dark: true },
-  { label: "To'q ko'k", value: '#0f172a', dark: true },
-  { label: "To'q yashil", value: '#0d1f1a', dark: true },
+  { label: 'To\'q ko\'k', value: '#0f172a', dark: true },
+  { label: 'To\'q yashil', value: '#0d1f1a', dark: true }
 ]
 const defaultBg = bgPresets[0]?.value ?? '#3480f1'
 const bg = ref(defaultBg)
@@ -108,19 +116,19 @@ function cleanNotionHtml(html: string): string {
       h2: i => `<h2>${i}</h2>\n`,
       h3: i => `<h3>${i}</h3>\n`,
       h4: i => `<h4>${i}</h4>\n`,
-      p:  i => i.trim() ? `<p>${i}</p>\n` : '',
+      p: i => i.trim() ? `<p>${i}</p>\n` : '',
       ul: i => `<ul>\n${i}</ul>\n`,
       ol: i => `<ol>\n${i}</ol>\n`,
       li: i => `  <li>${i}</li>\n`,
       strong: i => `<strong>${i}</strong>`,
-      b:      i => `<strong>${i}</strong>`,
+      b: i => `<strong>${i}</strong>`,
       em: i => `<em>${i}</em>`,
-      i:  i => `<em>${i}</em>`,
+      i: i => `<em>${i}</em>`,
       code: i => `<code>${i}</code>`,
-      pre:  i => `<pre><code>${i.replace(/<[^>]+>/g, '')}</code></pre>\n`,
+      pre: i => `<pre><code>${i.replace(/<[^>]+>/g, '')}</code></pre>\n`,
       blockquote: i => `<blockquote>${i}</blockquote>\n`,
       br: () => `<br>`,
-      a:  (i, e) => `<a href="${e.getAttribute('href') ?? ''}">${i}</a>`,
+      a: (i, e) => `<a href="${e.getAttribute('href') ?? ''}">${i}</a>`
     }
 
     if (keep[tag]) return keep[tag](inner, el)
@@ -183,7 +191,7 @@ function addLesson(mi: number) {
     type: 'Nazariy',
     duration: '',
     free: false,
-    videoUrl: undefined,
+    videoUrl: undefined
   })
 }
 
@@ -195,19 +203,19 @@ async function uploadVideo(mi: number, li: number, file: File) {
   uploadingLesson.value = key
   uploadError.value = null
   try {
-    const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string; publicUrl: string }>(
+    const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string, publicUrl: string }>(
       '/api/upload/presign',
       { method: 'POST', body: { filename: file.name, contentType: file.type } }
     )
     await fetch(uploadUrl, {
       method: 'PUT',
       body: file,
-      headers: { 'Content-Type': file.type },
+      headers: { 'Content-Type': file.type }
     })
     const lesson = modulesList.value[mi]?.lessons[li]
     if (lesson) lesson.videoUrl = publicUrl
-  } catch (e: any) {
-    uploadError.value = e?.message ?? 'Yuklashda xato'
+  } catch (e: unknown) {
+    uploadError.value = e instanceof Error ? e.message : 'Yuklashda xato'
   } finally {
     uploadingLesson.value = null
   }
@@ -239,12 +247,12 @@ const errors = ref<string[]>([])
 
 function validate() {
   const e: string[] = []
-  if (!title.value.trim()) e.push("Kurs nomi kiritilmagan")
-  if (!desc.value.trim()) e.push("Tavsif kiritilmagan")
-  if (!duration.value.trim()) e.push("Davomiylik kiritilmagan")
-  if (tags.value.length === 0) e.push("Kamida bitta tag qo'shing")
+  if (!title.value.trim()) e.push('Kurs nomi kiritilmagan')
+  if (!desc.value.trim()) e.push('Tavsif kiritilmagan')
+  if (!duration.value.trim()) e.push('Davomiylik kiritilmagan')
+  if (tags.value.length === 0) e.push('Kamida bitta tag qo\'shing')
   if (slugError.value) e.push(slugError.value)
-  if (totalLessons.value === 0) e.push("Kamida bitta dars qo'shing")
+  if (totalLessons.value === 0) e.push('Kamida bitta dars qo\'shing')
   modulesList.value.forEach((m, i) => {
     if (!m.title.trim()) e.push(`Modul ${i + 1}: nom kiritilmagan`)
     m.lessons.forEach((l, j) => {
@@ -284,25 +292,25 @@ async function save() {
       accentColor: accentColor.value,
       image: previewImage.value || undefined,
       content: content.value || undefined,
-      free: false,
+      free: false
     }
 
     const result = await coursesStore.addCourse(course)
     navigateTo(`/courses/${result.slug}`)
-  } catch (e: any) {
-    errors.value = [e?.data?.message ?? e?.message ?? 'Saqlashda xatolik yuz berdi']
+  } catch (e: unknown) {
+    const error = e as { data?: { message?: string }, message?: string }
+    errors.value = [error.data?.message ?? error.message ?? 'Saqlashda xatolik yuz berdi']
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } finally {
     saving.value = false
   }
 }
 
-useSeoMeta({ title: "Kurs qo'shish — Admin" })
+useSeoMeta({ title: 'Kurs qo\'shish — Admin' })
 </script>
 
 <template>
   <div class="min-h-screen bg-white">
-
     <!-- Top bar -->
     <div class="sticky top-0 z-30 bg-white border-b border-cx-line">
       <div class="w-310 max-w-[calc(100vw-40px)] mx-auto px-0 h-14 flex items-center justify-between">
@@ -311,11 +319,17 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
             to="/courses"
             class="grid size-8 place-items-center rounded-lg border border-cx-line text-cx-muted hover:text-cx-ink hover:border-cx-ink transition-colors"
           >
-            <UIcon name="i-lucide-arrow-left" class="size-4" />
+            <UIcon
+              name="i-lucide-arrow-left"
+              class="size-4"
+            />
           </NuxtLink>
           <div class="h-4 w-px bg-cx-line" />
           <div class="flex items-center gap-2 text-[13px]">
-            <NuxtLink to="/courses" class="text-cx-muted hover:text-cx-ink transition-colors">Kurslar</NuxtLink>
+            <NuxtLink
+              to="/courses"
+              class="text-cx-muted hover:text-cx-ink transition-colors"
+            >Kurslar</NuxtLink>
             <span class="text-cx-faint">/</span>
             <span class="text-cx-ink font-semibold">Yangi kurs</span>
           </div>
@@ -333,8 +347,16 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
             :disabled="saving"
             @click="save"
           >
-            <UIcon v-if="saving" name="i-lucide-loader-circle" class="size-4 animate-spin" />
-            <UIcon v-else name="i-lucide-cloud-upload" class="size-4" />
+            <UIcon
+              v-if="saving"
+              name="i-lucide-loader-circle"
+              class="size-4 animate-spin"
+            />
+            <UIcon
+              v-else
+              name="i-lucide-cloud-upload"
+              class="size-4"
+            />
             {{ saving ? 'Saqlanmoqda...' : 'Nashr qilish' }}
           </button>
         </div>
@@ -342,31 +364,46 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
     </div>
 
     <div class="w-310 max-w-[calc(100vw-40px)] mx-auto px-0 py-8">
-
       <!-- Page heading -->
       <div class="mb-7">
-        <h1 class="text-[26px] font-extrabold tracking-tight text-[#1a1a1a]">Yangi kurs qo'shish</h1>
-        <p class="text-cx-muted text-[13px] mt-1">Barcha maydonlarni to'ldiring — kurs darhol saytda ko'rinadi.</p>
+        <h1 class="text-[26px] font-extrabold tracking-tight text-[#1a1a1a]">
+          Yangi kurs qo'shish
+        </h1>
+        <p class="text-cx-muted text-[13px] mt-1">
+          Barcha maydonlarni to'ldiring — kurs darhol saytda ko'rinadi.
+        </p>
       </div>
 
       <!-- Errors -->
-      <div v-if="errors.length" class="mb-6 rounded-2xl bg-red-50 border border-red-200 p-4">
+      <div
+        v-if="errors.length"
+        class="mb-6 rounded-2xl bg-red-50 border border-red-200 p-4"
+      >
         <div class="flex items-start gap-2.5">
-          <UIcon name="i-lucide-circle-alert" class="size-4 text-red-500 shrink-0 mt-0.5" />
+          <UIcon
+            name="i-lucide-circle-alert"
+            class="size-4 text-red-500 shrink-0 mt-0.5"
+          />
           <div>
-            <p class="text-[13px] font-bold text-red-600 mb-1.5">Quyidagi xatoliklarni to'g'rilang:</p>
+            <p class="text-[13px] font-bold text-red-600 mb-1.5">
+              Quyidagi xatoliklarni to'g'rilang:
+            </p>
             <ul class="flex flex-col gap-1">
-              <li v-for="e in errors" :key="e" class="text-[12px] text-red-500">— {{ e }}</li>
+              <li
+                v-for="e in errors"
+                :key="e"
+                class="text-[12px] text-red-500"
+              >
+                — {{ e }}
+              </li>
             </ul>
           </div>
         </div>
       </div>
 
       <div class="grid grid-cols-[1fr_320px] gap-6 items-start">
-
         <!-- ── LEFT COLUMN ─────────────────────────────── -->
         <div class="flex flex-col gap-4">
-
           <!-- 01 · Basic info -->
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-6 py-4 border-b border-cx-line flex items-center gap-3">
@@ -375,7 +412,6 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
             </div>
 
             <div class="p-6 flex flex-col gap-5">
-
               <!-- Title -->
               <div>
                 <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2">Kurs nomi *</label>
@@ -384,12 +420,21 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                   type="text"
                   placeholder="Masalan: ChatGPT bilan professional ishlash"
                   class="w-full px-4 py-3 rounded-xl border border-cx-line bg-[#fafafa] text-[15px] font-semibold text-[#1a1a1a] placeholder:text-cx-faint placeholder:font-normal focus:outline-none focus:border-cx-blue focus:bg-white transition-colors"
-                />
-                <div v-if="slug" class="mt-2 flex items-center gap-1.5 text-[11px]">
-                  <UIcon name="i-lucide-link" class="size-3 text-cx-muted" />
+                >
+                <div
+                  v-if="slug"
+                  class="mt-2 flex items-center gap-1.5 text-[11px]"
+                >
+                  <UIcon
+                    name="i-lucide-link"
+                    class="size-3 text-cx-muted"
+                  />
                   <span class="text-cx-muted">chayroom.ai/courses/</span>
                   <span class="font-mono font-bold text-cx-blue">{{ slug }}</span>
-                  <span v-if="slugError" class="text-red-500 font-semibold">· {{ slugError }}</span>
+                  <span
+                    v-if="slugError"
+                    class="text-red-500 font-semibold"
+                  >· {{ slugError }}</span>
                 </div>
               </div>
 
@@ -406,7 +451,6 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
 
               <!-- Row: Level + Duration + Badge -->
               <div class="grid grid-cols-[auto_1fr_1fr] gap-5">
-
                 <!-- Level -->
                 <div>
                   <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2">Daraja *</label>
@@ -439,7 +483,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                       type="text"
                       placeholder="~2h, ~8h..."
                       class="w-full px-4 py-2.5 rounded-xl border border-cx-line bg-[#fafafa] text-[14px] text-[#1a1a1a] placeholder:text-cx-faint focus:outline-none focus:border-cx-blue focus:bg-white transition-colors"
-                    />
+                    >
                   </div>
                   <div>
                     <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2">Badge</label>
@@ -448,13 +492,12 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                       type="text"
                       placeholder="kurs, bootcamp..."
                       class="w-full px-4 py-2.5 rounded-xl border border-cx-line bg-[#fafafa] text-[14px] text-[#1a1a1a] placeholder:text-cx-faint focus:outline-none focus:border-cx-blue focus:bg-white transition-colors"
-                    />
+                    >
                   </div>
                 </div>
 
                 <div class="col-span-1" />
               </div>
-
             </div>
           </div>
 
@@ -473,8 +516,8 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                   placeholder="Enter yoki vergul bosib tag qo'shing..."
                   class="flex-1 px-4 py-2.5 rounded-xl border border-cx-line bg-[#fafafa] text-[14px] text-[#1a1a1a] placeholder:text-cx-faint focus:outline-none focus:border-cx-blue focus:bg-white transition-colors"
                   @keydown.enter.prevent="addTag"
-                  @keydown.comma.prevent="addTag"
-                />
+                  @keydown="onTagKeydown"
+                >
                 <button
                   class="shrink-0 px-4 py-2.5 rounded-xl bg-[#1a1a1a] text-white text-[13px] font-semibold hover:bg-[#333] transition-colors"
                   @click="addTag"
@@ -483,7 +526,10 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                 </button>
               </div>
 
-              <div v-if="tags.length" class="flex flex-wrap gap-2">
+              <div
+                v-if="tags.length"
+                class="flex flex-wrap gap-2"
+              >
                 <span
                   v-for="(tag, i) in tags"
                   :key="tag"
@@ -494,12 +540,18 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                     class="grid size-4 place-items-center rounded-full hover:bg-cx-blue hover:text-white transition-colors text-cx-blue/60 leading-none"
                     @click="removeTag(i)"
                   >
-                    <UIcon name="i-lucide-x" class="size-2.5" />
+                    <UIcon
+                      name="i-lucide-x"
+                      class="size-2.5"
+                    />
                   </button>
                 </span>
               </div>
 
-              <p v-else class="text-[12px] text-cx-faint">
+              <p
+                v-else
+                class="text-[12px] text-cx-faint"
+              >
                 Teglar kurs kategoriya filtriga ta'sir qiladi.
               </p>
             </div>
@@ -521,7 +573,6 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
             </div>
 
             <div class="p-5 flex flex-col gap-3">
-
               <div
                 v-for="(mod, mi) in modulesList"
                 :key="mi"
@@ -537,25 +588,28 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                     type="text"
                     placeholder="Modul nomi"
                     class="flex-1 px-3 py-1.5 rounded-lg border border-cx-line bg-white text-[13px] font-semibold text-[#1a1a1a] placeholder:font-normal placeholder:text-cx-faint focus:outline-none focus:border-cx-blue transition-colors"
-                  />
+                  >
                   <input
                     v-model="mod.subtitle"
                     type="text"
                     placeholder="Ichki nom"
                     class="w-28 px-3 py-1.5 rounded-lg border border-cx-line bg-white text-[12px] text-cx-muted placeholder:text-cx-faint focus:outline-none focus:border-cx-blue transition-colors"
-                  />
+                  >
                   <input
                     v-model="mod.duration"
                     type="text"
                     placeholder="~30m"
                     class="w-20 px-3 py-1.5 rounded-lg border border-cx-line bg-white text-[12px] text-cx-muted placeholder:text-cx-faint focus:outline-none focus:border-cx-blue transition-colors"
-                  />
+                  >
                   <button
                     v-if="modulesList.length > 1"
                     class="shrink-0 grid size-7 place-items-center rounded-lg text-cx-muted hover:bg-red-50 hover:text-red-500 transition-colors"
                     @click="removeModule(mi)"
                   >
-                    <UIcon name="i-lucide-trash-2" class="size-3.5" />
+                    <UIcon
+                      name="i-lucide-trash-2"
+                      class="size-3.5"
+                    />
                   </button>
                 </div>
 
@@ -567,13 +621,16 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                     class="flex items-center gap-2.5 px-4 py-2.5 bg-white hover:bg-[#fafafa] transition-colors group"
                   >
                     <span class="text-[11px] font-bold text-cx-muted/60 shrink-0 w-5 text-center">{{ li + 1 }}</span>
-                    <UIcon name="i-lucide-grip-vertical" class="size-3.5 text-cx-line shrink-0" />
+                    <UIcon
+                      name="i-lucide-grip-vertical"
+                      class="size-3.5 text-cx-line shrink-0"
+                    />
                     <input
                       v-model="lesson.title"
                       type="text"
                       placeholder="Dars sarlavhasi"
                       class="flex-1 bg-transparent text-[13px] text-[#1a1a1a] placeholder:text-cx-faint focus:outline-none"
-                    />
+                    >
                     <select
                       v-model="lesson.type"
                       class="shrink-0 px-2.5 py-1.5 rounded-lg border border-cx-line bg-[#fafafa] text-[11px] font-semibold text-cx-muted focus:outline-none focus:border-cx-blue transition-colors cursor-pointer"
@@ -586,14 +643,18 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                       type="text"
                       placeholder="10 min"
                       class="w-18 px-2.5 py-1.5 rounded-lg border border-cx-line bg-[#fafafa] text-[11px] text-cx-muted placeholder:text-cx-faint focus:outline-none focus:border-cx-blue transition-colors text-center"
-                    />
+                    >
                     <label class="flex items-center gap-1.5 shrink-0 cursor-pointer group/free">
                       <div
                         class="size-4 rounded border-2 flex items-center justify-center transition-all"
                         :class="lesson.free ? 'bg-cx-blue border-cx-blue' : 'border-cx-line bg-white group-hover/free:border-cx-blue'"
                         @click="lesson.free = !lesson.free"
                       >
-                        <UIcon v-if="lesson.free" name="i-lucide-check" class="size-2.5 text-white" />
+                        <UIcon
+                          v-if="lesson.free"
+                          name="i-lucide-check"
+                          class="size-2.5 text-white"
+                        />
                       </div>
                       <span class="text-[11px] text-cx-muted select-none">Bepul</span>
                     </label>
@@ -601,14 +662,20 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                     <div class="shrink-0 flex items-center gap-1">
                       <template v-if="lesson.videoUrl">
                         <span class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-                          <UIcon name="i-lucide-video" class="size-3" />
+                          <UIcon
+                            name="i-lucide-video"
+                            class="size-3"
+                          />
                           Video
                         </span>
                         <button
                           class="grid size-5 place-items-center rounded text-red-400 hover:bg-red-50 transition-colors"
                           @click="removeVideo(mi, li)"
                         >
-                          <UIcon name="i-lucide-x" class="size-3" />
+                          <UIcon
+                            name="i-lucide-x"
+                            class="size-3"
+                          />
                         </button>
                       </template>
                       <template v-else>
@@ -626,7 +693,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                             class="hidden"
                             :disabled="!!uploadingLesson"
                             @change="onVideoFileChange(mi, li, $event)"
-                          />
+                          >
                         </label>
                       </template>
                     </div>
@@ -634,7 +701,10 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                       class="shrink-0 grid size-6 place-items-center rounded-lg text-cx-line hover:text-red-400 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
                       @click="removeLesson(mi, li)"
                     >
-                      <UIcon name="i-lucide-x" class="size-3" />
+                      <UIcon
+                        name="i-lucide-x"
+                        class="size-3"
+                      />
                     </button>
                   </div>
                 </div>
@@ -645,10 +715,18 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                     class="flex items-center gap-2 text-[12px] font-semibold text-cx-muted hover:text-cx-blue transition-colors"
                     @click="addLesson(mi)"
                   >
-                    <UIcon name="i-lucide-plus" class="size-3.5" />
+                    <UIcon
+                      name="i-lucide-plus"
+                      class="size-3.5"
+                    />
                     Dars qo'shish
                   </button>
-                  <p v-if="uploadError" class="px-4 py-2 text-[12px] text-red-500">{{ uploadError }}</p>
+                  <p
+                    v-if="uploadError"
+                    class="px-4 py-2 text-[12px] text-red-500"
+                  >
+                    {{ uploadError }}
+                  </p>
                 </div>
               </div>
 
@@ -658,7 +736,10 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                 @click="addModule"
               >
                 <div class="size-5 rounded border-2 border-current flex items-center justify-center">
-                  <UIcon name="i-lucide-plus" class="size-3" />
+                  <UIcon
+                    name="i-lucide-plus"
+                    class="size-3"
+                  />
                 </div>
                 Yangi modul qo'shish
               </button>
@@ -678,7 +759,10 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                   :class="contentTab === 'editor' ? 'bg-white text-cx-ink shadow-sm' : 'text-cx-muted hover:text-cx-ink'"
                   @click="contentTab = 'editor'"
                 >
-                  <UIcon name="i-lucide-pencil-line" class="size-3.5" />
+                  <UIcon
+                    name="i-lucide-pencil-line"
+                    class="size-3.5"
+                  />
                   Vizual
                 </button>
                 <button
@@ -686,7 +770,10 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                   :class="contentTab === 'notion' ? 'bg-white text-cx-ink shadow-sm' : 'text-cx-muted hover:text-cx-ink'"
                   @click="contentTab = 'notion'; notionPasted = false"
                 >
-                  <UIcon name="i-lucide-clipboard-paste" class="size-3.5" />
+                  <UIcon
+                    name="i-lucide-clipboard-paste"
+                    class="size-3.5"
+                  />
                   Notion paste
                 </button>
               </div>
@@ -703,12 +790,20 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                   class="flex flex-col items-center justify-center gap-3 py-16 rounded-xl border-2 border-green-300 bg-green-50"
                 >
                   <div class="grid size-12 place-items-center rounded-full bg-green-100">
-                    <UIcon name="i-lucide-check" class="size-6 text-green-600" />
+                    <UIcon
+                      name="i-lucide-check"
+                      class="size-6 text-green-600"
+                    />
                   </div>
-                  <p class="text-[14px] font-bold text-green-700">Muvaffaqiyatli import qilindi!</p>
+                  <p class="text-[14px] font-bold text-green-700">
+                    Muvaffaqiyatli import qilindi!
+                  </p>
                 </div>
 
-                <div v-else class="rounded-xl border-2 border-dashed border-cx-line overflow-hidden">
+                <div
+                  v-else
+                  class="rounded-xl border-2 border-dashed border-cx-line overflow-hidden"
+                >
                   <div class="px-4 py-3 bg-[#fafafa] border-b border-cx-line flex items-center gap-2">
                     <div class="size-5 rounded flex items-center justify-center bg-[#1a1a1a]">
                       <span class="text-white font-bold text-[10px]">N</span>
@@ -744,18 +839,19 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                 </div>
 
                 <p class="mt-3 text-[11px] text-cx-muted flex items-center gap-1.5">
-                  <UIcon name="i-lucide-info" class="size-3 shrink-0" />
+                  <UIcon
+                    name="i-lucide-info"
+                    class="size-3 shrink-0"
+                  />
                   H1–H3, paragraf, ro'yxat, kod bloklari, qalin va kursiv matn avtomatik HTML ga aylanadi.
                 </p>
               </div>
             </div>
           </div>
-
         </div>
 
         <!-- ── RIGHT COLUMN ────────────────────────────── -->
         <div class="sticky top-20 flex flex-col gap-4 max-h-[calc(100vh-5.5rem)] overflow-y-auto pb-2 pr-0.5">
-
           <!-- Visual settings -->
           <div class="rounded-2xl bg-[#f7f7f5] border border-cx-line overflow-hidden">
             <div class="px-5 py-3.5 border-b border-cx-line flex items-center gap-3">
@@ -764,7 +860,6 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
             </div>
 
             <div class="p-5 flex flex-col gap-5">
-
               <!-- BG presets -->
               <div>
                 <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2.5">Fon rangi</label>
@@ -799,15 +894,19 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                       v-model="accentColor"
                       type="color"
                       class="absolute inset-0 opacity-0 w-full h-full cursor-pointer rounded-xl"
-                    />
+                    >
                     <div
                       class="size-10 rounded-xl border-2 border-cx-line cursor-pointer"
                       :style="{ backgroundColor: accentColor }"
                     />
                   </div>
                   <div>
-                    <div class="text-[13px] font-mono font-bold text-[#1a1a1a]">{{ accentColor }}</div>
-                    <div class="text-[11px] text-cx-muted">Sarlavha va aksentlar uchun</div>
+                    <div class="text-[13px] font-mono font-bold text-[#1a1a1a]">
+                      {{ accentColor }}
+                    </div>
+                    <div class="text-[11px] text-cx-muted">
+                      Sarlavha va aksentlar uchun
+                    </div>
                   </div>
                 </div>
               </div>
@@ -817,13 +916,23 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                 <label class="block text-[11px] font-bold text-cx-muted uppercase tracking-wider mb-2.5">Kurs rasmi</label>
 
                 <!-- Uploaded state -->
-                <div v-if="previewImage" class="relative rounded-xl overflow-hidden border border-cx-line">
-                  <img :src="previewImage" alt="preview" class="w-full h-40 object-cover" />
+                <div
+                  v-if="previewImage"
+                  class="relative rounded-xl overflow-hidden border border-cx-line"
+                >
+                  <img
+                    :src="previewImage"
+                    alt="preview"
+                    class="w-full h-40 object-cover"
+                  >
                   <button
                     class="absolute top-2 right-2 grid size-7 place-items-center rounded-lg bg-black/50 text-white hover:bg-black/70 transition-colors"
                     @click="removeImage"
                   >
-                    <UIcon name="i-lucide-x" class="size-3.5" />
+                    <UIcon
+                      name="i-lucide-x"
+                      class="size-3.5"
+                    />
                   </button>
                 </div>
 
@@ -838,9 +947,12 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                     accept="image/*"
                     class="sr-only"
                     @change="onImagePick"
-                  />
+                  >
                   <div class="grid size-10 place-items-center rounded-xl bg-cx-blue/10">
-                    <UIcon name="i-lucide-image-plus" class="size-5 text-cx-blue" />
+                    <UIcon
+                      name="i-lucide-image-plus"
+                      class="size-5 text-cx-blue"
+                    />
                   </div>
                   <div class="text-center">
                     <p class="text-[13px] font-semibold text-cx-ink">Rasm yuklash</p>
@@ -848,7 +960,6 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                   </div>
                 </label>
               </div>
-
             </div>
           </div>
 
@@ -872,7 +983,7 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                     :src="previewImage"
                     alt=""
                     class="absolute inset-0 w-full h-full object-cover"
-                  />
+                  >
                   <div class="absolute inset-0 flex items-end px-4 pb-4">
                     <div class="absolute top-2.5 left-3">
                       <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-black/25 text-white">
@@ -905,7 +1016,10 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
                         class="px-2 py-0.5 rounded-full bg-[#eaeae8] text-[10px] font-medium text-cx-muted"
                       >{{ tag }}</span>
                     </template>
-                    <span v-else class="px-2 py-0.5 rounded-full bg-[#eaeae8] text-[10px] text-cx-faint">tag</span>
+                    <span
+                      v-else
+                      class="px-2 py-0.5 rounded-full bg-[#eaeae8] text-[10px] text-cx-faint"
+                    >tag</span>
                   </div>
 
                   <p class="text-[11px] font-semibold text-[#1a1a1a] mb-0.5 line-clamp-1">
@@ -918,15 +1032,24 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
 
                   <div class="flex items-center gap-3 text-[10px] text-cx-muted mb-2.5">
                     <span class="flex items-center gap-1">
-                      <UIcon name="i-lucide-layout-list" class="size-3" />
+                      <UIcon
+                        name="i-lucide-layout-list"
+                        class="size-3"
+                      />
                       {{ totalModules }} modul
                     </span>
                     <span class="flex items-center gap-1">
-                      <UIcon name="i-lucide-play-circle" class="size-3" />
+                      <UIcon
+                        name="i-lucide-play-circle"
+                        class="size-3"
+                      />
                       {{ totalLessons }} dars
                     </span>
                     <span class="flex items-center gap-1">
-                      <UIcon name="i-lucide-clock" class="size-3" />
+                      <UIcon
+                        name="i-lucide-clock"
+                        class="size-3"
+                      />
                       {{ duration || '—' }}
                     </span>
                   </div>
@@ -938,8 +1061,6 @@ useSeoMeta({ title: "Kurs qo'shish — Admin" })
               </div>
             </div>
           </div>
-
-
         </div>
       </div>
     </div>

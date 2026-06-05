@@ -10,13 +10,13 @@ const rules = [
     body: [
       {
         type: 'text',
-        content: 'Чат — для рабочих тем: вайбкодинг, проекты, задачи, AI-инструменты, разборы и идеи.',
+        content: 'Чат — для рабочих тем: вайбкодинг, проекты, задачи, AI-инструменты, разборы и идеи.'
       },
       {
         type: 'text',
-        content: 'Организационные вопросы — про оплату, доступы и содержание курсов — это в @helptreysi. Так чат не превращается в очередь поддержки и остаётся местом для содержательных разговоров.',
-      },
-    ],
+        content: 'Организационные вопросы — про оплату, доступы и содержание курсов — это в @helptreysi. Так чат не превращается в очередь поддержки и остаётся местом для содержательных разговоров.'
+      }
+    ]
   },
   {
     icon: 'i-solar-heart-bold',
@@ -30,11 +30,11 @@ const rules = [
         items: [
           'Не оскорбляем и не переходим на личности.',
           'Цель любого спора — найти решение, а не «остаться правым». Если ты прав — это будет видно по результату.',
-          'Сохраняем дружелюбный тон даже когда не согласны.',
-        ],
+          'Сохраняем дружелюбный тон даже когда не согласны.'
+        ]
       },
-      { type: 'text', content: 'Это база, ради которой всё и собирается.' },
-    ],
+      { type: 'text', content: 'Это база, ради которой всё и собирается.' }
+    ]
   },
   {
     icon: 'i-solar-forbidden-bold',
@@ -44,8 +44,8 @@ const rules = [
     body: [
       { type: 'text', content: 'Любой пиар своего продукта или услуги в чате запрещён.' },
       { type: 'text', content: 'После двух предупреждений — аннулирование доступа к сообществу без возможности вернуться.' },
-      { type: 'text', content: 'Если есть что-то реально полезное для участников — напиши в @helptreysi, обсудим.' },
-    ],
+      { type: 'text', content: 'Если есть что-то реально полезное для участников — напиши в @helptreysi, обсудим.' }
+    ]
   },
   {
     icon: 'i-solar-lock-bold',
@@ -58,12 +58,12 @@ const rules = [
         type: 'list',
         items: [
           'Не пересылай и не выкладывай материалы за пределы клуба.',
-          'Не передавай свой доступ кому-то ещё.',
-        ],
+          'Не передавай свой доступ кому-то ещё.'
+        ]
       },
-      { type: 'text', content: 'Нарушение — аннулирование доступа к сообществу.' },
-    ],
-  },
+      { type: 'text', content: 'Нарушение — аннулирование доступа к сообществу.' }
+    ]
+  }
 ]
 
 const support = [
@@ -72,22 +72,21 @@ const support = [
     iconColor: '#14b8a6',
     iconBg: 'rgba(20,184,166,0.12)',
     title: 'Помощь другим',
-    desc: 'Если ты активно отвечаешь на вопросы и делишься знаниями — со временем можешь стать одним из кураторов клуба, со своими привилегиями.',
+    desc: 'Если ты активно отвечаешь на вопросы и делишься знаниями — со временем можешь стать одним из кураторов клуба, со своими привилегиями.'
   },
   {
     icon: 'i-solar-rocket-bold',
     iconColor: '#8b5cf6',
     iconBg: 'rgba(139,92,246,0.12)',
     title: 'Кейсы и проекты',
-    desc: 'Делись тем, что собрал внутри клуба — мы посмотрим, дадим обратную связь, а самые яркие истории попадут в наши соцсети.',
-  },
+    desc: 'Делись тем, что собрал внутри клуба — мы посмотрим, дадим обратную связь, а самые яркие истории попадут в наши соцсети.'
+  }
 ]
 </script>
 
 <template>
   <div class="min-h-screen bg-cx-surface">
     <div class="w-[780px] max-w-[calc(100vw-40px)] mx-auto py-14 max-md:py-10 max-md:px-4">
-
       <!-- Hero -->
       <div class="mb-14 max-md:mb-10">
         <span class="inline-block text-[13px] font-semibold tracking-widest uppercase text-cx-blue mb-4 max-md:mb-3">
@@ -112,8 +111,15 @@ const support = [
         >
           <!-- Left: number + icon -->
           <div class="w-10 shrink-0 flex flex-col items-center gap-2 max-md:flex-row max-md:w-auto">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center" :style="{ background: rule.iconBg }">
-              <UIcon :name="rule.icon" class="size-5" :style="{ color: rule.iconColor }" />
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center"
+              :style="{ background: rule.iconBg }"
+            >
+              <UIcon
+                :name="rule.icon"
+                class="size-5"
+                :style="{ color: rule.iconColor }"
+              />
             </div>
             <span class="text-[12px] font-semibold text-cx-faint">{{ String(i + 1).padStart(2, '0') }}</span>
           </div>
@@ -124,11 +130,20 @@ const support = [
               {{ rule.title }}
             </h2>
             <div class="flex flex-col gap-3">
-              <template v-for="(block, bi) in rule.body" :key="bi">
-                <p v-if="block.type === 'text'" class="text-[15px] text-cx-muted leading-relaxed">
+              <template
+                v-for="(block, bi) in rule.body"
+                :key="bi"
+              >
+                <p
+                  v-if="block.type === 'text'"
+                  class="text-[15px] text-cx-muted leading-relaxed"
+                >
                   {{ block.content }}
                 </p>
-                <ul v-else-if="block.type === 'list'" class="flex flex-col gap-2 pl-0">
+                <ul
+                  v-else-if="block.type === 'list'"
+                  class="flex flex-col gap-2 pl-0"
+                >
                   <li
                     v-for="item in block.items"
                     :key="item"
@@ -160,12 +175,23 @@ const support = [
             :key="item.title"
             class="rounded-2xl bg-[#f7f5ef] border border-[#e8e6e1] p-6 flex flex-col gap-3"
           >
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center" :style="{ background: item.iconBg }">
-              <UIcon :name="item.icon" class="size-5" :style="{ color: item.iconColor }" />
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center"
+              :style="{ background: item.iconBg }"
+            >
+              <UIcon
+                :name="item.icon"
+                class="size-5"
+                :style="{ color: item.iconColor }"
+              />
             </div>
             <div>
-              <div class="text-[16px] font-semibold text-[#14161f] mb-1.5">{{ item.title }}</div>
-              <div class="text-[14px] text-cx-muted leading-relaxed">{{ item.desc }}</div>
+              <div class="text-[16px] font-semibold text-[#14161f] mb-1.5">
+                {{ item.title }}
+              </div>
+              <div class="text-[14px] text-cx-muted leading-relaxed">
+                {{ item.desc }}
+              </div>
             </div>
           </div>
         </div>
@@ -173,7 +199,6 @@ const support = [
           Это и есть то, что превращает клуб из набора материалов в живое сообщество.
         </p>
       </section>
-
     </div>
   </div>
 </template>

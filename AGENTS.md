@@ -7,7 +7,6 @@ Do not duplicate long sections from `CLAUDE.md` here. When instructions conflict
 ## Start Here
 
 - Read `CLAUDE.md` before making code changes.
-- Follow `BRANCHING_STRATEGY.md` and `GIT_WORKFLOW.md` for branching, commit conventions, pull requests, and merges.
 - Follow `CLAUDE.md` section 9 for cross-tool instruction, skill, agent, and shared-knowledge maintenance.
 - Keep changes surgical and goal-driven.
 - Use Tailwind CSS v4 utility classes for component styling.

@@ -137,7 +137,7 @@ function requestAccess(_planId: string) {
           v-for="plan in plans"
           :key="plan.period"
           class="pricing-plan relative flex flex-col"
-          :class="plan.badge ? 'pt-8' : (plan.id === 'monthly' ? 'pt-10' : plan.id === 'half-year' ? 'pt-8 pb-6' : '')"
+          :class="plan.badge ? 'pt-8' : 'pt-8'"
         >
           <div
             v-if="plan.badge"
@@ -148,7 +148,7 @@ function requestAccess(_planId: string) {
           <div
             :class="[
               'price-card flex flex-col flex-1 w-full max-md:h-auto',
-              plan.featured ? 'price-card--featured -mt-6 p-8 pb-6 mb-6 max-md:mt-0 max-md:mb-0' : plan.id === 'monthly' ? 'p-6 pb-[18px] max-md:pb-6' : 'p-6'
+              plan.featured ? 'price-card--featured -mt-6 px-8 pt-12 pb-6 max-md:mt-0 max-md:p-6' : 'p-6'
             ]"
           >
             <!-- Period + desc: fixed height for cross-card alignment -->
@@ -220,10 +220,7 @@ function requestAccess(_planId: string) {
             </ul>
 
             <button
-              :class="[
-                'hero-link-btn hero-link-btn--blue flex w-full items-center justify-center px-6 py-[15px] text-[16px]',
-                plan.featured ? 'translate-y-1 max-md:translate-y-0' : ''
-              ]"
+              class="hero-link-btn hero-link-btn--blue flex w-full items-center justify-center px-6 py-[15px] text-[16px]"
               @click="requestAccess(plan.id)"
             >
               <span>Kirish huquqini olish</span>
@@ -349,6 +346,10 @@ function requestAccess(_planId: string) {
   content: none;
 }
 
+.price-card--featured {
+  box-shadow: 0 8px 22px rgba(52, 128, 241, 0.06);
+}
+
 .price-period {
   display: inline-flex;
   align-items: center;
@@ -369,9 +370,6 @@ function requestAccess(_planId: string) {
   background: #0a0a0a;
   flex-shrink: 0;
   color: #ffffff;
-  transform-origin: center;
-  animation: price-period-icon-float 2.8s ease-in-out infinite;
-  will-change: transform;
 }
 
 .price-feature {
@@ -389,10 +387,7 @@ function requestAccess(_planId: string) {
   height: 18px;
   flex-shrink: 0;
   margin-top: 1px;
-  color: #0a0a0a !important;
-  transform-origin: center;
-  animation: price-check-pop 2.4s ease-in-out infinite;
-  will-change: transform;
+  color: #3480f1 !important;
 }
 
 .price-btn {
@@ -442,7 +437,7 @@ function requestAccess(_planId: string) {
 
 .pricing-badge {
   position: absolute;
-  top: 36px;
+  top: 42px;
   left: 50%;
   z-index: 2;
   transform: translate(-50%, -50%);
@@ -526,34 +521,6 @@ function requestAccess(_planId: string) {
 @keyframes btn-shimmer {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
-}
-
-@keyframes price-period-icon-float {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg) scale(1);
-  }
-
-  35% {
-    transform: translateY(-2px) rotate(-4deg) scale(1.04, 0.98);
-  }
-
-  70% {
-    transform: translateY(1px) rotate(3deg) scale(0.98, 1.03);
-  }
-}
-
-@keyframes price-check-pop {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-  }
-
-  45% {
-    transform: translateY(-1px) scale(1.14);
-  }
-
-  70% {
-    transform: translateY(0) scale(0.96);
-  }
 }
 
 @keyframes pricing-badge-bob {

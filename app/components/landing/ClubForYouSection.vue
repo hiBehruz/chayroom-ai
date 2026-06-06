@@ -39,22 +39,12 @@ onMounted(() => {
     ease: 'power2.out',
     clearProps: 'all'
   })
-
-  gsap.from(sectionRef.value!.querySelectorAll('.cfy-icon'), {
-    scrollTrigger: { trigger: sectionRef.value, start: 'top 80%', once: true },
-    scale: 0.6,
-    opacity: 0,
-    duration: 0.4,
-    stagger: 0.1,
-    delay: 0.12,
-    ease: 'power2.out',
-    clearProps: 'all'
-  })
 })
 </script>
 
 <template>
   <section
+    id="about"
     ref="sectionRef"
     class="pt-0 pb-20 -mt-2 max-md:pb-14"
   >
@@ -104,22 +94,5 @@ onMounted(() => {
   width: 64px;
   height: 64px;
   color: #14161f;
-  animation: cfy-icon-float 3.0s ease-in-out infinite;
-  will-change: transform;
-}
-
-.cfy-item:nth-child(1) .cfy-icon { animation-delay: 0s; }
-.cfy-item:nth-child(2) .cfy-icon { animation-delay: 0.6s; }
-.cfy-item:nth-child(3) .cfy-icon { animation-delay: 1.2s; }
-.cfy-item:nth-child(4) .cfy-icon { animation-delay: 1.8s; }
-
-@keyframes cfy-icon-float {
-  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-  35% { transform: translateY(-3px) rotate(-5deg) scale(1.06, 0.96); }
-  70% { transform: translateY(1px) rotate(3deg) scale(0.97, 1.04); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cfy-icon { animation: none; will-change: auto; }
 }
 </style>

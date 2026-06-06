@@ -136,7 +136,7 @@ onMounted(() => {
             <div class="shrink-0 flex items-center justify-center">
               <UIcon
                 :name="item.icon"
-                class="usage-icon size-9 text-white/80"
+                class="size-9 text-white/80"
               />
             </div>
             <div>
@@ -153,25 +153,3 @@ onMounted(() => {
     </section>
   </div>
 </template>
-
-<style scoped>
-.usage-icon {
-  animation: usage-icon-float 3.0s ease-in-out infinite;
-  will-change: transform;
-}
-
-.usage-grid .usage-item:nth-child(4n+1) .usage-icon { animation-delay: 0s; }
-.usage-grid .usage-item:nth-child(4n+2) .usage-icon { animation-delay: 0.55s; }
-.usage-grid .usage-item:nth-child(4n+3) .usage-icon { animation-delay: 1.1s; }
-.usage-grid .usage-item:nth-child(4n+4) .usage-icon { animation-delay: 1.65s; }
-
-@keyframes usage-icon-float {
-  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-  35% { transform: translateY(-3px) rotate(-4deg) scale(1.06, 0.96); }
-  70% { transform: translateY(1px) rotate(3deg) scale(0.97, 1.04); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .usage-icon { animation: none; will-change: auto; }
-}
-</style>

@@ -25,17 +25,6 @@ onMounted(() => {
     ease: 'power2.out',
     clearProps: 'transform'
   })
-
-  gsap.from(sectionRef.value!.querySelectorAll('.feature-icon'), {
-    scrollTrigger: { trigger: sectionRef.value, start: 'top 85%', once: true },
-    scale: 0.65,
-    opacity: 0,
-    duration: 0.45,
-    stagger: 0.1,
-    delay: 0.08,
-    ease: 'power2.out',
-    clearProps: 'all'
-  })
 })
 </script>
 
@@ -76,7 +65,7 @@ onMounted(() => {
           <div class="size-16 mb-4 text-[#0f1117]">
             <UIcon
               :name="f.icon"
-              class="feature-icon size-16"
+              class="size-16"
             />
           </div>
           <div class="text-[20px] font-bold leading-[1.2] text-(--text)">
@@ -92,28 +81,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.feature-icon {
-  animation: feature-icon-float 3.2s ease-in-out infinite;
-  will-change: transform;
-}
-
-.feature-card:nth-child(1) .feature-icon { animation-delay: 0s; }
-.feature-card:nth-child(2) .feature-icon { animation-delay: 0.45s; }
-.feature-card:nth-child(3) .feature-icon { animation-delay: 0.9s; }
-.feature-card:nth-child(4) .feature-icon { animation-delay: 1.35s; }
-.feature-card:nth-child(5) .feature-icon { animation-delay: 0.22s; }
-.feature-card:nth-child(6) .feature-icon { animation-delay: 0.67s; }
-
-@keyframes feature-icon-float {
-  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-  35% { transform: translateY(-3px) rotate(-4deg) scale(1.05, 0.97); }
-  70% { transform: translateY(1px) rotate(3deg) scale(0.97, 1.03); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .feature-icon { animation: none; will-change: auto; }
-}
-
 .what-inside-underline {
   position: relative;
   display: inline-block;

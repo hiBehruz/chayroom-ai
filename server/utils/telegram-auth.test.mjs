@@ -2,9 +2,21 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash, createHmac } from 'node:crypto'
 
-import { verifyTelegramLoginPayload, parseAdminIds, isAdminId } from './telegram-auth.ts'
+import { verifyTelegramLoginPayload, parseAdminIds, isAdminId, verifyTelegramWebAppInitData } from './telegram-auth.ts'
 
 const BOT_TOKEN = '123456:test-bot-token'
+
+function signInitData(fields, botToken = BOT_TOKEN) {
+  const params = new URLSearchParams(fields)
+  const dataCheckString = [...params.entries()]
+    .map(([k, v]) => `${k}=${v}`)
+    .sort()
+    .join('\n')
+  const secret = createHmac('sha256', 'WebAppData').update(botToken).digest()
+  const hash = createHmac('sha256', secret).update(dataCheckString).digest('hex')
+  params.set('hash', hash)
+  return params.toString()
+}
 
 function signPayload(fields, botToken = BOT_TOKEN) {
   const dataCheckString = Object.keys(fields)
@@ -50,4 +62,30 @@ test('isAdminId matches by string form', () => {
   assert.equal(isAdminId(2, '1,2,3'), true)
   assert.equal(isAdminId('2', '1,2,3'), true)
   assert.equal(isAdminId(9, '1,2,3'), false)
+})
+
+test('verifyTelegramWebAppInitData accepts valid initData and returns user', () => {
+  const initData = signInitData({
+    auth_date: String(now),
+    query_id: 'AAExample',
+    user: JSON.stringify({ id: 6781623829, first_name: 'Behruz', username: 'behruzzaripov' })
+  })
+  const user = verifyTelegramWebAppInitData(initData, BOT_TOKEN)
+  assert.ok(user)
+  assert.equal(user.id, 6781623829)
+  assert.equal(user.username, 'behruzzaripov')
+})
+
+test('verifyTelegramWebAppInitData rejects tampered user', () => {
+  const initData = signInitData({ auth_date: String(now), user: JSON.stringify({ id: 1, first_name: 'A' }) })
+  const params = new URLSearchParams(initData)
+  params.set('user', JSON.stringify({ id: 999, first_name: 'A' }))
+  assert.equal(verifyTelegramWebAppInitData(params.toString(), BOT_TOKEN), null)
+})
+
+test('verifyTelegramWebAppInitData rejects stale and wrong-token initData', () => {
+  const stale = signInitData({ auth_date: String(now - 90000), user: JSON.stringify({ id: 1, first_name: 'A' }) })
+  assert.equal(verifyTelegramWebAppInitData(stale, BOT_TOKEN), null)
+  const fresh = signInitData({ auth_date: String(now), user: JSON.stringify({ id: 1, first_name: 'A' }) })
+  assert.equal(verifyTelegramWebAppInitData(fresh, 'other-token'), null)
 })

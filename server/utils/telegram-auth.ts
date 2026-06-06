@@ -48,3 +48,59 @@ export function parseAdminIds(raw: string | undefined | null): string[] {
 export function isAdminId(id: string | number, raw: string | undefined | null): boolean {
   return parseAdminIds(raw).includes(String(id))
 }
+
+export interface TelegramWebAppUser {
+  id: number
+  first_name?: string
+  last_name?: string
+  username?: string
+  photo_url?: string
+}
+
+/**
+ * Verifies a Telegram Mini App `initData` string and returns the embedded user.
+ * Mini App uses a different secret than the Login Widget:
+ *   secret = HMAC_SHA256(key="WebAppData", message=botToken)
+ * See https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app
+ */
+export function verifyTelegramWebAppInitData(
+  initData: string,
+  botToken: string,
+  maxAgeSec = 86_400
+): TelegramWebAppUser | null {
+  if (!initData || !botToken) return null
+
+  const params = new URLSearchParams(initData)
+  const hash = params.get('hash')
+  if (!hash) return null
+
+  const authDate = Number(params.get('auth_date'))
+  if (!authDate || Number.isNaN(authDate)) return null
+  const ageSec = Math.floor(Date.now() / 1000) - authDate
+  if (ageSec < 0 || ageSec > maxAgeSec) return null
+
+  const dataCheckString = [...params.entries()]
+    .filter(([k]) => k !== 'hash')
+    .map(([k, v]) => `${k}=${v}`)
+    .sort()
+    .join('\n')
+
+  const secretKey = createHmac('sha256', 'WebAppData').update(botToken).digest()
+  const computed = createHmac('sha256', secretKey).update(dataCheckString).digest('hex')
+
+  if (computed.length !== hash.length) return null
+  try {
+    if (!timingSafeEqual(Buffer.from(computed, 'hex'), Buffer.from(hash, 'hex'))) return null
+  } catch {
+    return null
+  }
+
+  const userRaw = params.get('user')
+  if (!userRaw) return null
+  try {
+    const user = JSON.parse(userRaw) as TelegramWebAppUser
+    return user?.id ? user : null
+  } catch {
+    return null
+  }
+}

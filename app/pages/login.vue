@@ -22,8 +22,8 @@ function goAfterLogin() {
   return navigateTo({ path: '/dashboard', query })
 }
 
-function loginWithTelegram(user: TelegramUser) {
-  authStore.login(user)
+async function loginWithTelegram(user: TelegramUser) {
+  await authStore.login(user)
   goAfterLogin()
 }
 

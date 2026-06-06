@@ -1,38 +1,11 @@
-import { eq, desc } from 'drizzle-orm'
-import { db } from '../../db'
-import { users, subscriptions } from '../../db/schema'
+import { getSubscriptionState } from '../../utils/user-session'
 
 export default defineEventHandler(async (event) => {
-  const cookie = getCookie(event, 'cx-user')
-  if (!cookie) {
-    return { user: null, hasSubscription: false, subscription: null }
-  }
+  const { user, hasSubscription, subscription } = await getSubscriptionState(event)
 
-  let parsed: { id?: number, telegramId?: number } | null = null
-  try {
-    parsed = JSON.parse(cookie)
-  } catch {
-    return { user: null, hasSubscription: false, subscription: null }
-  }
-
-  const telegramId = String(parsed?.telegramId ?? parsed?.id ?? '')
-  if (!telegramId) {
-    return { user: null, hasSubscription: false, subscription: null }
-  }
-
-  const [user] = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1)
   if (!user) {
     return { user: null, hasSubscription: false, subscription: null }
   }
-
-  const [sub] = await db.select().from(subscriptions)
-    .where(eq(subscriptions.userId, user.id))
-    .orderBy(desc(subscriptions.expiresAt))
-    .limit(1)
-
-  const now = new Date()
-  const isAdmin = user.role === 'ADMIN'
-  const hasSubscription = isAdmin || (!!sub && sub.status === 'ACTIVE' && sub.expiresAt > now)
 
   return {
     user: {
@@ -45,11 +18,11 @@ export default defineEventHandler(async (event) => {
       role: user.role
     },
     hasSubscription,
-    subscription: sub
+    subscription: subscription
       ? {
-          period: sub.period,
-          expiresAt: sub.expiresAt.toISOString(),
-          cancelledAt: sub.cancelledAt ? sub.cancelledAt.toISOString() : null
+          period: subscription.period,
+          expiresAt: subscription.expiresAt.toISOString(),
+          cancelledAt: subscription.cancelledAt ? subscription.cancelledAt.toISOString() : null
         }
       : null
   }

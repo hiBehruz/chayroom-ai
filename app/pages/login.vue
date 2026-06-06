@@ -128,7 +128,7 @@ function mountTelegramWidget() {
   script.setAttribute('data-radius', '12')
   script.setAttribute('data-userpic', 'true')
   script.setAttribute('data-request-access', 'write')
-  script.setAttribute('data-onauth', 'onTelegramAuth(user)')
+  script.setAttribute('data-auth-url', window.location.href.split('?')[0])
   container.appendChild(script)
   widgetState.value = 'ready'
 }

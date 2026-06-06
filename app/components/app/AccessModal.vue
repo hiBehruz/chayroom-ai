@@ -10,31 +10,7 @@ const accessFeatures = [
 ]
 
 const config = useRuntimeConfig()
-const tiers = [
-  {
-    label: '1 oy',
-    price: '$15.90',
-    url: config.public.tributeTier1MonthUrl,
-    highlight: false
-  },
-  {
-    label: '3 oy',
-    price: '$39.90',
-    sub: '$13.30 / oy',
-    url: config.public.tributeTier3MonthUrl,
-    highlight: true
-  },
-  {
-    label: '6 oy',
-    price: '$69.90',
-    sub: '$11.65 / oy',
-    url: config.public.tributeTier6MonthUrl,
-    highlight: false
-  }
-]
-
-const defaultTributeUrl = 'https://t.me/tribute/app?startapp=sXgF'
-const featuredTierUrl = computed(() => tiers.find(tier => tier.highlight)?.url ?? defaultTributeUrl)
+const tributeUrl = computed(() => config.public.tributeUrl || 'https://t.me/tribute/app?startapp=sXgF')
 </script>
 
 <template>
@@ -171,7 +147,7 @@ const featuredTierUrl = computed(() => tiers.find(tier => tier.highlight)?.url ?
           </ul>
 
           <a
-            :href="featuredTierUrl"
+            :href="tributeUrl"
             target="_blank"
             rel="noopener noreferrer"
             class="modal-buy-btn mb-2"

@@ -42,9 +42,7 @@ export default defineNuxtConfig({
       appUrl: 'https://chayroom.uz',
       supportUsername: 'hellobehruz',
       sentryDsn: '',
-      tributeTier1MonthUrl: '',
-      tributeTier3MonthUrl: '',
-      tributeTier6MonthUrl: ''
+      tributeUrl: 'https://t.me/tribute/app?startapp=sXgF'
     }
   },
 

@@ -49,7 +49,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/': { prerender: true },
+    '/': process.env.NODE_ENV === 'production' ? { prerender: true } : {},
     '/catalog': { swr: 3600 },
     '/community': { swr: 3600 },
     '/about-me': { swr: 3600 },
@@ -65,8 +65,8 @@ export default defineNuxtConfig({
     preset: 'node-server',
     storage: {
       cache: {
-        driver: process.env.REDIS_URL ? 'redis' : 'memory',
-        url: process.env.REDIS_URL
+        driver: process.env.NODE_ENV === 'production' ? 'redis' : 'memory',
+        url: process.env.REDIS_URL ?? 'redis://redis:6379'
       }
     },
     prerender: {

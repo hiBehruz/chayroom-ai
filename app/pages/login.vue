@@ -1,5 +1,7 @@
 <!-- app/pages/login.vue -->
 <script setup lang="ts">
+import { resolvePostLoginTarget } from '../utils/login-flow.mjs'
+
 declare global {
   interface Window {
     onTelegramAuth?: (user: TelegramUser) => void
@@ -11,14 +13,37 @@ const route = useRoute()
 const config = useRuntimeConfig()
 const { isMiniApp } = useTelegramApp()
 const telegramBotUsername = computed(() => config.public.telegramBotUsername)
+const appHostname = computed(() => {
+  try {
+    return new URL(config.public.appUrl).hostname
+  } catch {
+    return ''
+  }
+})
+const currentHostname = computed(() => import.meta.client ? window.location.hostname : '')
+const canUseTelegramWidget = computed(() => {
+  if (!import.meta.client) return false
+  if (!appHostname.value) return true
+  return currentHostname.value === appHostname.value
+})
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
+const botPollState = ref<'idle' | 'opening' | 'waiting'>('idle')
+const authError = ref('')
+const showWidget = ref(false)
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
+let botPollTimer: ReturnType<typeof window.setTimeout> | null = null
 
 function goAfterLogin() {
-  if (redirectPath.value) return navigateTo(redirectPath.value)
-  const query = selectedPlan.value ? { plan: selectedPlan.value } : undefined
-  return navigateTo({ path: '/dashboard', query })
+  return navigateTo(resolvePostLoginTarget(selectedPlan.value, redirectPath.value))
+}
+
+function stopBotPoll() {
+  if (botPollTimer) {
+    window.clearTimeout(botPollTimer)
+    botPollTimer = null
+  }
+  botPollState.value = 'idle'
 }
 
 async function loginWithTelegram(user: TelegramUser) {
@@ -26,67 +51,60 @@ async function loginWithTelegram(user: TelegramUser) {
   goAfterLogin()
 }
 
-const botLoginState = ref<'idle' | 'waiting'>('idle')
-const botPollState = ref<'idle' | 'waiting'>('idle')
-let botPollTimer: ReturnType<typeof setInterval> | null = null
+async function loginViaTelegramOAuth() {
+  authError.value = ''
 
-function stopBotPoll() {
-  if (botPollTimer) {
-    clearInterval(botPollTimer)
-    botPollTimer = null
+  if (!canUseTelegramWidget.value) {
+    showWidget.value = false
+    authError.value = `${currentHostname.value} manzilida Telegram kirish ishlamaydi. Uni ${appHostname.value} domenida tekshiring.`
+    return
   }
+
+  showWidget.value = true
+  mountTelegramWidget()
+}
+
+async function pollBotLoginStatus(token: string) {
+  const res = await $fetch<{ status: 'pending' | 'expired' | 'authenticated' }>('/api/auth/bot-login/status', {
+    query: { token }
+  })
+
+  if (res.status === 'authenticated') {
+    stopBotPoll()
+    await authStore.syncMe()
+    await goAfterLogin()
+    return
+  }
+
+  if (res.status === 'expired') {
+    stopBotPoll()
+    authError.value = 'Kirish havolasi eskirdi. Qaytadan urinib ko‘ring.'
+    return
+  }
+
+  botPollTimer = window.setTimeout(() => {
+    void pollBotLoginStatus(token)
+  }, 1500)
 }
 
 async function loginViaBot() {
-  if (botLoginState.value === 'waiting') return
-  botLoginState.value = 'waiting'
-  try {
-    const { botId, url } = await $fetch<{ token: string, botId: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
-    if (botId) {
-      const origin = encodeURIComponent(window.location.origin)
-      const returnTo = encodeURIComponent(window.location.href)
-      window.location.href = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${origin}&embed=0&request_access=write&return_to=${returnTo}`
-    }
-    else {
-      window.open(url, '_blank')
-      botLoginState.value = 'idle'
-    }
-  }
-  catch {
-    botLoginState.value = 'idle'
-  }
-}
+  authError.value = ''
+  botPollState.value = 'opening'
 
-async function loginViaBotPolling() {
-  if (botPollState.value === 'waiting') return
   try {
-    const { token, url } = await $fetch<{ token: string, botId: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
-    window.open(url, '_blank')
+    const res = await $fetch<{ url: string, token: string }>('/api/auth/bot-login/start', {
+      method: 'POST'
+    })
+
+    if (import.meta.client) {
+      window.open(res.url, '_blank', 'noopener,noreferrer')
+    }
+
     botPollState.value = 'waiting'
-    const startedAt = Date.now()
-    botPollTimer = setInterval(async () => {
-      if (Date.now() - startedAt > 5 * 60 * 1000) {
-        stopBotPoll()
-        botPollState.value = 'idle'
-        return
-      }
-      try {
-        const res = await $fetch<{ status: string }>('/api/auth/bot-login/status', { params: { token } })
-        if (res.status === 'authenticated') {
-          stopBotPoll()
-          await authStore.syncMe()
-          goAfterLogin()
-        }
-        else if (res.status === 'expired') {
-          stopBotPoll()
-          botPollState.value = 'idle'
-        }
-      }
-      catch { /* keep polling */ }
-    }, 2000)
-  }
-  catch {
-    botPollState.value = 'idle'
+    await pollBotLoginStatus(res.token)
+  } catch {
+    stopBotPoll()
+    authError.value = 'Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko‘ring.'
   }
 }
 
@@ -96,6 +114,7 @@ function mountTelegramWidget() {
 
   if (!telegramBotUsername.value) {
     widgetState.value = 'missing-bot'
+    authError.value = 'Telegram bot username topilmadi.'
     return
   }
 
@@ -144,18 +163,12 @@ onMounted(async () => {
       username: q.username ? String(q.username) : undefined,
       photo_url: q.photo_url ? String(q.photo_url) : undefined,
       auth_date: Number(q.auth_date || 0),
-      hash: String(q.hash),
+      hash: String(q.hash)
     })
     return
   }
 
-  if (isDev) {
-    widgetState.value = 'ready'
-    return
-  }
-
   window.onTelegramAuth = loginWithTelegram
-  mountTelegramWidget()
 })
 
 onUnmounted(() => {
@@ -171,6 +184,7 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
     <!-- Logo -->
     <NuxtLink
       to="/"
+      :prefetch="false"
       class="mb-10 flex items-center gap-2.5 transition-opacity duration-200 hover:opacity-70"
     >
       <span class="grid size-8 place-items-center rounded-xl bg-[#14161f]">
@@ -206,34 +220,55 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           Telegramni yangilang va qaytadan kirging.
         </div>
 
-        <!-- Primary: Telegram OAuth (phone number flow) -->
+        <!-- Primary: Telegram OAuth flow -->
         <button
           type="button"
           class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3480f1] px-5 py-3 text-[15px] font-bold text-white transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-70"
-          :disabled="botLoginState === 'waiting'"
+          @click="loginViaTelegramOAuth"
+        >
+          <UIcon
+            name="i-lucide-send"
+            class="size-4.5"
+          />
+          Telegram orqali kirish
+        </button>
+
+        <div
+          v-if="showWidget"
+          id="telegram-widget-container"
+          class="mt-4 flex min-h-13 items-center justify-center"
+        />
+
+        <p class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]">
+          Telegram orqali tasdiqlaysiz va profilingiz avtomatik ochiladi.
+        </p>
+
+        <button
+          type="button"
+          class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#d8dbe5] bg-white px-5 py-3 text-[15px] font-bold text-[#14161f] transition-all duration-200 hover:border-[#c7ccdb] hover:bg-[#f8f9fc] active:scale-[0.98] disabled:opacity-70"
+          :disabled="botPollState !== 'idle'"
           @click="loginViaBot"
         >
           <UIcon
-            :name="botLoginState === 'waiting' ? 'i-lucide-loader-circle' : 'i-lucide-send'"
-            :class="['size-4.5', botLoginState === 'waiting' ? 'animate-spin' : '']"
+            name="i-lucide-bot"
+            class="size-4.5"
           />
-          {{ botLoginState === 'waiting' ? 'Yo\'naltirilmoqda…' : 'Telegram orqali kirish' }}
+          Telegram bot orqali kirish
         </button>
 
-        <!-- Secondary: Bot deep link + polling -->
-        <button
-          type="button"
-          class="mt-2.5 flex w-full items-center justify-center gap-2 rounded-xl border border-[#e8e8e6] bg-white px-5 py-3 text-[15px] font-semibold text-[#14161f] transition-all duration-200 hover:bg-[#f5f5f3] active:scale-[0.98] disabled:opacity-70"
-          :disabled="botPollState === 'waiting'"
-          @click="loginViaBotPolling"
+        <p
+          v-if="botPollState === 'waiting'"
+          class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
         >
-          <UIcon
-            :name="botPollState === 'waiting' ? 'i-lucide-loader-circle' : 'i-lucide-bot'"
-            :class="['size-4.5', botPollState === 'waiting' ? 'animate-spin' : '']"
-          />
-          {{ botPollState === 'waiting' ? 'Telegram\'da tasdiqlang…' : 'Войти через Telegram Бота' }}
-        </button>
+          Telegram botda tasdiqlang. So‘ng profilingiz avtomatik ochiladi.
+        </p>
 
+        <p
+          v-if="authError"
+          class="mt-3 text-center text-[13px] leading-5 text-red-600"
+        >
+          {{ authError }}
+        </p>
       </div>
 
       <div class="mt-8 pb-8" />

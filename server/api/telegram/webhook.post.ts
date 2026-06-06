@@ -1,6 +1,12 @@
-import { sendTelegramMessage } from '../../utils/telegram'
+import { answerTelegramCallbackQuery, sendTelegramMessage } from '../../utils/telegram'
 import { buildMiniAppLoginUrl } from '../../utils/telegram-bot.js'
-import { botLoginKey, BOT_LOGIN_TTL_MS, type BotLoginEntry } from '../../utils/bot-login'
+import {
+  BOT_LOGIN_SUCCESS_MESSAGE,
+  buildAuthenticatedBotLoginEntry,
+  botLoginKey,
+  BOT_LOGIN_TTL_MS,
+  type BotLoginEntry
+} from '../../utils/bot-login'
 
 interface TgFrom {
   id: number
@@ -15,6 +21,14 @@ interface TgUpdate {
     chat?: { id: number }
     from?: TgFrom
   }
+  callback_query?: {
+    id: string
+    data?: string
+    from?: TgFrom
+    message?: {
+      chat?: { id: number }
+    }
+  }
 }
 
 export default defineEventHandler(async (event) => {
@@ -28,10 +42,19 @@ export default defineEventHandler(async (event) => {
 
   const update = await readBody<TgUpdate>(event)
   const message = update?.message
+  const callbackQuery = update?.callback_query
   const text = message?.text?.trim()
   const from = message?.from
   const chatId = message?.chat?.id ?? from?.id
   const botToken = config.telegramBotToken
+
+  if (callbackQuery?.id && botToken) {
+    await answerTelegramCallbackQuery(botToken, callbackQuery.id, {
+      text: 'Kirish allaqachon tasdiqlangan. Saytga qayting.',
+      show_alert: false
+    })
+    return { ok: true }
+  }
 
   if (!text || !from || !chatId || !text.startsWith('/start')) {
     return { ok: true }
@@ -46,21 +69,24 @@ export default defineEventHandler(async (event) => {
     const key = botLoginKey(token)
     const entry = await storage.getItem<BotLoginEntry>(key)
 
-    if (entry && entry.status === 'pending' && entry.exp > Date.now()) {
-      const authed: BotLoginEntry = {
-        status: 'authenticated',
-        exp: entry.exp,
-        user: {
-          id: from.id,
-          first_name: from.first_name || 'Foydalanuvchi',
-          last_name: from.last_name,
-          username: from.username
-        }
-      }
-      await storage.setItem(key, authed, { ttl: Math.ceil(BOT_LOGIN_TTL_MS / 1000) })
-      if (botToken) {
-        await sendTelegramMessage(botToken, chatId, '✅ Kirish tasdiqlandi! Brauzerga qaytishingiz mumkin.')
-      }
+    if (!entry) {
+      console.warn('[bot-login] entry not found for token', token)
+    } else if (entry.status !== 'pending') {
+      console.warn('[bot-login] entry already used, status:', entry.status)
+    } else if (entry.exp <= Date.now()) {
+      console.warn('[bot-login] entry expired')
+    } else if (!botToken) {
+      console.error('[bot-login] botToken not configured')
+    }
+
+    if (entry && entry.status === 'pending' && entry.exp > Date.now() && botToken) {
+      await storage.setItem(key, buildAuthenticatedBotLoginEntry({
+        id: from.id,
+        first_name: from.first_name || 'Foydalanuvchi',
+        last_name: from.last_name,
+        username: from.username
+      }, entry.exp), { ttl: Math.ceil(BOT_LOGIN_TTL_MS / 1000) })
+      await sendTelegramMessage(botToken, chatId, BOT_LOGIN_SUCCESS_MESSAGE)
     } else if (botToken) {
       await sendTelegramMessage(botToken, chatId, '⚠️ Kirish havolasi eskirgan. Saytda qaytadan urinib ko\'ring.')
     }

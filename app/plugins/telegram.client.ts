@@ -2,7 +2,7 @@ const DEV_MOCK = {
   WebApp: {
     initData: 'test',
     initDataUnsafe: {
-      user: { id: 123456789, first_name: 'Behruz', last_name: 'Zaripov', username: 'behruzzaripov' }
+      user: { id: 6781623829, first_name: 'Behruz', last_name: 'Zaripov', username: 'behruzzaripov' }
     },
     ready: () => {},
     expand: () => {},

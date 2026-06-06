@@ -45,10 +45,10 @@ export const useAuthStore = defineStore('auth', () => {
     'munisa', 'farida', 'dilfuza', 'mavluda', 'umida', 'nilufar'
   ]
 
-  const OWNER_USERNAME = 'behruzzaripov'
+  const OWNER_TELEGRAM_ID = 6781623829
 
   const isOwner = computed(() =>
-    !!user.value && user.value.username === OWNER_USERNAME
+    !!user.value && Number(user.value.telegramId ?? user.value.id) === OWNER_TELEGRAM_ID
   )
 
   const isAdmin = computed(() => user.value?.role === 'ADMIN')
@@ -224,7 +224,7 @@ export const useAuthStore = defineStore('auth', () => {
   function devLogin() {
     if (!import.meta.dev) return
     login({
-      id: 123456789,
+      id: 6781623829,
       first_name: 'Behruz',
       last_name: 'Zaripov',
       username: 'behruzzaripov',

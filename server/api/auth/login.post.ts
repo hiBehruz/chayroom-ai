@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm'
 import { db } from '../../db/index'
 import { users, subscriptions } from '../../db/schema'
 import { sendTelegramMessage } from '../../utils/telegram'
+import { isAdminId } from '../../utils/telegram-auth'
 import { buildMiniAppLoginUrl, buildPlatformMenuButton, setTelegramChatMenuButton } from '../../utils/telegram-bot.js'
 
 interface LoginBody {
@@ -21,6 +22,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const telegramId = String(body.id)
+  const adminRole = isAdminId(body.id, config.adminTelegramIds) ? { role: 'ADMIN' as const } : {}
 
   // Upsert user
   const existing = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1)
@@ -32,14 +34,16 @@ export default defineEventHandler(async (event) => {
       firstName: body.first_name,
       lastName: body.last_name ?? null,
       username: body.username ?? null,
-      photoUrl: body.photo_url ?? null
+      photoUrl: body.photo_url ?? null,
+      ...adminRole
     })
   } else {
     await db.update(users).set({
       firstName: body.first_name,
       lastName: body.last_name ?? null,
       username: body.username ?? null,
-      photoUrl: body.photo_url ?? null
+      photoUrl: body.photo_url ?? null,
+      ...adminRole
     }).where(eq(users.telegramId, telegramId))
   }
 

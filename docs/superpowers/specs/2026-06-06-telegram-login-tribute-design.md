@@ -29,6 +29,12 @@ Callback endpoint `state` qiymatini tekshiradi, authorization code'ni Telegram t
 
 Sayt sessiyasi foydalanuvchi boshqara oladigan JSON cookie o'rniga server imzolagan, `httpOnly`, `secure` va `sameSite=lax` cookie orqali yuritiladi. Mijoz `/api/auth/me` orqali foydalanuvchi va obuna holatini oladi.
 
+Mavjud Tribute integratsiyasi qayta yozilmaydi. Ushbu dizayn
+`docs/superpowers/specs/2026-06-05-tribute-subscription-integration-design.md`
+da belgilangan webhook, subscription maydonlari, profil holati va tarif
+havolalarini davom ettiradi. Yangi ish login xavfsizligi, bot tasdiq xabari va
+login'dan oldin kelgan Tribute webhook'ini yo'qotmaslik bilan cheklanadi.
+
 ## Login Entry Points
 
 Navigatsiyadagi desktop, mobile va ochiladigan menyu `Kirish` tugmalari yangi `/api/auth/telegram/start` endpointiga o'tadi. Himoyalangan sahifaga kirishga urinish va kurs darsiga kirish ham shu oqimdan foydalanadi, bunda xavfsiz ichki `redirect` qiymati saqlanadi.
@@ -54,7 +60,17 @@ Saytga qayting, kirish allaqachon bajarildi.
 
 Tribute webhook Telegram ID'ni yagona bog'lovchi identifikator sifatida ishlatadi.
 
-Hozirgi webhook noma'lum Telegram ID kelganda obunani tashlab yuboradi. Yangi oqimda webhook foydalanuvchi hali saytga kirmagan bo'lsa, minimal placeholder user yaratadi va obunani shu userga bog'laydi. Keyingi Telegram loginida ism, username va profil rasmi yangilanadi.
+Hozirgi webhook noma'lum Telegram ID kelganda `200` qaytarib, obuna
+ma'lumotini saqlamaydi. Oldingi Tribute hujjatida bu holat uchun bir-biriga
+mos kelmaydigan ikki qoida bor: bir qoidada faqat log yozish, ikkinchisida
+`userId=null` subscription yaratish aytilgan. Amaldagi schema
+`subscriptions.userId` uchun `NOT NULL` talab qiladi.
+
+Yangi oqim amaldagi schemaga mos bitta qoidadan foydalanadi: webhook
+foydalanuvchi hali saytga kirmagan bo'lsa, Telegram ID bilan minimal
+placeholder user yaratadi va obunani shu userga bog'laydi. Keyingi Telegram
+loginida ism, username va profil rasmi haqiqiy Telegram ma'lumotlari bilan
+yangilanadi. Alohida nullable subscription yoki pending jadval kiritilmaydi.
 
 Obuna holatlari:
 
@@ -91,6 +107,18 @@ Production muhitida quyidagilar talab qilinadi:
 - Tribute API key va mavjud webhook URL
 
 Secret qiymatlar faqat private runtime config'da saqlanadi. Client secret va bot token mijoz bundle'iga chiqmaydi.
+
+Mavjud Tribute environment qiymatlari saqlanadi:
+
+- `NUXT_TRIBUTE_API_KEY`
+- `NUXT_PUBLIC_TRIBUTE_TIER_1_MONTH_URL`
+- `NUXT_PUBLIC_TRIBUTE_TIER_3_MONTH_URL`
+- `NUXT_PUBLIC_TRIBUTE_TIER_6_MONTH_URL`
+
+Implementatsiya vaqtida bu nomlar `nuxt.config.ts` runtime config mapping'i
+bilan aniq bog'lanadi. Hozirgi property nomlari va env nomlari orasidagi
+avtomatik Nuxt mapping'iga tayanilmaydi, chunki `TIER_1` va `tier1` shakllari
+bir xil env nomiga aylanmaydi.
 
 ## Testing
 

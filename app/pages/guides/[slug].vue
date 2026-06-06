@@ -30,9 +30,10 @@ const freeGuideCtaFeatures = [
   }
 ]
 
+const reqFetch = useRequestFetch()
 const { data: guide, status } = await useAsyncData(
   `guide-${route.params.slug}`,
-  () => $fetch<import('~/stores/guides').Guide>(`/api/guides/${route.params.slug as string}`),
+  () => reqFetch<import('~/stores/guides').Guide>(`/api/guides/${route.params.slug as string}`),
   { getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key] }
 )
 

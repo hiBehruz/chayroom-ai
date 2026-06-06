@@ -21,6 +21,7 @@ interface Lesson {
   free: boolean
   content: string | null
   videoUrl?: string | null
+  locked?: boolean
 }
 
 interface CourseModule {
@@ -50,8 +51,11 @@ interface FlatLesson extends Lesson {
   modTitle: string
 }
 
-const courseData = await $fetch<CourseApiDetail>(`/api/courses/${slug}`).catch(() => null)
+const requestFetch = useRequestFetch()
+const courseData = await requestFetch<CourseApiDetail>(`/api/courses/${slug}`).catch(() => null)
 if (!courseData) throw createError({ statusCode: 404, statusMessage: 'Kurs topilmadi' })
+
+const isAccessModalOpen = ref(false)
 
 const course: CourseDetail = {
   slug: courseData.slug,
@@ -210,9 +214,38 @@ useSeoMeta({ title: `${lesson.flatIndex}. ${lesson.title} — ${course.title}` }
             {{ lesson.title }}
           </h1>
 
+          <!-- Locked: subscription required -->
+          <div
+            v-if="lesson.locked"
+            class="rounded-2xl border border-[#e8e5dd] bg-[#f7f5ef] px-6 py-12 text-center max-md:px-5 max-md:py-10"
+          >
+            <div class="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-[#eef4ff]">
+              <UIcon
+                name="i-solar-lock-keyhole-bold"
+                class="size-7 text-cx-blue"
+              />
+            </div>
+            <h3 class="mb-2 text-[20px] font-extrabold tracking-tight text-[#14161f] max-md:text-[18px]">
+              Bu dars obuna uchun
+            </h3>
+            <p class="mx-auto mb-6 max-w-md text-[15px] leading-relaxed text-cx-muted max-md:text-[14px]">
+              Darsni to'liq ko'rish uchun AI Room Club obunasini faollashtiring.
+            </p>
+            <button
+              class="inline-flex items-center gap-2 rounded-full bg-cx-blue px-6 py-3 text-[15px] font-bold text-white transition-all duration-200 hover:scale-[1.03] hover:opacity-90 active:scale-95"
+              @click="isAccessModalOpen = true"
+            >
+              Kirish huquqini olish
+              <UIcon
+                name="i-lucide-arrow-right"
+                class="size-4"
+              />
+            </button>
+          </div>
+
           <!-- Video player -->
           <div
-            v-if="lesson.videoUrl"
+            v-if="!lesson.locked && lesson.videoUrl"
             class="mb-8"
           >
             <UiVideoPlayer :src="lesson.videoUrl" />
@@ -221,6 +254,7 @@ useSeoMeta({ title: `${lesson.flatIndex}. ${lesson.title} — ${course.title}` }
           <!-- Content -->
           <!-- eslint-disable vue/no-v-html -->
           <div
+            v-if="!lesson.locked"
             ref="contentRef"
             class="lesson-content text-[#1a1a1a]
             [&_strong]:font-bold [&_strong]:text-[#1a1a1a]
@@ -278,6 +312,8 @@ useSeoMeta({ title: `${lesson.flatIndex}. ${lesson.title} — ${course.title}` }
         </div>
       </div><!-- /882px inner -->
     </div>
+
+    <AppAccessModal v-model="isAccessModalOpen" />
   </div>
 </template>
 

@@ -1,9 +1,10 @@
 import { db } from '../../db'
 import { guides, categories } from '../../db/schema'
 import { eq } from 'drizzle-orm'
-import { detailCacheKey, publicApiCacheNames } from '../../utils/cache'
+import { getSubscriptionState } from '../../utils/user-session'
 
-export default defineCachedEventHandler(async (event) => {
+// Not publicly cached: the body is gated per viewer (subscription/admin).
+export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')!
 
   const [guide] = await db
@@ -32,10 +33,8 @@ export default defineCachedEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Guide not found' })
   }
 
-  return guide
-}, {
-  base: 'cache',
-  name: publicApiCacheNames.guideDetail,
-  maxAge: 300,
-  getKey: event => detailCacheKey(getRouterParam(event, 'slug')!)
+  const { hasSubscription } = await getSubscriptionState(event)
+  const locked = !guide.isFree && !hasSubscription
+
+  return locked ? { ...guide, content: null, locked: true } : { ...guide, locked: false }
 })

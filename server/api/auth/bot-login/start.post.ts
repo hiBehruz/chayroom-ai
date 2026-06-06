@@ -15,8 +15,11 @@ export default defineEventHandler(async (event) => {
   const storage = useStorage('cache')
   await storage.setItem(botLoginKey(token), entry, { ttl: Math.ceil(BOT_LOGIN_TTL_MS / 1000) })
 
+  const botId = config.telegramBotToken ? config.telegramBotToken.split(':')[0] : ''
+
   return {
     token,
+    botId,
     url: `https://t.me/${botUsername}?start=login_${token}`
   }
 })

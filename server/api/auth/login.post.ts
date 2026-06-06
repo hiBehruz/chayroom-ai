@@ -88,7 +88,6 @@ export default defineEventHandler(async (event) => {
     hasSubscription = sub?.status === 'ACTIVE' && sub.expiresAt > new Date()
   }
 
-  // Send welcome bot message on first login
   const botToken = config.telegramBotToken
   if (botToken) {
     const appUrl = config.public.appUrl || 'https://chayroom.uz'
@@ -97,6 +96,7 @@ export default defineEventHandler(async (event) => {
     await setTelegramChatMenuButton(botToken, buildPlatformMenuButton(appUrl))
 
     if (!isFirstLogin) {
+      await sendTelegramMessage(botToken, tgUser.id, `✅ Вы успешно авторизовались на chayroom.uz\n\nВозвращайтесь на сайт — вход уже выполнен.`)
       return { hasSubscription }
     }
 

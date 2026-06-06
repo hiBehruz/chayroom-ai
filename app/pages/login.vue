@@ -10,7 +10,6 @@ const authStore = useAuthStore()
 const route = useRoute()
 const config = useRuntimeConfig()
 const { isMiniApp } = useTelegramApp()
-const isDev = import.meta.dev
 const telegramBotUsername = computed(() => config.public.telegramBotUsername)
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
@@ -28,6 +27,7 @@ async function loginWithTelegram(user: TelegramUser) {
 }
 
 const botLoginState = ref<'idle' | 'waiting'>('idle')
+const botPollState = ref<'idle' | 'waiting'>('idle')
 let botPollTimer: ReturnType<typeof setInterval> | null = null
 
 function stopBotPoll() {
@@ -39,33 +39,54 @@ function stopBotPoll() {
 
 async function loginViaBot() {
   if (botLoginState.value === 'waiting') return
+  botLoginState.value = 'waiting'
   try {
-    const { token, url } = await $fetch<{ token: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
+    const { botId, url } = await $fetch<{ token: string, botId: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
+    if (botId) {
+      const origin = encodeURIComponent(window.location.origin)
+      const returnTo = encodeURIComponent(window.location.href)
+      window.location.href = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${origin}&embed=0&request_access=write&return_to=${returnTo}`
+    }
+    else {
+      window.open(url, '_blank')
+      botLoginState.value = 'idle'
+    }
+  }
+  catch {
+    botLoginState.value = 'idle'
+  }
+}
+
+async function loginViaBotPolling() {
+  if (botPollState.value === 'waiting') return
+  try {
+    const { token, url } = await $fetch<{ token: string, botId: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
     window.open(url, '_blank')
-    botLoginState.value = 'waiting'
+    botPollState.value = 'waiting'
     const startedAt = Date.now()
     botPollTimer = setInterval(async () => {
       if (Date.now() - startedAt > 5 * 60 * 1000) {
         stopBotPoll()
-        botLoginState.value = 'idle'
+        botPollState.value = 'idle'
         return
       }
       try {
-        const res = await $fetch<{ status: string, hasSubscription?: boolean }>('/api/auth/bot-login/status', { params: { token } })
+        const res = await $fetch<{ status: string }>('/api/auth/bot-login/status', { params: { token } })
         if (res.status === 'authenticated') {
           stopBotPoll()
           await authStore.syncMe()
           goAfterLogin()
-        } else if (res.status === 'expired') {
-          stopBotPoll()
-          botLoginState.value = 'idle'
         }
-      } catch {
-        // keep polling
+        else if (res.status === 'expired') {
+          stopBotPoll()
+          botPollState.value = 'idle'
+        }
       }
+      catch { /* keep polling */ }
     }, 2000)
-  } catch {
-    botLoginState.value = 'idle'
+  }
+  catch {
+    botPollState.value = 'idle'
   }
 }
 
@@ -113,6 +134,21 @@ onMounted(async () => {
     return
   }
 
+  // Handle Telegram OAuth redirect callback (id + hash in URL params)
+  const q = route.query
+  if (q.id && q.hash) {
+    await loginWithTelegram({
+      id: Number(q.id),
+      first_name: String(q.first_name || ''),
+      last_name: q.last_name ? String(q.last_name) : undefined,
+      username: q.username ? String(q.username) : undefined,
+      photo_url: q.photo_url ? String(q.photo_url) : undefined,
+      auth_date: Number(q.auth_date || 0),
+      hash: String(q.hash),
+    })
+    return
+  }
+
   if (isDev) {
     widgetState.value = 'ready'
     return
@@ -148,64 +184,29 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
 
     <!-- Card -->
     <div class="w-full max-w-100 rounded-[28px] border border-[#e8e8e6] bg-white shadow-[0_4px_24px_rgba(20,22,31,0.07)]">
-      <!-- Card header -->
-      <div class="px-10 pt-11 pb-8 text-center max-md:px-7 max-md:pt-9">
-        <div class="mb-6 grid size-14 place-items-center rounded-2xl bg-[#f0f5ff] mx-auto">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="size-7"
-            viewBox="0 0 24 24"
-          >
-            <path
-              fill="#3480f1"
-              d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10m-9.642-2.618q-1.458.607-5.831 2.513q-.711.282-.744.552c-.038.304.343.424.862.587l.218.07c.51.166 1.198.36 1.555.368q.486.01 1.084-.4q4.086-2.76 4.218-2.789c.063-.014.149-.032.207.02c.059.052.053.15.047.177c-.038.161-1.534 1.552-2.308 2.271q-.344.324-.683.653c-.474.457-.83.8.02 1.36c.861.568 1.73 1.134 2.57 1.733c.414.296.786.56 1.246.519c.267-.025.543-.276.683-1.026c.332-1.77.983-5.608 1.133-7.19a1.8 1.8 0 0 0-.017-.393a.42.42 0 0 0-.142-.27c-.12-.098-.305-.118-.387-.117c-.376.007-.953.207-3.73 1.362"
-            />
-          </svg>
-        </div>
-
+      <div class="px-10 pt-10 pb-6 text-center max-md:px-7">
         <h1 class="text-[24px] font-extrabold tracking-tight text-[#14161f]">
-          Telegram orqali kiring
+          Kirish
         </h1>
-        <p class="mt-2 text-[15px] leading-relaxed text-[#70707a]">
-          Kurslar va qo'llanmalarga bir bosmada kirish
-        </p>
       </div>
 
-      <!-- Widget area -->
       <div class="px-10 max-md:px-7">
+        <!-- Mini-app states -->
         <div
-          id="telegram-widget-container"
-          class="flex min-h-13 items-center justify-center"
+          v-if="widgetState === 'mini-app'"
+          class="flex min-h-13 items-center justify-center gap-2 text-[14px] text-[#a0a0a8]"
         >
-          <div
-            v-if="widgetState === 'loading'"
-            class="flex items-center gap-2 text-[14px] text-[#a0a0a8]"
-          >
-            <span class="size-4 rounded-full border-2 border-[#e0e0e4] border-t-[#3480f1] animate-spin" />
-            Yuklanmoqda...
-          </div>
-          <div
-            v-else-if="widgetState === 'missing-bot'"
-            class="w-full rounded-2xl bg-[#f0f5ff] px-4 py-3 text-[13px] leading-relaxed text-[#3480f1]"
-          >
-            <span class="font-bold">NUXT_PUBLIC_TELEGRAM_BOT_USERNAME</span> ko'rsatilmagan.
-          </div>
-          <div
-            v-else-if="widgetState === 'mini-app'"
-            class="flex items-center gap-2 text-[14px] text-[#a0a0a8]"
-          >
-            <span class="size-4 rounded-full border-2 border-[#e0e0e4] border-t-[#3480f1] animate-spin" />
-            Kirilmoqda...
-          </div>
-          <div
-            v-else-if="widgetState === 'mini-app-error'"
-            class="w-full rounded-2xl bg-red-50 px-4 py-3 text-[13px] text-red-600"
-          >
-            Telegramni yangilang va qaytadan kirging.
-          </div>
+          <span class="size-4 rounded-full border-2 border-[#e0e0e4] border-t-[#3480f1] animate-spin" />
+          Kirilmoqda...
+        </div>
+        <div
+          v-else-if="widgetState === 'mini-app-error'"
+          class="mb-4 w-full rounded-2xl bg-red-50 px-4 py-3 text-[13px] text-red-600"
+        >
+          Telegramni yangilang va qaytadan kirging.
         </div>
 
-        <!-- Telegram bot login (fallback that works inside in-app browsers) -->
+        <!-- Primary: Telegram OAuth (phone number flow) -->
         <button
           type="button"
           class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3480f1] px-5 py-3 text-[15px] font-bold text-white transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-70"
@@ -216,53 +217,26 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
             :name="botLoginState === 'waiting' ? 'i-lucide-loader-circle' : 'i-lucide-send'"
             :class="['size-4.5', botLoginState === 'waiting' ? 'animate-spin' : '']"
           />
-          {{ botLoginState === 'waiting' ? "Telegram'da tasdiqlang…" : 'Telegram bot orqali kirish' }}
+          {{ botLoginState === 'waiting' ? 'Yo\'naltirilmoqda…' : 'Telegram orqali kirish' }}
         </button>
 
-        <!-- Dev login -->
-        <div
-          v-if="isDev"
-          class="mt-5 text-center"
+        <!-- Secondary: Bot deep link + polling -->
+        <button
+          type="button"
+          class="mt-2.5 flex w-full items-center justify-center gap-2 rounded-xl border border-[#e8e8e6] bg-white px-5 py-3 text-[15px] font-semibold text-[#14161f] transition-all duration-200 hover:bg-[#f5f5f3] active:scale-[0.98] disabled:opacity-70"
+          :disabled="botPollState === 'waiting'"
+          @click="loginViaBotPolling"
         >
-          <p class="mb-2 text-[11px] font-semibold uppercase tracking-widest text-[#c0c0c8]">
-            dev only
-          </p>
-          <button
-            class="w-full rounded-xl bg-[#14161f] px-5 py-3 text-[14px] font-bold text-white transition-opacity duration-200 hover:opacity-80"
-            @click="authStore.devLogin(); goAfterLogin()"
-          >
-            Kirish (Dev)
-          </button>
-        </div>
+          <UIcon
+            :name="botPollState === 'waiting' ? 'i-lucide-loader-circle' : 'i-lucide-bot'"
+            :class="['size-4.5', botPollState === 'waiting' ? 'animate-spin' : '']"
+          />
+          {{ botPollState === 'waiting' ? 'Telegram\'da tasdiqlang…' : 'Войти через Telegram Бота' }}
+        </button>
 
-        <!-- Switch account -->
-        <div class="mt-5 text-center">
-          <button
-            class="text-[13px] text-[#a0a0a8] transition-colors duration-200 hover:text-[#14161f]"
-            type="button"
-            @click="mountTelegramWidget"
-          >
-            Boshqa akkaunt orqali kirish
-          </button>
-        </div>
       </div>
 
-      <!-- Card footer -->
-      <div class="mt-8 border-t border-[#f2f2f0] px-10 py-7 max-md:px-7">
-        <p class="text-center text-[12px] leading-relaxed text-[#b8b8c0]">
-          Faqat ism, rasm va Telegram ID olinadi. Boshqa ma'lumot so'ralmaydi.
-        </p>
-        <div class="mt-4 text-center">
-          <a
-            href="https://t.me/hellobehruz"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-[13px] font-medium text-[#70707a] transition-colors duration-200 hover:text-[#3480f1]"
-          >
-            Tasdiqlash kelmayaptimi? Yozing
-          </a>
-        </div>
-      </div>
+      <div class="mt-8 pb-8" />
     </div>
   </div>
 </template>

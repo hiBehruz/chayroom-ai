@@ -2,6 +2,7 @@ import { db } from '../../db'
 import { courses } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 import { requireAdmin } from '../../utils/admin-session'
+import { invalidateCourseCache } from '../../utils/cache'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
@@ -17,5 +18,6 @@ export default defineEventHandler(async (event) => {
   if (Object.keys(patch).length === 0) return { ok: true }
 
   await db.update(courses).set(patch).where(eq(courses.slug, slug))
+  await invalidateCourseCache(slug)
   return { ok: true }
 })

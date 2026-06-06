@@ -1,8 +1,9 @@
 import { db } from '../../db'
 import { courses, modules, lessons } from '../../db/schema'
 import { eq, asc } from 'drizzle-orm'
+import { detailCacheKey, publicApiCacheNames } from '../../utils/cache'
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')!
 
   const [course] = await db.select().from(courses).where(eq(courses.slug, slug))
@@ -19,4 +20,9 @@ export default defineEventHandler(async (event) => {
   }))
 
   return { ...course, modulesList }
+}, {
+  base: 'cache',
+  name: publicApiCacheNames.courseDetail,
+  maxAge: 300,
+  getKey: event => detailCacheKey(getRouterParam(event, 'slug')!)
 })

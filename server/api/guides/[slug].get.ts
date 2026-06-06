@@ -1,8 +1,9 @@
 import { db } from '../../db'
 import { guides, categories } from '../../db/schema'
 import { eq } from 'drizzle-orm'
+import { detailCacheKey, publicApiCacheNames } from '../../utils/cache'
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')!
 
   const [guide] = await db
@@ -32,4 +33,9 @@ export default defineEventHandler(async (event) => {
   }
 
   return guide
+}, {
+  base: 'cache',
+  name: publicApiCacheNames.guideDetail,
+  maxAge: 300,
+  getKey: event => detailCacheKey(getRouterParam(event, 'slug')!)
 })

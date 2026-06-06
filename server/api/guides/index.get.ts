@@ -1,8 +1,9 @@
 import { db } from '../../db'
 import { guides, categories } from '../../db/schema'
 import { desc, isNotNull, eq } from 'drizzle-orm'
+import { listCacheKey, publicApiCacheNames } from '../../utils/cache'
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
   const query = getQuery(event)
   const limit = query.limit ? Number(query.limit) : undefined
 
@@ -30,4 +31,9 @@ export default defineEventHandler(async (event) => {
 
   if (limit) return await q.limit(limit)
   return await q
+}, {
+  base: 'cache',
+  name: publicApiCacheNames.guideList,
+  maxAge: 300,
+  getKey: event => listCacheKey(getQuery(event).limit as string | undefined)
 })

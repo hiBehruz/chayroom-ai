@@ -1,3 +1,6 @@
 chayroom.uz, www.chayroom.uz {
+	encode zstd gzip
+	@immutable path /_nuxt/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
 	reverse_proxy nuxt:3000
 }

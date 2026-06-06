@@ -1,7 +1,10 @@
 node_modules
 .nuxt
+.output
+.vercel
 .pnpm-store
 dist
 .git
 .env
+.DS_Store
 *.log

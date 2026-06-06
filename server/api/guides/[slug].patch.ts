@@ -2,6 +2,7 @@ import { db } from '../../db'
 import { guides, categories } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 import { requireAdmin } from '../../utils/admin-session'
+import { invalidateGuideCache } from '../../utils/cache'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)
@@ -28,6 +29,8 @@ export default defineEventHandler(async (event) => {
       updatedAt: new Date()
     })
     .where(eq(guides.slug, slug))
+
+  await invalidateGuideCache(slug)
 
   return { ok: true }
 })

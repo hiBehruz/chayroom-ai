@@ -27,6 +27,48 @@ async function loginWithTelegram(user: TelegramUser) {
   goAfterLogin()
 }
 
+const botLoginState = ref<'idle' | 'waiting'>('idle')
+let botPollTimer: ReturnType<typeof setInterval> | null = null
+
+function stopBotPoll() {
+  if (botPollTimer) {
+    clearInterval(botPollTimer)
+    botPollTimer = null
+  }
+}
+
+async function loginViaBot() {
+  if (botLoginState.value === 'waiting') return
+  try {
+    const { token, url } = await $fetch<{ token: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
+    window.open(url, '_blank')
+    botLoginState.value = 'waiting'
+    const startedAt = Date.now()
+    botPollTimer = setInterval(async () => {
+      if (Date.now() - startedAt > 5 * 60 * 1000) {
+        stopBotPoll()
+        botLoginState.value = 'idle'
+        return
+      }
+      try {
+        const res = await $fetch<{ status: string, hasSubscription?: boolean }>('/api/auth/bot-login/status', { params: { token } })
+        if (res.status === 'authenticated') {
+          stopBotPoll()
+          await authStore.syncMe()
+          goAfterLogin()
+        } else if (res.status === 'expired') {
+          stopBotPoll()
+          botLoginState.value = 'idle'
+        }
+      } catch {
+        // keep polling
+      }
+    }, 2000)
+  } catch {
+    botLoginState.value = 'idle'
+  }
+}
+
 function mountTelegramWidget() {
   const container = document.querySelector('#telegram-widget-container')
   if (!container) return
@@ -82,6 +124,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   delete window.onTelegramAuth
+  stopBotPoll()
 })
 
 useSeoMeta({ title: 'Kirish — Chayroom AI' })
@@ -161,6 +204,20 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
             Telegramni yangilang va qaytadan kirging.
           </div>
         </div>
+
+        <!-- Telegram bot login (fallback that works inside in-app browsers) -->
+        <button
+          type="button"
+          class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3480f1] px-5 py-3 text-[15px] font-bold text-white transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-70"
+          :disabled="botLoginState === 'waiting'"
+          @click="loginViaBot"
+        >
+          <UIcon
+            :name="botLoginState === 'waiting' ? 'i-lucide-loader-circle' : 'i-lucide-send'"
+            :class="['size-4.5', botLoginState === 'waiting' ? 'animate-spin' : '']"
+          />
+          {{ botLoginState === 'waiting' ? "Telegram'da tasdiqlang…" : 'Telegram bot orqali kirish' }}
+        </button>
 
         <!-- Dev login -->
         <div

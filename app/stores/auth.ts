@@ -121,7 +121,15 @@ export const useAuthStore = defineStore('auth', () => {
     if (!import.meta.client) return
     try {
       const res = await $fetch<{
-        user: (TelegramUser & { role?: 'USER' | 'ADMIN' }) | null
+        user: {
+          id: number
+          telegramId: number
+          firstName: string
+          lastName: string | null
+          username: string | null
+          photoUrl: string | null
+          role: 'USER' | 'ADMIN'
+        } | null
         hasSubscription: boolean
         subscription: { period: string | null, expiresAt: string, cancelledAt: string | null } | null
       }>('/api/auth/me')
@@ -131,7 +139,19 @@ export const useAuthStore = defineStore('auth', () => {
         return
       }
 
-      if (res.user.role && user.value) {
+      if (!user.value) {
+        // Hydrate the store from the signed session (e.g. after bot login)
+        setUserSession({
+          id: res.user.telegramId,
+          telegramId: res.user.telegramId,
+          first_name: res.user.firstName,
+          last_name: res.user.lastName ?? undefined,
+          username: res.user.username ?? undefined,
+          photo_url: res.user.photoUrl ?? undefined,
+          role: res.user.role,
+          hash: 'session'
+        })
+      } else if (res.user.role) {
         user.value = { ...user.value, role: res.user.role }
       }
 

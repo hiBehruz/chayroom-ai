@@ -65,7 +65,7 @@ export default defineNuxtConfig({
     preset: 'node-server',
     storage: {
       cache: {
-        driver: process.env.NODE_ENV === 'production' ? 'redis' : 'memory',
+        driver: 'redis',
         url: process.env.REDIS_URL ?? 'redis://redis:6379'
       }
     },

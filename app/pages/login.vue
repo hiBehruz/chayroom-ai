@@ -28,9 +28,7 @@ const canUseTelegramWidget = computed(() => {
 })
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
 const botPollState = ref<'idle' | 'opening' | 'waiting'>('idle')
-const botLoginUrl = ref('')
 const authError = ref('')
-const showWidget = ref(false)
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
 let botPollTimer: ReturnType<typeof window.setTimeout> | null = null
@@ -46,26 +44,12 @@ function stopBotPoll() {
     botPollTimer = null
   }
   botPollState.value = 'idle'
-  botLoginUrl.value = ''
   activePollToken = ''
 }
 
 async function loginWithTelegram(user: TelegramUser) {
   await authStore.login(user)
   goAfterLogin()
-}
-
-async function loginViaTelegramOAuth() {
-  authError.value = ''
-
-  if (!canUseTelegramWidget.value) {
-    showWidget.value = false
-    authError.value = `${currentHostname.value} manzilida Telegram kirish ishlamaydi. Uni ${appHostname.value} domenida tekshiring.`
-    return
-  }
-
-  showWidget.value = true
-  mountTelegramWidget()
 }
 
 async function pollBotLoginStatus(token: string) {
@@ -101,16 +85,16 @@ async function loginViaBot() {
       method: ‘POST’
     })
 
-    // tg:// scheme: opens Telegram app directly, browser stays on this page
-    botLoginUrl.value = res.tgUrl || res.url
-
     if (import.meta.client) {
       const isMobile = ‘ontouchstart’ in window || navigator.maxTouchPoints > 0
-      if (!isMobile) {
-        // Desktop: open in new tab, polling continues on this page
-        window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
+      if (isMobile) {
+        // Mobile: navigate directly via tg:// scheme, save token for resume
+        sessionStorage.setItem(‘bot_login_token’, res.token)
+        window.location.href = res.tgUrl || res.url
+        return
       }
-      // Mobile: user taps the "Telegramni ochish" tg:// button shown below
+      // Desktop: open in new tab, polling continues on this page
+      window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
     }
 
     botPollState.value = ‘waiting’
@@ -182,6 +166,11 @@ onMounted(async () => {
   }
 
   window.onTelegramAuth = loginWithTelegram
+
+  // Auto-mount Telegram widget (no button click needed)
+  if (canUseTelegramWidget.value) {
+    mountTelegramWidget()
+  }
 
   const resumePendingBotLogin = () => {
     const savedToken = sessionStorage.getItem('bot_login_token')
@@ -260,23 +249,10 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           Telegramni yangilang va qaytadan kirging.
         </div>
 
-        <!-- Primary: Telegram OAuth flow -->
-        <button
-          type="button"
-          class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3480f1] px-5 py-3 text-[15px] font-bold text-white transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-70"
-          @click="loginViaTelegramOAuth"
-        >
-          <UIcon
-            name="i-lucide-send"
-            class="size-4.5"
-          />
-          Telegram orqali kirish
-        </button>
-
+        <!-- Primary: Telegram widget (auto-mounted) -->
         <div
-          v-if="showWidget"
           id="telegram-widget-container"
-          class="mt-4 flex min-h-13 items-center justify-center"
+          class="mt-3 flex min-h-13 items-center justify-center"
         />
 
         <p class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]">
@@ -296,22 +272,12 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           Telegram bot orqali kirish
         </button>
 
-        <div
+        <p
           v-if="botPollState === ‘waiting’"
-          class="mt-3 text-center"
+          class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
         >
-          <p class="text-[13px] leading-5 text-[#6f7480] mb-2">
-            Telegram botda tasdiqlang. So’ng profilingiz avtomatik ochiladi.
-          </p>
-          <a
-            v-if="botLoginUrl"
-            :href="botLoginUrl"
-            class="inline-flex items-center gap-2 rounded-xl bg-[#2aabee] px-5 py-2.5 text-[14px] font-bold text-white no-underline"
-          >
-            <UIcon name="i-lucide-send" class="size-4 shrink-0" />
-            Telegramni ochish
-          </a>
-        </div>
+          Telegram botda tasdiqlang. So’ng profilingiz avtomatik ochiladi.
+        </p>
 
         <p
           v-if="authError"

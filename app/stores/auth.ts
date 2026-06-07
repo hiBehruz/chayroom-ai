@@ -117,21 +117,16 @@ export const useAuthStore = defineStore('auth', () => {
         return
       }
 
-      if (!user.value) {
-        // Hydrate the store from the signed session (e.g. after bot login)
-        setUserSession({
-          id: res.user.telegramId,
-          telegramId: res.user.telegramId,
-          first_name: res.user.firstName,
-          last_name: res.user.lastName ?? undefined,
-          username: res.user.username ?? undefined,
-          photo_url: res.user.photoUrl ?? undefined,
-          role: res.user.role,
-          hash: 'session'
-        })
-      } else if (res.user.role) {
-        user.value = { ...user.value, role: res.user.role }
-      }
+      setUserSession({
+        id: res.user.telegramId,
+        telegramId: res.user.telegramId,
+        first_name: res.user.firstName || user.value?.first_name || '',
+        last_name: res.user.lastName ?? undefined,
+        username: res.user.username ?? undefined,
+        photo_url: res.user.photoUrl ?? undefined,
+        role: res.user.role,
+        hash: user.value?.hash ?? 'session'
+      })
 
       if (res.hasSubscription) {
         activateSubscription(res.subscription

@@ -4,7 +4,6 @@ import {
   buildBotLoginStartRequest,
   clearPendingBotLoginToken,
   readPendingBotLoginToken,
-  resolveBotLoginLaunchUrl,
   resolvePostLoginTarget,
   storePendingBotLoginToken
 } from '../utils/login-flow.mjs'
@@ -35,6 +34,8 @@ const canUseTelegramWidget = computed(() => {
 })
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
 const botPollState = ref<'idle' | 'opening' | 'waiting'>('idle')
+const botTelegramUrl = ref('')
+const botLinkExpired = ref(false)
 const authError = ref('')
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
@@ -51,7 +52,13 @@ function stopBotPoll() {
     botPollTimer = null
   }
   botPollState.value = 'idle'
+  botTelegramUrl.value = ''
   activePollToken = ''
+}
+
+function resetBotState() {
+  botLinkExpired.value = false
+  stopBotPoll()
 }
 
 async function loginWithTelegram(user: TelegramUser) {
@@ -76,8 +83,8 @@ async function pollBotLoginStatus(token: string) {
 
     if (res.status === 'expired') {
       clearPendingBotLoginToken({ sessionStorage, localStorage })
+      botLinkExpired.value = true
       stopBotPoll()
-      authError.value = "Kirish havolasi eskirdi. Qaytadan urinib ko'ring."
       return
     }
   } catch {
@@ -92,7 +99,7 @@ async function pollBotLoginStatus(token: string) {
 async function loginViaBot() {
   authError.value = ''
   clearPendingBotLoginToken({ sessionStorage, localStorage })
-  stopBotPoll()
+  resetBotState()
   botPollState.value = 'opening'
 
   try {
@@ -101,9 +108,11 @@ async function loginViaBot() {
 
     if (import.meta.client) {
       storePendingBotLoginToken({ sessionStorage, localStorage }, res.token)
-      window.location.href = resolveBotLoginLaunchUrl({
-        url: res.url
-      })
+      botTelegramUrl.value = res.url
+      botPollState.value = 'waiting'
+      void pollBotLoginStatus(res.token)
+      // tg:// opens Telegram app without navigating the browser tab away
+      window.location.href = res.tgUrl
     }
   } catch {
     stopBotPoll()
@@ -260,34 +269,36 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           class="mt-3 flex min-h-13 items-center justify-center"
         />
 
+        <!-- Expired: light-blue renew button -->
         <button
+          v-if="botLinkExpired"
           type="button"
-          class="mx-auto mt-4 flex items-center justify-center gap-2 rounded-xl border border-[#3480f1] bg-[#3480f1] px-4 py-2.5 text-[14px] font-bold text-white shadow-[0_10px_24px_rgba(52,128,241,0.2)] transition-all duration-200 hover:border-[#256fe0] hover:bg-[#256fe0] active:scale-[0.98] disabled:opacity-70"
-          :disabled="botPollState === 'opening'"
+          class="mt-3 flex w-full items-center justify-center rounded-xl bg-[#e8f2fe] px-4 py-3 text-[14px] font-semibold text-[#3480f1] transition-colors hover:bg-[#dce9fd]"
           @click="loginViaBot"
         >
-          <UIcon
-            name="i-lucide-bot"
-            class="size-4.5"
-          />
-          Telegram bot orqali kirish
+          Havola muddati tugadi — yangilash
         </button>
 
-        <div
-          v-if="botPollState === 'waiting'"
-          class="mt-3 flex flex-col items-center gap-1.5"
-        >
-          <p class="text-center text-[13px] leading-5 text-[#6f7480]">
-            Telegram botda tasdiqlang. So'ng profilingiz avtomatik ochiladi.
-          </p>
+        <!-- Bot button -->
+        <template v-else>
           <button
             type="button"
-            class="text-[13px] text-[#a0a0a8] underline underline-offset-2 hover:text-[#14161f]"
-            @click="() => { clearPendingBotLoginToken({ sessionStorage, localStorage }); stopBotPoll() }"
+            class="mt-3 flex w-full items-center justify-center gap-2.5 rounded-xl bg-[#229ED9] px-4 py-3 text-[14px] font-semibold text-white transition-all duration-150 hover:bg-[#1e90c4] active:scale-[0.98] disabled:opacity-60"
+            :disabled="botPollState === 'opening'"
+            @click="loginViaBot"
           >
-            Bekor qilish
+            <UIcon name="i-simple-icons-telegram" class="size-4" />
+            Telegram bot orqali kirish
           </button>
-        </div>
+
+          <div
+            v-if="botPollState === 'waiting'"
+            class="mt-2.5 flex items-center justify-center gap-2 text-[13px] text-[#6f7480]"
+          >
+            <span class="size-3.5 shrink-0 rounded-full border-2 border-[#e0e0e4] border-t-[#229ED9] animate-spin" />
+            Bot tasdig'ini kutmoqda...
+          </div>
+        </template>
 
         <p
           v-if="authError"

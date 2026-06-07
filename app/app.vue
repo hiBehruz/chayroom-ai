@@ -31,7 +31,9 @@ onMounted(() => {
 
   // JWT cookie may be set (e.g. after bot-callback redirect) without cx-sub cookie.
   // Sync from server so subscription state is correct on first render.
-  if (shouldSyncServerSession(authStore.user, authStore.hasSubscription)) {
+  // Skip on /login: the login flow calls authStore.login() shortly after mount, and
+  // a concurrent syncMe() that returns null user would call logout() and race with it.
+  if (route.path !== '/login' && shouldSyncServerSession(authStore.user, authStore.hasSubscription)) {
     void authStore.syncMe()
   }
 })

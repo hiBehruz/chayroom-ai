@@ -68,8 +68,6 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
       console.error('[bot-login] botToken not configured')
     }
 
-    const appUrl = (config.public as Record<string, string>).appUrl || 'https://chayroom.uz'
-
     if ((!entry || canCompleteBotLogin(entry, from.id)) && botToken) {
       await storage.setItem(
         key,
@@ -77,7 +75,8 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
           { id: from.id, first_name: from.first_name || 'Foydalanuvchi', last_name: from.last_name, username: from.username }
         )
       )
-      await sendTelegramMessage(botToken, chatId, buildBotLoginSuccessMessage(appUrl, token))
+      const { text: successText, options: successOptions } = buildBotLoginSuccessMessage()
+      await sendTelegramMessage(botToken, chatId, successText, successOptions)
     } else if (botToken) {
       await sendTelegramMessage(botToken, chatId, '⚠️ Kirish havolasi eskirgan. Saytda qaytadan urinib ko\'ring.')
     }

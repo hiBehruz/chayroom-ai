@@ -22,7 +22,7 @@ export async function upsertUserFromTelegram(input: TelegramUserInput): Promise<
   if (!existing) {
     const [inserted] = await db.insert(users).values({
       telegramId,
-      firstName: input.first_name,
+      firstName: input.first_name || 'Foydalanuvchi',
       lastName: input.last_name ?? null,
       username: input.username ?? null,
       photoUrl: input.photo_url ?? null,
@@ -32,10 +32,10 @@ export async function upsertUserFromTelegram(input: TelegramUserInput): Promise<
   }
 
   const [updated] = await db.update(users).set({
-    firstName: input.first_name,
-    lastName: input.last_name ?? null,
-    username: input.username ?? null,
-    photoUrl: input.photo_url ?? null,
+    ...(input.first_name ? { firstName: input.first_name } : {}),
+    ...(input.last_name !== undefined ? { lastName: input.last_name ?? null } : {}),
+    ...(input.username !== undefined ? { username: input.username ?? null } : {}),
+    ...(input.photo_url !== undefined ? { photoUrl: input.photo_url ?? null } : {}),
     ...adminRole
   }).where(eq(users.telegramId, telegramId)).returning()
   return updated!

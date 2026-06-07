@@ -5,15 +5,16 @@ const { isMiniApp } = useTelegramApp()
 authStore.restoreFromStorage()
 
 const { data: meData } = await useAsyncData('profile-me', () => $fetch('/api/auth/me'))
-if (meData.value?.user && !authStore.user) {
+if (meData.value?.user) {
+  const apiUser = meData.value.user
   authStore.setUserSession({
-    id: meData.value.user.telegramId,
-    telegramId: meData.value.user.telegramId,
-    first_name: meData.value.user.firstName,
-    last_name: meData.value.user.lastName ?? undefined,
-    username: meData.value.user.username ?? undefined,
-    photo_url: meData.value.user.photoUrl ?? undefined,
-    role: meData.value.user.role,
+    id: apiUser.telegramId,
+    telegramId: apiUser.telegramId,
+    first_name: apiUser.firstName || authStore.user?.first_name || '',
+    last_name: apiUser.lastName ?? undefined,
+    username: apiUser.username ?? undefined,
+    photo_url: apiUser.photoUrl ?? undefined,
+    role: apiUser.role,
     hash: 'session'
   })
 }

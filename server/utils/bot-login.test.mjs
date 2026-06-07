@@ -22,11 +22,10 @@ test('parseBotLoginConfirmData returns token only for confirm payloads', () => {
   assert.equal(parseBotLoginConfirmData('other'), null)
 })
 
-test('buildBotLoginSuccessMessage links through the login callback', () => {
-  assert.equal(
-    buildBotLoginSuccessMessage('https://chayroom.uz/', 'abc123'),
-    '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\n<a href="https://chayroom.uz/auth/bot-callback?token=abc123">Chayroom.uz</a> saytiga qayting va foydalanishda davom eting. 🚀'
-  )
+test('buildBotLoginSuccessMessage returns plain confirmation with no link', () => {
+  const { text, options } = buildBotLoginSuccessMessage()
+  assert.equal(text, '✅ Kirish tasdiqlandi!\n\nBrauzeringizga qayting — profil avtomatik ochiladi.')
+  assert.deepEqual(options, {})
 })
 
 test('buildAuthenticatedBotLoginEntry returns authenticated storage payload', () => {
@@ -57,7 +56,7 @@ test('canCompleteBotLogin allows the same Telegram user to retry an authenticate
   assert.equal(canCompleteBotLogin(entry, 99), false)
 })
 
-test('getBotLoginRedirectTarget opens the authenticated profile', () => {
+test('getBotLoginRedirectTarget opens the profile page', () => {
   assert.equal(getBotLoginRedirectTarget(), '/profile')
 })
 

@@ -23,14 +23,14 @@ test('resolvePostLoginTarget keeps selected plan only for dashboard redirects', 
   assert.deepEqual(resolvePostLoginTarget('pro', '/dashboard'), { path: '/dashboard', query: { plan: 'pro' } })
 })
 
-test('resolveBotLoginLaunchUrl prefers https universal links in Safari', () => {
+test('resolveBotLoginLaunchUrl sends Safari directly to Telegram with the fresh token', () => {
   assert.equal(
     resolveBotLoginLaunchUrl({
       url: 'https://t.me/chayroomai_bot?start=auth_abc',
       tgUrl: 'tg://resolve?domain=chayroomai_bot&start=auth_abc',
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1'
     }),
-    'https://t.me/chayroomai_bot?start=auth_abc'
+    'tg://resolve?domain=chayroomai_bot&start=auth_abc'
   )
 })
 

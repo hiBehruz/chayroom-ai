@@ -17,8 +17,8 @@ export function isSafariUserAgent(userAgent) {
   return /Safari\//.test(ua) && !/Chrome\/|CriOS\/|FxiOS\/|EdgiOS\//.test(ua)
 }
 
-export function resolveBotLoginLaunchUrl({ url, tgUrl }) {
-  return tgUrl || url
+export function resolveBotLoginLaunchUrl({ url }) {
+  return url
 }
 
 export function storePendingBotLoginToken({ sessionStorage, localStorage }, token) {

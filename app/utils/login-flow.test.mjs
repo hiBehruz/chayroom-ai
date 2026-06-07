@@ -23,14 +23,14 @@ test('resolvePostLoginTarget keeps selected plan only for dashboard redirects', 
   assert.deepEqual(resolvePostLoginTarget('pro', '/dashboard'), { path: '/dashboard', query: { plan: 'pro' } })
 })
 
-test('resolveBotLoginLaunchUrl sends Safari directly to Telegram with the fresh token', () => {
+test('resolveBotLoginLaunchUrl opens the bot through its HTTPS start link', () => {
   assert.equal(
     resolveBotLoginLaunchUrl({
       url: 'https://t.me/chayroomai_bot?start=auth_abc',
       tgUrl: 'tg://resolve?domain=chayroomai_bot&start=auth_abc',
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1'
     }),
-    'tg://resolve?domain=chayroomai_bot&start=auth_abc'
+    'https://t.me/chayroomai_bot?start=auth_abc'
   )
 })
 
@@ -45,14 +45,14 @@ test('isSafariUserAgent detects mobile Safari only', () => {
   )
 })
 
-test('resolveBotLoginLaunchUrl keeps tg links outside Safari', () => {
+test('resolveBotLoginLaunchUrl keeps the HTTPS start link outside Safari', () => {
   assert.equal(
     resolveBotLoginLaunchUrl({
       url: 'https://t.me/chayroomai_bot?start=auth_abc',
       tgUrl: 'tg://resolve?domain=chayroomai_bot&start=auth_abc',
       userAgent: 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36'
     }),
-    'tg://resolve?domain=chayroomai_bot&start=auth_abc'
+    'https://t.me/chayroomai_bot?start=auth_abc'
   )
 })
 

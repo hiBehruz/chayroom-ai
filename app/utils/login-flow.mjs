@@ -12,13 +12,15 @@ export function resolvePostLoginTarget(selectedPlan, redirectPath) {
 
 const BOT_LOGIN_TOKEN_KEY = 'bot_login_token'
 
+export function isSafariUserAgent(userAgent) {
+  const ua = String(userAgent || '')
+  return /Safari\//.test(ua) && !/Chrome\/|CriOS\/|FxiOS\/|EdgiOS\//.test(ua)
+}
+
 export function resolveBotLoginLaunchUrl({ url, tgUrl, userAgent }) {
   if (!tgUrl) return url
 
-  const ua = String(userAgent || '')
-  const isSafari = /Safari\//.test(ua) && !/Chrome\/|CriOS\/|FxiOS\/|EdgiOS\//.test(ua)
-
-  return isSafari ? url : tgUrl
+  return isSafariUserAgent(userAgent) ? url : tgUrl
 }
 
 export function storePendingBotLoginToken({ sessionStorage, localStorage }, token) {

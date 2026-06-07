@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
+  isSafariUserAgent,
   readPendingBotLoginToken,
   resolveBotLoginLaunchUrl,
   resolvePostLoginTarget,
@@ -29,6 +30,17 @@ test('resolveBotLoginLaunchUrl prefers https universal links in Safari', () => {
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1'
     }),
     'https://t.me/chayroomai_bot?start=auth_abc'
+  )
+})
+
+test('isSafariUserAgent detects mobile Safari only', () => {
+  assert.equal(
+    isSafariUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1'),
+    true
+  )
+  assert.equal(
+    isSafariUserAgent('Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36'),
+    false
   )
 })
 

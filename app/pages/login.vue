@@ -1,6 +1,11 @@
 <!-- app/pages/login.vue -->
 <script setup lang="ts">
-import { resolvePostLoginTarget } from '../utils/login-flow.mjs'
+import {
+  readPendingBotLoginToken,
+  resolveBotLoginLaunchUrl,
+  resolvePostLoginTarget,
+  storePendingBotLoginToken
+} from '../utils/login-flow.mjs'
 
 declare global {
   interface Window {
@@ -31,7 +36,7 @@ const botPollState = ref<'idle' | 'opening' | 'waiting'>('idle')
 const authError = ref('')
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
-let botPollTimer: ReturnType<typeof window.setTimeout> | null = null
+let botPollTimer: number | null = null
 let activePollToken = ''
 
 function goAfterLogin() {
@@ -86,9 +91,12 @@ async function loginViaBot() {
     })
 
     if (import.meta.client) {
-      sessionStorage.setItem('bot_login_token', res.token)
-      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-      window.location.href = isMobile ? (res.tgUrl || res.url) : res.url
+      storePendingBotLoginToken({ sessionStorage, localStorage }, res.token)
+      window.location.href = resolveBotLoginLaunchUrl({
+        url: res.url,
+        tgUrl: res.tgUrl,
+        userAgent: navigator.userAgent
+      })
     }
   } catch {
     stopBotPoll()
@@ -116,7 +124,7 @@ function mountTelegramWidget() {
   script.setAttribute('data-radius', '12')
   script.setAttribute('data-userpic', 'true')
   script.setAttribute('data-request-access', 'write')
-  script.setAttribute('data-auth-url', window.location.href.split('?')[0])
+  script.setAttribute('data-auth-url', window.location.href.split('?')[0] || window.location.href)
   container.appendChild(script)
   widgetState.value = 'ready'
 }
@@ -164,9 +172,8 @@ onMounted(async () => {
   }
 
   const resumePendingBotLogin = () => {
-    const savedToken = sessionStorage.getItem('bot_login_token')
+    const savedToken = readPendingBotLoginToken({ sessionStorage, localStorage })
     if (savedToken && !authStore.user) {
-      sessionStorage.removeItem('bot_login_token')
       botPollState.value = 'waiting'
       void pollBotLoginStatus(savedToken)
     }

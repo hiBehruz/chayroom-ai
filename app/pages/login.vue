@@ -80,35 +80,17 @@ async function loginViaBot() {
   authError.value = ''
   botPollState.value = 'opening'
 
-  const isMobile = import.meta.client && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  // Open window synchronously during click (before async fetch) — prevents Safari popup blocker
-  const newWindow = (!isMobile && import.meta.client) ? window.open('', '_blank', 'noopener,noreferrer') : null
-
   try {
     const res = await $fetch<{ url: string, tgUrl: string, token: string }>('/api/auth/bot-login/start', {
       method: 'POST'
     })
 
     if (import.meta.client) {
-      if (isMobile) {
-        sessionStorage.setItem('bot_login_token', res.token)
-        window.location.href = res.tgUrl || res.url
-        return
-      }
-      if (newWindow) {
-        newWindow.location.href = res.url
-      } else {
-        // Fallback: navigate away if popup was still blocked
-        sessionStorage.setItem('bot_login_token', res.token)
-        window.location.href = res.url
-        return
-      }
+      sessionStorage.setItem('bot_login_token', res.token)
+      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      window.location.href = isMobile ? (res.tgUrl || res.url) : res.url
     }
-
-    botPollState.value = 'waiting'
-    await pollBotLoginStatus(res.token)
   } catch {
-    if (newWindow) newWindow.close()
     stopBotPoll()
     authError.value = "Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko'ring."
   }
@@ -263,10 +245,6 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           id="telegram-widget-container"
           class="mt-3 flex min-h-13 items-center justify-center"
         />
-
-        <p class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]">
-          Telegram orqali tasdiqlaysiz va profilingiz avtomatik ochiladi.
-        </p>
 
         <button
           type="button"

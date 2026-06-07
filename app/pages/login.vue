@@ -67,7 +67,7 @@ async function pollBotLoginStatus(token: string) {
 
   if (res.status === 'expired') {
     stopBotPoll()
-    authError.value = 'Kirish havolasi eskirdi. Qaytadan urinib ko'ring.'
+    authError.value = "Kirish havolasi eskirdi. Qaytadan urinib ko'ring."
     return
   }
 
@@ -80,26 +80,35 @@ async function loginViaBot() {
   authError.value = ''
   botPollState.value = 'opening'
 
+  const isMobile = import.meta.client && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  // Open window synchronously during click (before async fetch) — prevents Safari popup blocker
+  const newWindow = (!isMobile && import.meta.client) ? window.open('', '_blank', 'noopener,noreferrer') : null
+
   try {
     const res = await $fetch<{ url: string, tgUrl: string, token: string }>('/api/auth/bot-login/start', {
       method: 'POST'
     })
 
     if (import.meta.client) {
-      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
       if (isMobile) {
-        // Mobile: navigate directly via tg:// scheme, save token for resume
         sessionStorage.setItem('bot_login_token', res.token)
         window.location.href = res.tgUrl || res.url
         return
       }
-      // Desktop: open in new tab, polling continues on this page
-      window.open(res.url, '_blank', 'noopener,noreferrer')
+      if (newWindow) {
+        newWindow.location.href = res.url
+      } else {
+        // Fallback: navigate away if popup was still blocked
+        sessionStorage.setItem('bot_login_token', res.token)
+        window.location.href = res.url
+        return
+      }
     }
 
     botPollState.value = 'waiting'
     await pollBotLoginStatus(res.token)
   } catch {
+    if (newWindow) newWindow.close()
     stopBotPoll()
     authError.value = "Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko'ring."
   }

@@ -1,6 +1,5 @@
 <!-- app/pages/dashboard.vue -->
 <script setup lang="ts">
-import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 
 const authStore = useAuthStore()
 const { isMiniApp } = useTelegramApp()
@@ -24,19 +23,9 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
       <!-- Paywall CTA — tepada, obuna yo'q bo'lganda -->
       <div
         v-if="!user"
-        class="mb-8 rounded-2xl bg-[#f7f7f5ef] px-10 py-8 flex items-center justify-center gap-8 paywall-enter sticky top-20 z-10 w-220.5 max-w-full mx-auto max-md:flex-col max-md:px-6 max-md:py-6 max-md:text-center max-md:gap-4"
+        class="mb-8 rounded-2xl bg-[#f7f7f5] px-10 py-8 flex items-center justify-center gap-8 paywall-enter sticky top-20 z-10 w-220.5 max-w-full mx-auto max-md:flex-col max-md:px-6 max-md:py-6 max-md:text-center max-md:gap-4"
       >
-        <ClientOnly>
-          <div class="shrink-0 w-52 h-52 max-md:w-64 max-md:h-64">
-            <DotLottieVue
-              src="/animations/Door.lottie"
-              :autoplay="true"
-              :loop="true"
-              style="width:100%;height:100%;display:block"
-            />
-          </div>
-        </ClientOnly>
-        <div class="flex flex-col items-start text-left max-md:items-center max-md:text-center">
+        <div class="flex flex-col items-center text-center">
           <h2 class="text-[40px] font-extrabold text-[#1a1a1a] mb-3 leading-tight">
             O'quv dashboardingni och
           </h2>
@@ -51,7 +40,11 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
               name="i-lucide-sparkles"
               class="size-4.5 shrink-0"
             />
-            To'liq kirish huquqini olish
+            <span>To'liq kirish huquqini olish</span>
+            <UIcon
+              name="i-lucide-arrow-right"
+              class="size-4 shrink-0"
+            />
           </NuxtLink>
           <p class="mt-3 text-[13px] text-cx-muted">
             Telegram orqali to'lov. Barcha kurs va materiallarga kirish.

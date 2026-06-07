@@ -4,6 +4,7 @@ const isProfileOpen = ref(false)
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
 const scrolled = ref(false)
+const SECTION_SCROLL_KEY = 'cx-scroll-target'
 
 const navLinks = [
   { label: 'Panel', href: '/dashboard' },
@@ -15,20 +16,52 @@ function isActive(href: string) {
   return href.startsWith('/') && route.path === href
 }
 
-function scrollToSection(href: string) {
+async function goToHomeTop() {
+  if (route.path !== '/') {
+    if (import.meta.client) {
+      sessionStorage.removeItem(SECTION_SCROLL_KEY)
+      window.location.assign('/')
+      return
+    }
+    await navigateTo({ path: '/' })
+    return
+  }
+
+  if (import.meta.client) {
+    sessionStorage.removeItem(SECTION_SCROLL_KEY)
+    window.history.replaceState({}, '', '/')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+async function scrollToSection(href: string) {
   if (href.startsWith('/')) {
     navigateTo(href)
     return
   }
   if (route.path !== '/') {
-    navigateTo('/' + href)
+    if (import.meta.client) {
+      sessionStorage.setItem(SECTION_SCROLL_KEY, href)
+      window.location.assign('/')
+      return
+    }
+    await navigateTo({ path: '/' })
     return
   }
+  await nextTick()
+  requestAnimationFrame(() => doScroll(href))
+}
+
+function doScroll(href: string) {
   const el = document.querySelector(href)
   if (!el) return
+  if (import.meta.client && window.location.hash) {
+    window.history.replaceState({}, '', '/')
+  }
   const navEl = document.querySelector('.nav-scroll-shell') as HTMLElement
   const navHeight = navEl ? navEl.offsetHeight : 72
-  const top = el.getBoundingClientRect().top + window.scrollY - navHeight
+  const sectionOffset = href === '#about' ? 96 : 0
+  const top = el.getBoundingClientRect().top + window.scrollY - navHeight - sectionOffset
   window.scrollTo({ top, behavior: 'smooth' })
 }
 
@@ -43,6 +76,12 @@ onMounted(() => {
     scrolled.value = window.scrollY > 16
   }
   window.addEventListener('scroll', scrollHandler, { passive: true })
+
+  const pendingSection = sessionStorage.getItem(SECTION_SCROLL_KEY)
+  if (route.path === '/' && pendingSection) {
+    sessionStorage.removeItem(SECTION_SCROLL_KEY)
+    requestAnimationFrame(() => doScroll(pendingSection))
+  }
 })
 onUnmounted(() => {
   window.removeEventListener('scroll', scrollHandler)
@@ -62,6 +101,7 @@ onUnmounted(() => {
       <!-- Logo -->
       <NuxtLink
         to="/"
+        :prefetch="false"
         class="flex items-center gap-2.5 shrink-0 hover:opacity-80 transition-opacity duration-200"
       >
         <span class="nav-logo-mark">
@@ -80,7 +120,7 @@ onUnmounted(() => {
         <!-- Club haqida -->
         <button
           class="nav-text relative px-3.5 py-2 rounded-xl cursor-pointer focus:outline-none"
-          @click="scrollToSection('#about')"
+          @click="goToHomeTop"
         >
           Club haqida
         </button>
@@ -187,7 +227,7 @@ onUnmounted(() => {
         >
           <button
             class="text-[22px] font-semibold text-[#14161f] py-3 px-8 focus:outline-none active:scale-95"
-            @click="scrollToSection('#about'); isMobileMenuOpen = false"
+            @click="goToHomeTop(); isMobileMenuOpen = false"
           >
             Club haqida
           </button>

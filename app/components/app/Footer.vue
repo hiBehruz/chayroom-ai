@@ -5,6 +5,7 @@
         <div>
           <NuxtLink
             to="/"
+            :prefetch="false"
             class="inline-flex items-center gap-3 text-[#111318]"
           >
             <span class="footer-logo-mark">
@@ -43,6 +44,7 @@
         <nav class="footer-link-col items-start">
           <NuxtLink
             to="/#faq"
+            :prefetch="false"
             class="footer-link"
           >
             Savollar

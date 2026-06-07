@@ -4,9 +4,26 @@ const { isMiniApp } = useTelegramApp()
 
 authStore.restoreFromStorage()
 
+const { data: meData } = await useAsyncData('profile-me', () => $fetch('/api/auth/me'))
+if (meData.value?.user && !authStore.user) {
+  authStore.setUserSession({
+    id: meData.value.user.telegramId,
+    telegramId: meData.value.user.telegramId,
+    first_name: meData.value.user.firstName,
+    last_name: meData.value.user.lastName ?? undefined,
+    username: meData.value.user.username ?? undefined,
+    photo_url: meData.value.user.photoUrl ?? undefined,
+    role: meData.value.user.role,
+    hash: 'session'
+  })
+}
+if (meData.value?.hasSubscription && !authStore.hasSubscription) {
+  authStore.activateSubscription(meData.value.subscription ?? undefined)
+}
+
 const user = computed(() => authStore.user)
-const displayName = computed(() => authStore.displayName || user.value?.first_name || 'Behruz Zaripov')
-const username = computed(() => user.value?.username || 'hellobehruz')
+const displayName = computed(() => authStore.displayName || user.value?.first_name || '')
+const username = computed(() => user.value?.username || '')
 
 const initials = computed(() => {
   const parts = displayName.value.trim().split(/\s+/)

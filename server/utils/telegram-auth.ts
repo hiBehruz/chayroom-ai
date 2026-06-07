@@ -40,12 +40,12 @@ export function verifyTelegramLoginPayload(
   }
 }
 
-export function parseAdminIds(raw: string | undefined | null): string[] {
-  if (!raw) return []
-  return raw.split(',').map(s => s.trim()).filter(Boolean)
+export function parseAdminIds(raw: string | number | undefined | null): string[] {
+  if (!raw && raw !== 0) return []
+  return String(raw).split(',').map(s => s.trim()).filter(Boolean)
 }
 
-export function isAdminId(id: string | number, raw: string | undefined | null): boolean {
+export function isAdminId(id: string | number, raw: string | number | undefined | null): boolean {
   return parseAdminIds(raw).includes(String(id))
 }
 

@@ -30,25 +30,20 @@ export default defineEventHandler(async (event) => {
   await setSessionCookie(event, userToJwtPayload(dbUser))
 
   const botToken = config.telegramBotToken
-  if (botToken) {
+  if (botToken && isFirstLogin) {
     const appUrl = config.public.appUrl || 'https://chayroom.uz'
+    const platformUrl = buildMiniAppLoginUrl(appUrl)
+    const supportUsername = config.public.supportUsername || 'hellobehruz'
     await setTelegramChatMenuButton(botToken, buildPlatformMenuButton(appUrl))
-
-    if (!isFirstLogin) {
-      await sendTelegramMessage(botToken, tgUser.id, `✅ Вы успешно авторизовались на chayroom.uz\n\nВозвращайтесь на сайт — вход уже выполнен.`)
-    } else {
-      const platformUrl = buildMiniAppLoginUrl(appUrl)
-      const supportUsername = config.public.supportUsername || 'hellobehruz'
-      await sendTelegramMessage(botToken, tgUser.id, `Salom, ${tgUser.first_name}! 👋\n\nChayroom AI Club'ga xush kelibsiz — bu yerda biz AI'ni hayot, ish va biznesga joriy qilamiz.\n\nIchida: AI-agentlar, vibe coding, neyrotarmoqlar va boshqa amaliy materiallar.\n\nBoshlaylikmi?`, {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '🚀 Platformani ochish', web_app: { url: platformUrl } }],
-            [{ text: '💳 Obunani boshqarish', url: `${appUrl}/profile` }],
-            [{ text: '💬 Qo\'llab-quvvatlash', url: `https://t.me/${supportUsername}` }]
-          ]
-        }
-      })
-    }
+    await sendTelegramMessage(botToken, tgUser.id, `Salom, ${tgUser.first_name}! 👋\n\nChayroom AI Club'ga xush kelibsiz — bu yerda biz AI'ni hayot, ish va biznesga joriy qilamiz.\n\nIchida: AI-agentlar, vibe coding, neyrotarmoqlar va boshqa amaliy materiallar.\n\nBoshlaylikmi?`, {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '🚀 Platformani ochish', web_app: { url: platformUrl } }],
+          [{ text: '💳 Obunani boshqarish', url: `${appUrl}/profile` }],
+          [{ text: '💬 Qo\'llab-quvvatlash', url: `https://t.me/${supportUsername}` }]
+        ]
+      }
+    })
   }
 
   let hasSubscription = dbUser.role === 'ADMIN'

@@ -219,7 +219,7 @@ onUnmounted(() => {
 
         <!-- Hamburger -->
         <button
-          class="relative z-10000 flex items-center justify-center w-9 h-9 rounded-xl hover:bg-[#f2f2f0] transition-colors duration-200 focus:outline-none active:scale-90"
+          class="hamburger-button relative z-10000 flex items-center justify-center w-9 h-9 rounded-xl hover:bg-[#f2f2f0] transition-colors duration-200 focus:outline-none active:scale-90"
           style="transition: background 0.2s ease, transform 0.18s cubic-bezier(0.34,1.56,0.64,1)"
           :aria-label="isMobileMenuOpen ? 'Menyuni yopish' : 'Menyuni ochish'"
           @click="isMobileMenuOpen = !isMobileMenuOpen"
@@ -377,24 +377,19 @@ onUnmounted(() => {
   width: 18px;
   height: 14px;
 }
-
-/*
-  Two-layer approach:
-  - .hb-wrap  → translates to the vertical center (moves the pivot point)
-  - .hb-bar   → rotates around its own center (which is now the pivot we just moved)
-  Result: bar always rotates around wherever it currently is — true "in-place" spin.
-*/
 .hb-wrap {
   position: absolute;
   left: 0;
   width: 100%;
   top: calc(50% - 0.875px);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.hb-wrap-top { transform: translateY(-4px); }
-.hb-wrap-bot { transform: translateY(4px); }
+.hb-wrap-top { transform: translateY(-4.5px); }
+.hb-wrap-bot { transform: translateY(4.5px); }
 
+.hamburger-button:hover .hb-wrap-top,
+.hamburger-button:hover .hb-wrap-bot,
 .hamburger-icon.is-open .hb-wrap-top,
 .hamburger-icon.is-open .hb-wrap-bot {
   transform: translateY(0);
@@ -407,23 +402,26 @@ onUnmounted(() => {
   background: #14161f;
   border-radius: 1px;
   transform-origin: center;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.16s ease;
 }
 
 .hb-mid {
   position: absolute;
   left: 0;
   top: calc(50% - 0.875px);
-  transition: transform 0.15s ease, opacity 0.13s ease;
+  transition: transform 0.2s ease, opacity 0.14s ease;
 }
 
+.hamburger-button:hover .hb-wrap-top .hb-bar,
 .hamburger-icon.is-open .hb-wrap-top .hb-bar {
   transform: rotate(45deg);
 }
+.hamburger-button:hover .hb-mid,
 .hamburger-icon.is-open .hb-mid {
   opacity: 0;
   transform: scaleX(0);
 }
+.hamburger-button:hover .hb-wrap-bot .hb-bar,
 .hamburger-icon.is-open .hb-wrap-bot .hb-bar {
   transform: rotate(-45deg);
 }

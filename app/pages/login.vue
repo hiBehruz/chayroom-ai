@@ -179,17 +179,28 @@ onMounted(async () => {
 
   window.onTelegramAuth = loginWithTelegram
 
-  // Resume if user returned from t.me after popup was blocked (mobile)
-  const savedToken = sessionStorage.getItem('bot_login_token')
-  if (savedToken && !authStore.user) {
-    sessionStorage.removeItem('bot_login_token')
-    botPollState.value = 'waiting'
-    void pollBotLoginStatus(savedToken)
+  const resumePendingBotLogin = () => {
+    const savedToken = sessionStorage.getItem('bot_login_token')
+    if (savedToken && !authStore.user) {
+      sessionStorage.removeItem('bot_login_token')
+      botPollState.value = 'waiting'
+      void pollBotLoginStatus(savedToken)
+    }
   }
 
-  // When user switches back from Telegram app, resume polling immediately
+  // Fresh page load: check for pending token
+  resumePendingBotLogin()
+
+  // bfcache restore (iOS back button): onMounted doesn't re-run, pageshow does
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) resumePendingBotLogin()
+  })
+
+  // Switching back from Telegram app: resume suspended polling immediately
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && botPollState.value === 'waiting' && activePollToken) {
+    if (document.visibilityState !== 'visible') return
+    resumePendingBotLogin()
+    if (botPollState.value === 'waiting' && activePollToken) {
       if (botPollTimer) { window.clearTimeout(botPollTimer); botPollTimer = null }
       void pollBotLoginStatus(activePollToken)
     }

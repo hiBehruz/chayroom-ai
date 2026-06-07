@@ -1,11 +1,26 @@
-import { getSubscriptionState } from '../../utils/user-session'
+import { eq, desc } from 'drizzle-orm'
+import { db } from '../../db'
+import { users, subscriptions } from '../../db/schema'
+import { readSessionUser } from '../../utils/session-cookie'
 
 export default defineEventHandler(async (event) => {
-  const { user, hasSubscription, subscription } = await getSubscriptionState(event)
+  const jwtUser = await readSessionUser(event)
+  if (!jwtUser) {
+    return { user: null, hasSubscription: false, subscription: null }
+  }
 
+  const [user] = await db.select().from(users).where(eq(users.id, jwtUser.id)).limit(1)
   if (!user) {
     return { user: null, hasSubscription: false, subscription: null }
   }
+
+  const [sub] = await db.select().from(subscriptions)
+    .where(eq(subscriptions.userId, user.id))
+    .orderBy(desc(subscriptions.expiresAt))
+    .limit(1)
+
+  const now = new Date()
+  const hasSubscription = user.role === 'ADMIN' || (!!sub && sub.status === 'ACTIVE' && sub.expiresAt > now)
 
   return {
     user: {
@@ -18,11 +33,11 @@ export default defineEventHandler(async (event) => {
       role: user.role
     },
     hasSubscription,
-    subscription: subscription
+    subscription: sub
       ? {
-          period: subscription.period,
-          expiresAt: subscription.expiresAt.toISOString(),
-          cancelledAt: subscription.cancelledAt ? subscription.cancelledAt.toISOString() : null
+          period: sub.period,
+          expiresAt: sub.expiresAt.toISOString(),
+          cancelledAt: sub.cancelledAt ? sub.cancelledAt.toISOString() : null
         }
       : null
   }

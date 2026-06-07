@@ -20,6 +20,7 @@ export default defineCachedEventHandler(async (event) => {
       badge: guides.badge,
       level: guides.level,
       isFree: guides.isFree,
+      accessLevel: guides.accessLevel,
       publishedAt: guides.publishedAt,
       createdAt: guides.createdAt,
       category: categories.name

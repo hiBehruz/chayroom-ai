@@ -29,10 +29,10 @@ const canUseTelegramWidget = computed(() => {
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
 const botPollState = ref<'idle' | 'opening' | 'waiting'>('idle')
 const authError = ref('')
-const showWidget = ref(false)
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
 let botPollTimer: ReturnType<typeof window.setTimeout> | null = null
+let activePollToken = ''
 
 function goAfterLogin() {
   return navigateTo(resolvePostLoginTarget(selectedPlan.value, redirectPath.value))
@@ -44,6 +44,7 @@ function stopBotPoll() {
     botPollTimer = null
   }
   botPollState.value = 'idle'
+  activePollToken = ''
 }
 
 async function loginWithTelegram(user: TelegramUser) {
@@ -51,20 +52,8 @@ async function loginWithTelegram(user: TelegramUser) {
   goAfterLogin()
 }
 
-async function loginViaTelegramOAuth() {
-  authError.value = ''
-
-  if (!canUseTelegramWidget.value) {
-    showWidget.value = false
-    authError.value = `${currentHostname.value} manzilida Telegram kirish ishlamaydi. Uni ${appHostname.value} domenida tekshiring.`
-    return
-  }
-
-  showWidget.value = true
-  mountTelegramWidget()
-}
-
 async function pollBotLoginStatus(token: string) {
+  activePollToken = token
   const res = await $fetch<{ status: 'pending' | 'expired' | 'authenticated' }>('/api/auth/bot-login/status', {
     query: { token }
   })
@@ -78,7 +67,7 @@ async function pollBotLoginStatus(token: string) {
 
   if (res.status === 'expired') {
     stopBotPoll()
-    authError.value = 'Kirish havolasi eskirdi. Qaytadan urinib ko‘ring.'
+    authError.value = "Kirish havolasi eskirdi. Qaytadan urinib ko'ring."
     return
   }
 
@@ -91,20 +80,37 @@ async function loginViaBot() {
   authError.value = ''
   botPollState.value = 'opening'
 
+  const isMobile = import.meta.client && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  // Open window synchronously during click (before async fetch) — prevents Safari popup blocker
+  const newWindow = (!isMobile && import.meta.client) ? window.open('', '_blank', 'noopener,noreferrer') : null
+
   try {
-    const res = await $fetch<{ url: string, token: string }>('/api/auth/bot-login/start', {
+    const res = await $fetch<{ url: string, tgUrl: string, token: string }>('/api/auth/bot-login/start', {
       method: 'POST'
     })
 
     if (import.meta.client) {
-      window.open(res.url, '_blank', 'noopener,noreferrer')
+      if (isMobile) {
+        sessionStorage.setItem('bot_login_token', res.token)
+        window.location.href = res.tgUrl || res.url
+        return
+      }
+      if (newWindow) {
+        newWindow.location.href = res.url
+      } else {
+        // Fallback: navigate away if popup was still blocked
+        sessionStorage.setItem('bot_login_token', res.token)
+        window.location.href = res.url
+        return
+      }
     }
 
     botPollState.value = 'waiting'
     await pollBotLoginStatus(res.token)
   } catch {
+    if (newWindow) newWindow.close()
     stopBotPoll()
-    authError.value = 'Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko‘ring.'
+    authError.value = "Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko'ring."
   }
 }
 
@@ -169,6 +175,38 @@ onMounted(async () => {
   }
 
   window.onTelegramAuth = loginWithTelegram
+
+  // Auto-mount Telegram widget (no button click needed)
+  if (canUseTelegramWidget.value) {
+    mountTelegramWidget()
+  }
+
+  const resumePendingBotLogin = () => {
+    const savedToken = sessionStorage.getItem('bot_login_token')
+    if (savedToken && !authStore.user) {
+      sessionStorage.removeItem('bot_login_token')
+      botPollState.value = 'waiting'
+      void pollBotLoginStatus(savedToken)
+    }
+  }
+
+  // Fresh page load: check for pending token
+  resumePendingBotLogin()
+
+  // bfcache restore (iOS back button): onMounted doesn't re-run, pageshow does
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) resumePendingBotLogin()
+  })
+
+  // Switching back from Telegram app: resume suspended polling immediately
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return
+    resumePendingBotLogin()
+    if (botPollState.value === 'waiting' && activePollToken) {
+      if (botPollTimer) { window.clearTimeout(botPollTimer); botPollTimer = null }
+      void pollBotLoginStatus(activePollToken)
+    }
+  })
 })
 
 onUnmounted(() => {
@@ -220,23 +258,10 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           Telegramni yangilang va qaytadan kirging.
         </div>
 
-        <!-- Primary: Telegram OAuth flow -->
-        <button
-          type="button"
-          class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3480f1] px-5 py-3 text-[15px] font-bold text-white transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-70"
-          @click="loginViaTelegramOAuth"
-        >
-          <UIcon
-            name="i-lucide-send"
-            class="size-4.5"
-          />
-          Telegram orqali kirish
-        </button>
-
+        <!-- Primary: Telegram widget (auto-mounted) -->
         <div
-          v-if="showWidget"
           id="telegram-widget-container"
-          class="mt-4 flex min-h-13 items-center justify-center"
+          class="mt-3 flex min-h-13 items-center justify-center"
         />
 
         <p class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]">
@@ -260,7 +285,7 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           v-if="botPollState === 'waiting'"
           class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
         >
-          Telegram botda tasdiqlang. So‘ng profilingiz avtomatik ochiladi.
+          Telegram botda tasdiqlang. So'ng profilingiz avtomatik ochiladi.
         </p>
 
         <p

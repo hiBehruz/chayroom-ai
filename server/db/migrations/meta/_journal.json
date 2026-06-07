@@ -29,6 +29,13 @@
       "when": 1780000000000,
       "tag": "0003_tribute_subscription_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780816409682,
+      "tag": "0004_add_access_level_to_guides",
+      "breakpoints": true
     }
   ]
 }

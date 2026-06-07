@@ -93,28 +93,6 @@ export const useAuthStore = defineStore('auth', () => {
       telegramId: telegramUser.telegramId ?? telegramUser.id
     }
     userCookie.value = user.value
-    if (import.meta.client) {
-      localStorage.setItem('cx-user', JSON.stringify(user.value))
-    }
-  }
-
-  async function postLogin(body: Record<string, unknown>) {
-    if (!import.meta.client) return
-    try {
-      const res = await $fetch<{ hasSubscription?: boolean }>('/api/auth/login', {
-        method: 'POST',
-        body
-      })
-
-      if (res?.hasSubscription) {
-        activateSubscription()
-      } else {
-        hasSubscription.value = false
-        subCookie.value = null
-      }
-    } catch {
-      return
-    }
   }
 
   async function syncMe() {
@@ -168,16 +146,44 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function login(telegramUser: TelegramUser) {
-    setUserSession(telegramUser)
-    await postLogin({
-      id: telegramUser.id,
-      first_name: telegramUser.first_name,
-      last_name: telegramUser.last_name,
-      username: telegramUser.username,
-      photo_url: telegramUser.photo_url,
-      auth_date: telegramUser.auth_date,
-      hash: telegramUser.hash
-    })
+    if (!import.meta.client) return
+    try {
+      const res = await $fetch<{
+        user: { id: number; telegramId: number; firstName: string; lastName: string | null; username: string | null; photoUrl: string | null; role: 'USER' | 'ADMIN' }
+        hasSubscription: boolean
+      }>('/api/auth/telegram', {
+        method: 'POST',
+        body: {
+          id: telegramUser.id,
+          first_name: telegramUser.first_name,
+          last_name: telegramUser.last_name,
+          username: telegramUser.username,
+          photo_url: telegramUser.photo_url,
+          auth_date: telegramUser.auth_date,
+          hash: telegramUser.hash
+        }
+      })
+      if (res?.user) {
+        setUserSession({
+          id: res.user.telegramId,
+          telegramId: res.user.telegramId,
+          first_name: res.user.firstName,
+          last_name: res.user.lastName ?? undefined,
+          username: res.user.username ?? undefined,
+          photo_url: res.user.photoUrl ?? undefined,
+          role: res.user.role,
+          hash: 'session'
+        })
+      }
+      if (res?.hasSubscription) {
+        activateSubscription()
+      } else {
+        hasSubscription.value = false
+        subCookie.value = null
+      }
+    } catch {
+      return
+    }
   }
 
   function activateSubscription(data?: { period?: string | null, expiresAt?: string | null, cancelledAt?: string | null }) {
@@ -208,7 +214,6 @@ export const useAuthStore = defineStore('auth', () => {
     userCookie.value = null
     clearSubscription()
     if (import.meta.client) {
-      localStorage.removeItem('cx-user')
       void $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
     }
   }
@@ -226,21 +231,6 @@ export const useAuthStore = defineStore('auth', () => {
         ...userCookie.value,
         telegramId: userCookie.value.telegramId ?? userCookie.value.id
       }
-      return
-    }
-
-    if (!import.meta.client) return
-
-    const stored = localStorage.getItem('cx-user')
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as TelegramUser
-        user.value = {
-          ...parsed,
-          telegramId: parsed.telegramId ?? parsed.id
-        }
-        userCookie.value = user.value
-      } catch { localStorage.removeItem('cx-user') }
     }
   }
 
@@ -257,20 +247,10 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function loginFromMiniApp(tgUser: TelegramWebAppUser) {
-    const telegramUser = {
-      id: tgUser.id,
-      telegramId: tgUser.id,
-      first_name: tgUser.first_name,
-      last_name: tgUser.last_name,
-      username: tgUser.username,
-      photo_url: tgUser.photo_url,
-      hash: 'twa'
-    }
-
-    setUserSession(telegramUser)
+    if (!import.meta.client) return
 
     if (import.meta.dev) {
-      await postLogin({
+      await login({
         id: tgUser.id,
         first_name: tgUser.first_name,
         last_name: tgUser.last_name,
@@ -282,7 +262,37 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const initData = window.Telegram?.WebApp?.initData
-    await postLogin({ initData })
+    if (!initData) return
+
+    try {
+      const res = await $fetch<{
+        user: { id: number; telegramId: number; firstName: string; lastName: string | null; username: string | null; photoUrl: string | null; role: 'USER' | 'ADMIN' }
+        hasSubscription: boolean
+      }>('/api/auth/telegram-webapp', {
+        method: 'POST',
+        body: { initData }
+      })
+      if (res?.user) {
+        setUserSession({
+          id: res.user.telegramId,
+          telegramId: res.user.telegramId,
+          first_name: res.user.firstName,
+          last_name: res.user.lastName ?? undefined,
+          username: res.user.username ?? undefined,
+          photo_url: res.user.photoUrl ?? undefined,
+          role: res.user.role,
+          hash: 'session'
+        })
+      }
+      if (res?.hasSubscription) {
+        activateSubscription()
+      } else {
+        hasSubscription.value = false
+        subCookie.value = null
+      }
+    } catch {
+      return
+    }
   }
 
   return {

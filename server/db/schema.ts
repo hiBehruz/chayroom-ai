@@ -4,6 +4,7 @@ import { relations } from 'drizzle-orm'
 export const userRoleEnum = pgEnum('user_role', ['USER', 'ADMIN'])
 export const subscriptionStatusEnum = pgEnum('subscription_status', ['ACTIVE', 'EXPIRED', 'CANCELLED'])
 export const categoryTypeEnum = pgEnum('category_type', ['COURSE', 'GUIDE'])
+export const accessLevelEnum = pgEnum('access_level', ['public', 'free', 'member'])
 
 // ─── Users ───────────────────────────────────────────────────────────────────
 
@@ -140,6 +141,7 @@ export const guides = pgTable('guides', {
   badge: text('badge'),
   level: text('level'),
   isFree: boolean('is_free').notNull().default(false),
+  accessLevel: accessLevelEnum('access_level').notNull().default('member'),
   publishedAt: timestamp('published_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import gsap from 'gsap'
+import { shouldSyncServerSession } from './utils/auth-session.mjs'
 
 const authStore = useAuthStore()
 const route = useRoute()
@@ -30,7 +31,7 @@ onMounted(() => {
 
   // JWT cookie may be set (e.g. after bot-callback redirect) without cx-sub cookie.
   // Sync from server so subscription state is correct on first render.
-  if (!authStore.hasSubscription) {
+  if (shouldSyncServerSession(authStore.user, authStore.hasSubscription)) {
     void authStore.syncMe()
   }
 })

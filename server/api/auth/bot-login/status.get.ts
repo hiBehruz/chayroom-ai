@@ -1,13 +1,12 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../../../db'
-import { users, subscriptions } from '../../../db/schema'
-import { isAdminId } from '../../../utils/telegram-auth'
-import { useUserSession } from '../../../utils/user-session'
+import { subscriptions } from '../../../db/schema'
 import { botLoginKey, type BotLoginEntry } from '../../../utils/bot-login'
+import { upsertUserFromTelegram, userToJwtPayload } from '../../../utils/upsertUserFromTelegram'
+import { setSessionCookie } from '../../../utils/session-cookie'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'cache-control', 'no-store')
-  const config = useRuntimeConfig(event)
   const token = getQuery(event).token
 
   if (typeof token !== 'string' || !token) {
@@ -25,41 +24,13 @@ export default defineEventHandler(async (event) => {
     return { status: 'pending' as const }
   }
 
-  // Confirmed by the bot — upsert the verified user and open the signed session
-  const u = entry.user
-  const telegramId = String(u.id)
-  const adminRole = isAdminId(u.id, config.adminTelegramIds) ? { role: 'ADMIN' as const } : {}
+  const dbUser = await upsertUserFromTelegram(entry.user)
+  await setSessionCookie(event, userToJwtPayload(dbUser))
+  await storage.removeItem(key)
 
-  const existing = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1)
-  if (existing.length === 0) {
-    await db.insert(users).values({
-      telegramId,
-      firstName: u.first_name,
-      lastName: u.last_name ?? null,
-      username: u.username ?? null,
-      photoUrl: u.photo_url ?? null,
-      ...adminRole
-    })
-  } else {
-    await db.update(users).set({
-      firstName: u.first_name,
-      lastName: u.last_name ?? null,
-      username: u.username ?? null,
-      ...adminRole
-    }).where(eq(users.telegramId, telegramId))
-  }
-
-  const session = await useUserSession(event)
-  await session.update({ telegramId })
-
-  await storage.removeItem(key) // one-time use
-
-  const [dbUser] = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1)
-  let hasSubscription = dbUser?.role === 'ADMIN'
-  if (dbUser && !hasSubscription) {
-    const [sub] = await db.select().from(subscriptions)
-      .where(eq(subscriptions.userId, dbUser.id))
-      .limit(1)
+  let hasSubscription = dbUser.role === 'ADMIN'
+  if (!hasSubscription) {
+    const [sub] = await db.select().from(subscriptions).where(eq(subscriptions.userId, dbUser.id)).limit(1)
     hasSubscription = sub?.status === 'ACTIVE' && sub.expiresAt > new Date()
   }
 

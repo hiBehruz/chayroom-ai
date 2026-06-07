@@ -1,7 +1,7 @@
 import { db } from '../../db'
-import { guides, categories } from '../../db/schema'
-import { eq } from 'drizzle-orm'
-import { getSubscriptionState } from '../../utils/user-session'
+import { guides, categories, subscriptions, users } from '../../db/schema'
+import { eq, desc } from 'drizzle-orm'
+import { readSessionUser } from '../../utils/session-cookie'
 
 // Not publicly cached: the body is gated per viewer (subscription/admin).
 export default defineEventHandler(async (event) => {
@@ -33,7 +33,21 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Guide not found' })
   }
 
-  const { hasSubscription } = await getSubscriptionState(event)
+  const jwtUser = await readSessionUser(event)
+  let hasSubscription = false
+  if (jwtUser) {
+    const [user] = await db.select().from(users).where(eq(users.id, jwtUser.id)).limit(1)
+    if (user) {
+      hasSubscription = user.role === 'ADMIN'
+      if (!hasSubscription) {
+        const [sub] = await db.select().from(subscriptions)
+          .where(eq(subscriptions.userId, user.id))
+          .orderBy(desc(subscriptions.expiresAt))
+          .limit(1)
+        hasSubscription = !!sub && sub.status === 'ACTIVE' && sub.expiresAt > new Date()
+      }
+    }
+  }
   const locked = !guide.isFree && !hasSubscription
 
   return locked ? { ...guide, content: null, locked: true } : { ...guide, locked: false }

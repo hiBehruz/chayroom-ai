@@ -39,6 +39,7 @@ export default defineNuxtConfig({
     adminSessionPassword: '',
     adminCookieDomain: '',
     sessionPassword: '',
+    jwtSecret: '',
     public: {
       telegramBotUsername: 'chayroomai_bot',
       appUrl: 'https://chayroom.uz',

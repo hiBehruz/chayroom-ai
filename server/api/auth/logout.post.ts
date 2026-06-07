@@ -1,7 +1,6 @@
-import { useUserSession } from '../../utils/user-session'
+import { clearSessionCookie } from '../../utils/session-cookie'
 
-export default defineEventHandler(async (event) => {
-  const session = await useUserSession(event)
-  await session.clear()
+export default defineEventHandler((event) => {
+  clearSessionCookie(event)
   return { ok: true }
 })

@@ -6,6 +6,7 @@ import {
   buildAuthenticatedBotLoginEntry,
   buildBotLoginConfirmData,
   canCompleteBotLogin,
+  getBotLoginRedirectTarget,
   parseBotLoginConfirmData
 } from './bot-login.ts'
 
@@ -55,4 +56,8 @@ test('canCompleteBotLogin allows the same Telegram user to retry an authenticate
   assert.equal(canCompleteBotLogin(entry, 42, 1000), true)
   assert.equal(canCompleteBotLogin(entry, 99, 1000), false)
   assert.equal(canCompleteBotLogin(entry, 42, 2001), false)
+})
+
+test('getBotLoginRedirectTarget opens the authenticated profile', () => {
+  assert.equal(getBotLoginRedirectTarget(), '/profile')
 })

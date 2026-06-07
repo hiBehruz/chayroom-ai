@@ -48,6 +48,10 @@ export function canCompleteBotLogin(entry: BotLoginEntry | null, telegramUserId:
   return entry.user?.id === telegramUserId
 }
 
+export function getBotLoginRedirectTarget(): string {
+  return '/profile'
+}
+
 export function botLoginKey(token: string) {
   return `botlogin:${token}`
 }

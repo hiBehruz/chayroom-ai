@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../../db'
 import { subscriptions } from '../../db/schema'
-import { botLoginKey, type BotLoginEntry } from '../../utils/bot-login'
+import { botLoginKey, getBotLoginRedirectTarget, type BotLoginEntry } from '../../utils/bot-login'
 import { upsertUserFromTelegram, userToJwtPayload } from '../../utils/upsertUserFromTelegram'
 import { setSessionCookie } from '../../utils/session-cookie'
 
@@ -33,5 +33,5 @@ export default defineEventHandler(async (event) => {
     hasSubscription = sub?.status === 'ACTIVE' && sub.expiresAt > new Date()
   }
 
-  return sendRedirect(event, '/', 302)
+  return sendRedirect(event, getBotLoginRedirectTarget(), 302)
 })

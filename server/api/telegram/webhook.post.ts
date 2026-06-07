@@ -86,7 +86,12 @@ export default defineEventHandler(async (event) => {
         last_name: from.last_name,
         username: from.username
       }, entry.exp), { ttl: Math.ceil(BOT_LOGIN_TTL_MS / 1000) })
-      await sendTelegramMessage(botToken, chatId, BOT_LOGIN_SUCCESS_MESSAGE)
+      const appUrl = config.public.appUrl || 'https://chayroom.uz'
+      await sendTelegramMessage(botToken, chatId, BOT_LOGIN_SUCCESS_MESSAGE, {
+        reply_markup: {
+          inline_keyboard: [[{ text: '🌐 Chayroom.uz ga qaytish', url: `${appUrl}/auth/bot-callback?token=${token}` }]]
+        }
+      })
     } else if (botToken) {
       await sendTelegramMessage(botToken, chatId, '⚠️ Kirish havolasi eskirgan. Saytda qaytadan urinib ko\'ring.')
     }

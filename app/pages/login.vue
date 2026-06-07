@@ -67,7 +67,7 @@ async function pollBotLoginStatus(token: string) {
 
   if (res.status === 'expired') {
     stopBotPoll()
-    authError.value = 'Kirish havolasi eskirdi. Qaytadan urinib ko‘ring.'
+    authError.value = 'Kirish havolasi eskirdi. Qaytadan urinib ko'ring.'
     return
   }
 
@@ -77,31 +77,31 @@ async function pollBotLoginStatus(token: string) {
 }
 
 async function loginViaBot() {
-  authError.value = ‘’
-  botPollState.value = ‘opening’
+  authError.value = ''
+  botPollState.value = 'opening'
 
   try {
-    const res = await $fetch<{ url: string, tgUrl: string, token: string }>(‘/api/auth/bot-login/start’, {
-      method: ‘POST’
+    const res = await $fetch<{ url: string, tgUrl: string, token: string }>('/api/auth/bot-login/start', {
+      method: 'POST'
     })
 
     if (import.meta.client) {
-      const isMobile = ‘ontouchstart’ in window || navigator.maxTouchPoints > 0
+      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
       if (isMobile) {
         // Mobile: navigate directly via tg:// scheme, save token for resume
-        sessionStorage.setItem(‘bot_login_token’, res.token)
+        sessionStorage.setItem('bot_login_token', res.token)
         window.location.href = res.tgUrl || res.url
         return
       }
       // Desktop: open in new tab, polling continues on this page
-      window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
+      window.open(res.url, '_blank', 'noopener,noreferrer')
     }
 
-    botPollState.value = ‘waiting’
+    botPollState.value = 'waiting'
     await pollBotLoginStatus(res.token)
   } catch {
     stopBotPoll()
-    authError.value = "Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko’ring."
+    authError.value = "Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko'ring."
   }
 }
 
@@ -273,10 +273,10 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
         </button>
 
         <p
-          v-if="botPollState === ‘waiting’"
+          v-if="botPollState === 'waiting'"
           class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
         >
-          Telegram botda tasdiqlang. So’ng profilingiz avtomatik ochiladi.
+          Telegram botda tasdiqlang. So'ng profilingiz avtomatik ochiladi.
         </p>
 
         <p

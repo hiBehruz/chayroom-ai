@@ -22,9 +22,9 @@ test('parseBotLoginConfirmData returns token only for confirm payloads', () => {
   assert.equal(parseBotLoginConfirmData('other'), null)
 })
 
-test('buildBotLoginSuccessMessage returns plain confirmation with no link', () => {
+test('buildBotLoginSuccessMessage returns confirmation with chayroom.uz link', () => {
   const { text, options } = buildBotLoginSuccessMessage()
-  assert.equal(text, '✅ Kirish tasdiqlandi!\n\nBrauzeringizga qayting — profil avtomatik ochiladi.')
+  assert.equal(text, '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\n<a href="https://chayroom.uz">Chayroom.uz</a> saytiga qayting va foydalanishda davom eting. 🚀')
   assert.deepEqual(options, {})
 })
 

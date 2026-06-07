@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
   return {
     token,
     botId,
-    url: `https://t.me/${botUsername}?start=auth_${token}`
+    url: `https://t.me/${botUsername}?start=auth_${token}`,
+    tgUrl: `tg://resolve?domain=${botUsername}&start=auth_${token}`
   }
 })

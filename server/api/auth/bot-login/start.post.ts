@@ -20,6 +20,6 @@ export default defineEventHandler(async (event) => {
   return {
     token,
     botId,
-    url: `https://t.me/${botUsername}?start=login_${token}`
+    url: `https://t.me/${botUsername}?start=auth_${token}`
   }
 })

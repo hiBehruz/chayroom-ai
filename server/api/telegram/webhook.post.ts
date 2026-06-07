@@ -63,8 +63,8 @@ export default defineEventHandler(async (event) => {
   const payload = text.slice('/start'.length).trim()
 
   // Bot-login deep link: /start login_<token>
-  if (payload.startsWith('login_')) {
-    const token = payload.slice('login_'.length)
+  if (payload.startsWith('auth_')) {
+    const token = payload.slice('auth_'.length)
     const storage = useStorage('cache')
     const key = botLoginKey(token)
     const entry = await storage.getItem<BotLoginEntry>(key)

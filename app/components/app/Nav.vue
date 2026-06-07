@@ -156,7 +156,16 @@ onUnmounted(() => {
             to="/profile"
             class="flex items-center gap-2.5 px-3.5 py-2 rounded-full bg-[#14161f] hover:opacity-90 transition-opacity duration-200 cursor-pointer"
           >
-            <AppPixelAgentAvatar :variant="authStore.resolvedAgentVariant" />
+            <img
+              v-if="authStore.user?.photo_url"
+              :src="authStore.user.photo_url"
+              class="size-8 rounded-full object-cover shrink-0"
+              alt=""
+            >
+            <AppPixelAgentAvatar
+              v-else
+              :variant="authStore.resolvedAgentVariant"
+            />
             <div class="flex flex-col items-start gap-0.5">
               <span class="text-[13px] font-semibold text-white leading-none">{{ authStore.displayName || authStore.user.first_name }}</span>
               <span class="text-[11px] text-white/60 leading-none">Profil</span>
@@ -187,7 +196,16 @@ onUnmounted(() => {
             to="/profile"
             class="flex items-center gap-1.5 px-2 py-1 rounded-xl hover:bg-[#f2f2f0] transition-colors duration-200"
           >
-            <AppPixelAgentAvatar :variant="authStore.resolvedAgentVariant" />
+            <img
+              v-if="authStore.user?.photo_url"
+              :src="authStore.user.photo_url"
+              class="size-8 rounded-full object-cover shrink-0"
+              alt=""
+            >
+            <AppPixelAgentAvatar
+              v-else
+              :variant="authStore.resolvedAgentVariant"
+            />
           </NuxtLink>
         </template>
         <template v-else>

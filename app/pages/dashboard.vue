@@ -7,7 +7,7 @@ const { isMiniApp } = useTelegramApp()
 authStore.restoreFromStorage()
 
 const user = computed(() => authStore.user)
-const hasCourseAccess = computed(() => Boolean(user.value))
+const hasCourseAccess = computed(() => authStore.hasSubscription)
 const isAccessModalOpen = ref(false)
 
 useSeoMeta({ title: 'Panel — Chayroom AI' })
@@ -22,7 +22,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
     <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 py-8 max-md:px-4">
       <!-- Paywall CTA — tepada, obuna yo'q bo'lganda -->
       <div
-        v-if="!user"
+        v-if="!hasCourseAccess"
         class="mb-8 rounded-2xl bg-[#f7f7f5] px-10 py-8 flex items-center justify-center gap-8 paywall-enter sticky top-20 z-10 w-220.5 max-w-full mx-auto max-md:flex-col max-md:px-6 max-md:py-6 max-md:text-center max-md:gap-4"
       >
         <div class="flex flex-col items-center text-center">
@@ -33,7 +33,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
             Barcha kurslarga kirish, progress kuzatuvi va sertifikatlarga ega bo'ling.
           </p>
           <NuxtLink
-            to="/login"
+            :to="user ? '/#pricing' : '/login'"
             class="hero-link-btn hero-link-btn--blue paywall-btn max-md:self-center"
           >
             <UIcon

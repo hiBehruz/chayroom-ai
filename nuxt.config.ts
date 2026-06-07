@@ -50,7 +50,6 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/': process.env.NODE_ENV === 'production' ? { prerender: true } : {},
     '/catalog': { swr: 3600 },
     '/community': { swr: 3600 },
     '/about-me': { swr: 3600 },

@@ -28,6 +28,7 @@ const canUseTelegramWidget = computed(() => {
 })
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
 const botPollState = ref<'idle' | 'opening' | 'waiting'>('idle')
+const botTgUrl = ref('')
 const authError = ref('')
 const showWidget = ref(false)
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
@@ -44,6 +45,7 @@ function stopBotPoll() {
     botPollTimer = null
   }
   botPollState.value = 'idle'
+  botTgUrl.value = ''
 }
 
 async function loginWithTelegram(user: TelegramUser) {
@@ -96,14 +98,14 @@ async function loginViaBot() {
       method: ‘POST’
     })
 
+    botTgUrl.value = res.tgUrl || res.url
+
     if (import.meta.client) {
       const isMobile = ‘ontouchstart’ in window || navigator.maxTouchPoints > 0
-      if (isMobile && res.tgUrl) {
-        // tg:// scheme opens Telegram app directly — browser stays on this page, polling continues
-        window.location.href = res.tgUrl
-      } else {
+      if (!isMobile) {
         window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
       }
+      // Mobile: user taps the "Telegram’ni ochish" link shown in the UI below
     }
 
     botPollState.value = ‘waiting’
@@ -262,12 +264,22 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           Telegram bot orqali kirish
         </button>
 
-        <p
-          v-if="botPollState === 'waiting'"
-          class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
+        <div
+          v-if="botPollState === ‘waiting’"
+          class="mt-3 text-center"
         >
-          Telegram botda tasdiqlang. So‘ng profilingiz avtomatik ochiladi.
-        </p>
+          <p class="text-[13px] leading-5 text-[#6f7480] mb-2">
+            Telegram botda tasdiqlang. So’ng profilingiz avtomatik ochiladi.
+          </p>
+          <a
+            v-if="botTgUrl"
+            :href="botTgUrl"
+            class="inline-flex items-center gap-2 rounded-xl bg-[#2aabee] px-5 py-2.5 text-[14px] font-bold text-white no-underline"
+          >
+            <UIcon name="i-lucide-send" class="size-4 shrink-0" />
+            Telegram’ni ochish
+          </a>
+        </div>
 
         <p
           v-if="authError"

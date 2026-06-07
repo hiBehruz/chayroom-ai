@@ -51,6 +51,11 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
 
   caddy:
     image: caddy:2-alpine

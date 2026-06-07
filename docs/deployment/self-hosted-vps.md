@@ -96,7 +96,11 @@ ni oching.
 git pull
 docker compose --profile migrate run --rm migrate   # yangi migratsiya bo'lsa
 docker compose up -d --build nuxt
+docker image prune -f                               # eski (dangling) image'larni o'chirish
 ```
+
+> `docker image prune -f` faqat teglanmagan (eski build) image'larni o'chiradi —
+> ishlayotgan konteynerlar va volume'lar saqlanib qoladi.
 
 ## 7. Backup (Postgres)
 

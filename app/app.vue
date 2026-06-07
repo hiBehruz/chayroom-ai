@@ -19,14 +19,20 @@ authStore.restoreFromStorage()
 const handleBack = () => router.back()
 
 onMounted(() => {
-  if (!isMiniApp.value) return
-
-  const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user
-  if (tgUser && !authStore.hasSubscription) {
-    void authStore.loginFromMiniApp(tgUser)
+  if (isMiniApp.value) {
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user
+    if (tgUser && !authStore.hasSubscription) {
+      void authStore.loginFromMiniApp(tgUser)
+    }
+    backButton.onClick(handleBack)
+    return
   }
 
-  backButton.onClick(handleBack)
+  // JWT cookie may be set (e.g. after bot-callback redirect) without cx-sub cookie.
+  // Sync from server so subscription state is correct on first render.
+  if (!authStore.hasSubscription) {
+    void authStore.syncMe()
+  }
 })
 
 onUnmounted(() => {

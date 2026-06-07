@@ -7,8 +7,27 @@ const config = useRuntimeConfig()
 
 authStore.restoreFromStorage()
 
+// Fetch from server so SSR renders with correct subscription state.
+// Needed when bot-callback login sets only the JWT cookie, not cx-sub.
+const { data: meData } = await useAsyncData('dashboard-me', () => $fetch('/api/auth/me'))
+if (meData.value?.hasSubscription && !authStore.hasSubscription) {
+  authStore.activateSubscription(meData.value.subscription ?? undefined)
+}
+if (meData.value?.user && !authStore.user) {
+  authStore.setUserSession({
+    id: meData.value.user.telegramId,
+    telegramId: meData.value.user.telegramId,
+    first_name: meData.value.user.firstName,
+    last_name: meData.value.user.lastName ?? undefined,
+    username: meData.value.user.username ?? undefined,
+    photo_url: meData.value.user.photoUrl ?? undefined,
+    role: meData.value.user.role,
+    hash: 'session'
+  })
+}
+
 const user = computed(() => authStore.user)
-const hasCourseAccess = computed(() => authStore.hasSubscription)
+const hasCourseAccess = computed(() => authStore.hasSubscription || !!meData.value?.hasSubscription)
 const isAccessModalOpen = ref(false)
 
 useSeoMeta({ title: 'Panel — Chayroom AI' })
@@ -33,10 +52,9 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
           <p class="text-[22px] text-cx-muted mb-6 max-w-md leading-snug">
             Barcha kurslarga kirish, progress kuzatuvi va sertifikatlarga ega bo'ling.
           </p>
-          <NuxtLink
-            :to="user ? config.public.tributeUrl : '/login'"
-            :external="!!user"
+          <button
             class="hero-link-btn hero-link-btn--blue paywall-btn max-md:self-center"
+            @click="user ? (isAccessModalOpen = true) : navigateTo('/login')"
           >
             <UIcon
               name="i-lucide-sparkles"
@@ -47,7 +65,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
               name="i-lucide-arrow-right"
               class="size-4 shrink-0"
             />
-          </NuxtLink>
+          </button>
           <p class="mt-3 text-[13px] text-cx-muted">
             Telegram orqali to'lov. Barcha kurs va materiallarga kirish.
           </p>

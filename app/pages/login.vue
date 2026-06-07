@@ -28,6 +28,7 @@ const canUseTelegramWidget = computed(() => {
 })
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
 const botPollState = ref<'idle' | 'opening' | 'waiting'>('idle')
+const botLoginUrl = ref('')
 const authError = ref('')
 const showWidget = ref(false)
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
@@ -45,6 +46,7 @@ function stopBotPoll() {
     botPollTimer = null
   }
   botPollState.value = 'idle'
+  botLoginUrl.value = ''
   activePollToken = ''
 }
 
@@ -99,14 +101,14 @@ async function loginViaBot() {
       method: ‘POST’
     })
 
+    botLoginUrl.value = res.url
+
     if (import.meta.client) {
-      const opened = window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
-      if (!opened) {
-        // Popup blocked (mobile) — save token and navigate current tab
-        sessionStorage.setItem(‘bot_login_token’, res.token)
-        window.location.href = res.url
-        return
-      }
+      // Desktop: open in new tab (page stays, polling continues)
+      // Mobile: window.open blocked — show tap-able <a href> link below
+      // iOS Universal Links: tapping <a href="https://t.me/..."> opens Telegram app,
+      // Safari stays on this page, polling continues uninterrupted
+      window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
     }
 
     botPollState.value = ‘waiting’
@@ -292,12 +294,22 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           Telegram bot orqali kirish
         </button>
 
-        <p
+        <div
           v-if="botPollState === ‘waiting’"
-          class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
+          class="mt-3 text-center"
         >
-          Telegram botda tasdiqlang. So’ng profilingiz avtomatik ochiladi.
-        </p>
+          <p class="text-[13px] leading-5 text-[#6f7480] mb-2">
+            Telegram botda tasdiqlang. So’ng profilingiz avtomatik ochiladi.
+          </p>
+          <a
+            v-if="botLoginUrl"
+            :href="botLoginUrl"
+            class="inline-flex items-center gap-2 rounded-xl bg-[#2aabee] px-5 py-2.5 text-[14px] font-bold text-white no-underline"
+          >
+            <UIcon name="i-lucide-send" class="size-4 shrink-0" />
+            Telegramni ochish
+          </a>
+        </div>
 
         <p
           v-if="authError"

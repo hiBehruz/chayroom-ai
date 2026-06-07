@@ -34,6 +34,7 @@ const showWidget = ref(false)
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
 let botPollTimer: ReturnType<typeof window.setTimeout> | null = null
+let activePollToken = ''
 
 function goAfterLogin() {
   return navigateTo(resolvePostLoginTarget(selectedPlan.value, redirectPath.value))
@@ -46,6 +47,7 @@ function stopBotPoll() {
   }
   botPollState.value = 'idle'
   botTgUrl.value = ''
+  activePollToken = ''
 }
 
 async function loginWithTelegram(user: TelegramUser) {
@@ -67,6 +69,7 @@ async function loginViaTelegramOAuth() {
 }
 
 async function pollBotLoginStatus(token: string) {
+  activePollToken = token
   const res = await $fetch<{ status: 'pending' | 'expired' | 'authenticated' }>('/api/auth/bot-login/status', {
     query: { token }
   })
@@ -177,6 +180,14 @@ onMounted(async () => {
   }
 
   window.onTelegramAuth = loginWithTelegram
+
+  // When user returns from Telegram app, timers were suspended — poll immediately
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && botPollState.value === 'waiting' && activePollToken) {
+      if (botPollTimer) { window.clearTimeout(botPollTimer); botPollTimer = null }
+      void pollBotLoginStatus(activePollToken)
+    }
+  })
 })
 
 onUnmounted(() => {

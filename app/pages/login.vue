@@ -264,10 +264,6 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           class="mt-3 flex min-h-13 items-center justify-center"
         />
 
-        <p class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]">
-          Telegram orqali tasdiqlaysiz va profilingiz avtomatik ochiladi.
-        </p>
-
         <button
           type="button"
           class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#d8dbe5] bg-white px-5 py-3 text-[15px] font-bold text-[#14161f] transition-all duration-200 hover:border-[#c7ccdb] hover:bg-[#f8f9fc] active:scale-[0.98] disabled:opacity-70"

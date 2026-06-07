@@ -93,7 +93,12 @@ export default defineEventHandler(async (event) => {
     return { ok: true }
   }
 
-  // Plain /start — greet with the platform button
+  // Unknown payload (e.g. Telegram OAuth sends /start telegramauth_xxx) — ignore silently
+  if (payload) {
+    return { ok: true }
+  }
+
+  // Plain /start (no payload) — greet with the platform button
   if (botToken) {
     const appUrl = config.public.appUrl || 'https://chayroom.uz'
     await sendTelegramMessage(botToken, chatId, 'Salom! 👋 Chayroom AI Club platformasini oching:', {

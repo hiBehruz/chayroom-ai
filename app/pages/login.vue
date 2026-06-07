@@ -97,11 +97,12 @@ async function loginViaBot() {
   botPollState.value = ‘opening’
 
   try {
-    const res = await $fetch<{ url: string, token: string }>(‘/api/auth/bot-login/start’, {
+    const res = await $fetch<{ url: string, tgUrl: string, token: string }>(‘/api/auth/bot-login/start’, {
       method: ‘POST’
     })
 
-    botLoginUrl.value = res.url
+    // tg:// scheme: opens Telegram app directly, browser stays on this page
+    botLoginUrl.value = res.tgUrl || res.url
 
     if (import.meta.client) {
       // Desktop: open in new tab (page stays, polling continues)

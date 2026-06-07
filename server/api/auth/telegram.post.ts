@@ -6,6 +6,7 @@ import { upsertUserFromTelegram, userToJwtPayload } from '../../utils/upsertUser
 import { setSessionCookie } from '../../utils/session-cookie'
 import { sendTelegramMessage } from '../../utils/telegram'
 import { buildMiniAppLoginUrl, buildPlatformMenuButton, setTelegramChatMenuButton } from '../../utils/telegram-bot.js'
+import { BOT_LOGIN_SUCCESS_MESSAGE } from '../../utils/bot-login'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -30,20 +31,24 @@ export default defineEventHandler(async (event) => {
   await setSessionCookie(event, userToJwtPayload(dbUser))
 
   const botToken = config.telegramBotToken
-  if (botToken && isFirstLogin) {
-    const appUrl = config.public.appUrl || 'https://chayroom.uz'
-    const platformUrl = buildMiniAppLoginUrl(appUrl)
-    const supportUsername = config.public.supportUsername || 'hellobehruz'
-    await setTelegramChatMenuButton(botToken, buildPlatformMenuButton(appUrl))
-    await sendTelegramMessage(botToken, tgUser.id, `Salom, ${tgUser.first_name}! 👋\n\nChayroom AI Club'ga xush kelibsiz — bu yerda biz AI'ni hayot, ish va biznesga joriy qilamiz.\n\nIchida: AI-agentlar, vibe coding, neyrotarmoqlar va boshqa amaliy materiallar.\n\nBoshlaylikmi?`, {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: '🚀 Platformani ochish', web_app: { url: platformUrl } }],
-          [{ text: '💳 Obunani boshqarish', url: `${appUrl}/profile` }],
-          [{ text: '💬 Qo\'llab-quvvatlash', url: `https://t.me/${supportUsername}` }]
-        ]
-      }
-    })
+  if (botToken) {
+    if (isFirstLogin) {
+      const appUrl = config.public.appUrl || 'https://chayroom.uz'
+      const platformUrl = buildMiniAppLoginUrl(appUrl)
+      const supportUsername = config.public.supportUsername || 'hellobehruz'
+      await setTelegramChatMenuButton(botToken, buildPlatformMenuButton(appUrl))
+      await sendTelegramMessage(botToken, tgUser.id, `Salom, ${tgUser.first_name}! 👋\n\nChayroom AI Club'ga xush kelibsiz — bu yerda biz AI'ni hayot, ish va biznesga joriy qilamiz.\n\nIchida: AI-agentlar, vibe coding, neyrotarmoqlar va boshqa amaliy materiallar.\n\nBoshlaylikmi?`, {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '🚀 Platformani ochish', web_app: { url: platformUrl } }],
+            [{ text: '💳 Obunani boshqarish', url: `${appUrl}/profile` }],
+            [{ text: '💬 Qo\'llab-quvvatlash', url: `https://t.me/${supportUsername}` }]
+          ]
+        }
+      })
+    } else {
+      await sendTelegramMessage(botToken, tgUser.id, BOT_LOGIN_SUCCESS_MESSAGE)
+    }
   }
 
   let hasSubscription = dbUser.role === 'ADMIN'

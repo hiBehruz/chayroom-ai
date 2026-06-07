@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
+  buildBotLoginStartRequest,
   clearPendingBotLoginToken,
   isSafariUserAgent,
   readPendingBotLoginToken,
@@ -9,6 +10,22 @@ import {
   resolvePostLoginTarget,
   storePendingBotLoginToken
 } from './login-flow.mjs'
+
+test('buildBotLoginStartRequest bypasses cache with a fresh request id', () => {
+  assert.deepEqual(buildBotLoginStartRequest(1000), {
+    url: '/api/auth/telegram/start',
+    options: {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        'cache-control': 'no-store',
+        'pragma': 'no-cache'
+      },
+      query: { _: '1000' }
+    }
+  })
+  assert.notDeepEqual(buildBotLoginStartRequest(1000), buildBotLoginStartRequest(1001))
+})
 
 test('resolvePostLoginTarget sends users to profile by default', () => {
   assert.deepEqual(resolvePostLoginTarget('', ''), { path: '/profile' })

@@ -3,6 +3,12 @@ import type { BotLoginEntry } from '../../../utils/bot-login'
 import { botLoginKey, BOT_LOGIN_TTL_MS } from '../../../utils/bot-login'
 
 export default defineEventHandler(async (event) => {
+  setResponseHeaders(event, {
+    'cache-control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'pragma': 'no-cache',
+    'expires': '0'
+  })
+
   const config = useRuntimeConfig(event)
   const botUsername = config.public.telegramBotUsername
   if (!botUsername) {

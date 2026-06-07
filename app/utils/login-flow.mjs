@@ -10,6 +10,21 @@ export function resolvePostLoginTarget(selectedPlan, redirectPath) {
   return { path: '/profile' }
 }
 
+export function buildBotLoginStartRequest(requestId = Date.now()) {
+  return {
+    url: '/api/auth/telegram/start',
+    options: {
+      method: /** @type {const} */ ('POST'),
+      cache: /** @type {RequestCache} */ ('no-store'),
+      headers: {
+        'cache-control': 'no-store',
+        'pragma': 'no-cache'
+      },
+      query: { _: String(requestId) }
+    }
+  }
+}
+
 const BOT_LOGIN_TOKEN_KEY = 'bot_login_token'
 
 export function isSafariUserAgent(userAgent) {

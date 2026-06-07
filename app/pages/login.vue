@@ -1,6 +1,7 @@
 <!-- app/pages/login.vue -->
 <script setup lang="ts">
 import {
+  buildBotLoginStartRequest,
   clearPendingBotLoginToken,
   readPendingBotLoginToken,
   resolveBotLoginLaunchUrl,
@@ -95,16 +96,13 @@ async function loginViaBot() {
   botPollState.value = 'opening'
 
   try {
-    const res = await $fetch<{ url: string, tgUrl: string, token: string }>('/api/auth/bot-login/start', {
-      method: 'POST'
-    })
+    const request = buildBotLoginStartRequest()
+    const res = await $fetch<{ url: string, tgUrl: string, token: string }>(request.url, request.options)
 
     if (import.meta.client) {
       storePendingBotLoginToken({ sessionStorage, localStorage }, res.token)
       window.location.href = resolveBotLoginLaunchUrl({
-        url: res.url,
-        tgUrl: res.tgUrl,
-        userAgent: navigator.userAgent
+        url: res.url
       })
     }
   } catch {

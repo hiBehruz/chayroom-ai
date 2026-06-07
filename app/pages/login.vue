@@ -28,7 +28,6 @@ const canUseTelegramWidget = computed(() => {
 })
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
 const botPollState = ref<'idle' | 'opening' | 'waiting'>('idle')
-const botTgUrl = ref('')
 const authError = ref('')
 const showWidget = ref(false)
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
@@ -46,7 +45,6 @@ function stopBotPoll() {
     botPollTimer = null
   }
   botPollState.value = 'idle'
-  botTgUrl.value = ''
   activePollToken = ''
 }
 
@@ -97,18 +95,18 @@ async function loginViaBot() {
   botPollState.value = ‘opening’
 
   try {
-    const res = await $fetch<{ url: string, tgUrl: string, token: string }>(‘/api/auth/bot-login/start’, {
+    const res = await $fetch<{ url: string, token: string }>(‘/api/auth/bot-login/start’, {
       method: ‘POST’
     })
 
-    botTgUrl.value = res.tgUrl || res.url
-
     if (import.meta.client) {
-      const isMobile = ‘ontouchstart’ in window || navigator.maxTouchPoints > 0
-      if (!isMobile) {
-        window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
+      const opened = window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
+      if (!opened) {
+        // Popup blocked (mobile) — save token and navigate current tab
+        sessionStorage.setItem(‘bot_login_token’, res.token)
+        window.location.href = res.url
+        return
       }
-      // Mobile: user taps the "Telegram’ni ochish" link shown in the UI below
     }
 
     botPollState.value = ‘waiting’
@@ -181,7 +179,15 @@ onMounted(async () => {
 
   window.onTelegramAuth = loginWithTelegram
 
-  // When user returns from Telegram app, timers were suspended — poll immediately
+  // Resume if user returned from t.me after popup was blocked (mobile)
+  const savedToken = sessionStorage.getItem('bot_login_token')
+  if (savedToken && !authStore.user) {
+    sessionStorage.removeItem('bot_login_token')
+    botPollState.value = 'waiting'
+    void pollBotLoginStatus(savedToken)
+  }
+
+  // When user switches back from Telegram app, resume polling immediately
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && botPollState.value === 'waiting' && activePollToken) {
       if (botPollTimer) { window.clearTimeout(botPollTimer); botPollTimer = null }
@@ -275,22 +281,12 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           Telegram bot orqali kirish
         </button>
 
-        <div
+        <p
           v-if="botPollState === ‘waiting’"
-          class="mt-3 text-center"
+          class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
         >
-          <p class="text-[13px] leading-5 text-[#6f7480] mb-2">
-            Telegram botda tasdiqlang. So’ng profilingiz avtomatik ochiladi.
-          </p>
-          <a
-            v-if="botTgUrl"
-            :href="botTgUrl"
-            class="inline-flex items-center gap-2 rounded-xl bg-[#2aabee] px-5 py-2.5 text-[14px] font-bold text-white no-underline"
-          >
-            <UIcon name="i-lucide-send" class="size-4 shrink-0" />
-            Telegram’ni ochish
-          </a>
-        </div>
+          Telegram botda tasdiqlang. So’ng profilingiz avtomatik ochiladi.
+        </p>
 
         <p
           v-if="authError"

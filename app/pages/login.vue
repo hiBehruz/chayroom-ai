@@ -1,7 +1,6 @@
 <!-- app/pages/login.vue -->
 <script setup lang="ts">
 import {
-  isSafariUserAgent,
   readPendingBotLoginToken,
   resolveBotLoginLaunchUrl,
   resolvePostLoginTarget,
@@ -37,7 +36,6 @@ const botPollState = ref<'idle' | 'opening' | 'waiting'>('idle')
 const authError = ref('')
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
-const isSafariBrowser = computed(() => import.meta.client && isSafariUserAgent(navigator.userAgent))
 let botPollTimer: number | null = null
 let activePollToken = ''
 
@@ -257,7 +255,7 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
 
         <button
           type="button"
-          class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#d8dbe5] bg-white px-5 py-3 text-[15px] font-bold text-[#14161f] transition-all duration-200 hover:border-[#c7ccdb] hover:bg-[#f8f9fc] active:scale-[0.98] disabled:opacity-70"
+          class="mx-auto mt-4 flex items-center justify-center gap-2 rounded-xl border border-[#3480f1] bg-[#3480f1] px-4 py-2.5 text-[14px] font-bold text-white shadow-[0_10px_24px_rgba(52,128,241,0.2)] transition-all duration-200 hover:border-[#256fe0] hover:bg-[#256fe0] active:scale-[0.98] disabled:opacity-70"
           :disabled="botPollState !== 'idle'"
           @click="loginViaBot"
         >
@@ -273,13 +271,6 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
         >
           Telegram botda tasdiqlang. So'ng profilingiz avtomatik ochiladi.
-        </p>
-
-        <p
-          v-if="isSafariBrowser"
-          class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
-        >
-          Safari orqali kirishda Telegram ochilgach bot ichida <span class="font-semibold text-[#14161f]">Start</span> tugmasini bosing, keyin saytdagi kirish davom etadi.
         </p>
 
         <p

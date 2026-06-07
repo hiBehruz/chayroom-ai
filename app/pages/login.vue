@@ -1,6 +1,7 @@
 <!-- app/pages/login.vue -->
 <script setup lang="ts">
 import {
+  clearPendingBotLoginToken,
   readPendingBotLoginToken,
   resolveBotLoginLaunchUrl,
   resolvePostLoginTarget,
@@ -59,21 +60,27 @@ async function loginWithTelegram(user: TelegramUser) {
 
 async function pollBotLoginStatus(token: string) {
   activePollToken = token
-  const res = await $fetch<{ status: 'pending' | 'expired' | 'authenticated' }>('/api/auth/bot-login/status', {
-    query: { token }
-  })
+  try {
+    const res = await $fetch<{ status: 'pending' | 'expired' | 'authenticated' }>('/api/auth/bot-login/status', {
+      query: { token }
+    })
 
-  if (res.status === 'authenticated') {
-    stopBotPoll()
-    await authStore.syncMe()
-    await goAfterLogin()
-    return
-  }
+    if (res.status === 'authenticated') {
+      clearPendingBotLoginToken({ sessionStorage, localStorage })
+      stopBotPoll()
+      await authStore.syncMe()
+      await goAfterLogin()
+      return
+    }
 
-  if (res.status === 'expired') {
-    stopBotPoll()
-    authError.value = "Kirish havolasi eskirdi. Qaytadan urinib ko'ring."
-    return
+    if (res.status === 'expired') {
+      clearPendingBotLoginToken({ sessionStorage, localStorage })
+      stopBotPoll()
+      authError.value = "Kirish havolasi eskirdi. Qaytadan urinib ko'ring."
+      return
+    }
+  } catch {
+    if (activePollToken !== token) return
   }
 
   botPollTimer = window.setTimeout(() => {

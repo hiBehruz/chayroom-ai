@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
+  clearPendingBotLoginToken,
   isSafariUserAgent,
   readPendingBotLoginToken,
   resolveBotLoginLaunchUrl,
@@ -55,7 +56,7 @@ test('resolveBotLoginLaunchUrl keeps tg links outside Safari', () => {
   )
 })
 
-test('pending bot login token survives session storage loss via local storage fallback', () => {
+test('pending bot login token survives session storage loss and repeated reads', () => {
   const sessionStorage = createStorage()
   const localStorage = createStorage()
 
@@ -63,6 +64,16 @@ test('pending bot login token survives session storage loss via local storage fa
   sessionStorage.clear()
 
   assert.equal(readPendingBotLoginToken({ sessionStorage, localStorage }), 'token-123')
+  assert.equal(readPendingBotLoginToken({ sessionStorage, localStorage }), 'token-123')
+})
+
+test('pending bot login token is removed only after login finishes', () => {
+  const sessionStorage = createStorage()
+  const localStorage = createStorage()
+
+  storePendingBotLoginToken({ sessionStorage, localStorage }, 'token-123')
+  clearPendingBotLoginToken({ sessionStorage, localStorage })
+
   assert.equal(sessionStorage.getItem('bot_login_token'), null)
   assert.equal(localStorage.getItem('bot_login_token'), null)
 })

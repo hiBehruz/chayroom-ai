@@ -31,12 +31,10 @@ export function storePendingBotLoginToken({ sessionStorage, localStorage }, toke
 }
 
 export function readPendingBotLoginToken({ sessionStorage, localStorage }) {
-  const token = sessionStorage?.getItem(BOT_LOGIN_TOKEN_KEY) || localStorage?.getItem(BOT_LOGIN_TOKEN_KEY) || null
+  return sessionStorage?.getItem(BOT_LOGIN_TOKEN_KEY) || localStorage?.getItem(BOT_LOGIN_TOKEN_KEY) || null
+}
 
-  if (token) {
-    sessionStorage?.removeItem(BOT_LOGIN_TOKEN_KEY)
-    localStorage?.removeItem(BOT_LOGIN_TOKEN_KEY)
-  }
-
-  return token
+export function clearPendingBotLoginToken({ sessionStorage, localStorage }) {
+  sessionStorage?.removeItem(BOT_LOGIN_TOKEN_KEY)
+  localStorage?.removeItem(BOT_LOGIN_TOKEN_KEY)
 }

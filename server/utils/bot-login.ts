@@ -13,7 +13,7 @@ export interface BotLoginEntry {
 }
 
 export const BOT_LOGIN_TTL_MS = 5 * 60 * 1000
-export const BOT_LOGIN_SUCCESS_MESSAGE = '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀'
+export const BOT_LOGIN_SUCCESS_MESSAGE = '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom AI paneliga qayting va foydalanishda davom eting. 🚀'
 
 export function buildAuthenticatedBotLoginEntry(
   user: Pick<BotLoginUser, 'id' | 'first_name'> & Partial<Pick<BotLoginUser, 'last_name' | 'username' | 'photo_url'>>,

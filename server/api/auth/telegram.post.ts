@@ -47,7 +47,13 @@ export default defineEventHandler(async (event) => {
         }
       })
     } else {
-      await sendTelegramMessage(botToken, tgUser.id, BOT_LOGIN_SUCCESS_MESSAGE)
+      await sendTelegramMessage(botToken, tgUser.id, BOT_LOGIN_SUCCESS_MESSAGE, {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '🌐 Panelni ochish', web_app: { url: buildMiniAppLoginUrl(config.public.appUrl || 'https://chayroom.uz') } }]
+          ]
+        }
+      })
     }
   }
 

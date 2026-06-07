@@ -22,7 +22,7 @@ test('parseBotLoginConfirmData returns token only for confirm payloads', () => {
 test('BOT_LOGIN_SUCCESS_MESSAGE matches the website auth confirmation copy', () => {
   assert.equal(
     BOT_LOGIN_SUCCESS_MESSAGE,
-    '✅ Вы успешно авторизовались на chayroom.uz\n\nВозвращайтесь на сайт — вход уже выполнен.'
+    '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom AI paneliga qayting va foydalanishda davom eting. 🚀'
   )
 })
 

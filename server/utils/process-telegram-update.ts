@@ -81,7 +81,7 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
       const appUrl = (config.public as Record<string, string>).appUrl || 'https://chayroom.uz'
       await sendTelegramMessage(botToken, chatId, BOT_LOGIN_SUCCESS_MESSAGE, {
         reply_markup: {
-          inline_keyboard: [[{ text: '🌐 Chayroom.uz ga qaytish', url: `${appUrl}/auth/bot-callback?token=${token}` }]]
+          inline_keyboard: [[{ text: '🌐 Panelga qaytish', url: `${appUrl}/auth/bot-callback?token=${token}` }]]
         }
       })
     } else if (botToken) {

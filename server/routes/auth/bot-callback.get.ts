@@ -33,5 +33,5 @@ export default defineEventHandler(async (event) => {
     hasSubscription = sub?.status === 'ACTIVE' && sub.expiresAt > new Date()
   }
 
-  return sendRedirect(event, '/dashboard', 302)
+  return sendRedirect(event, '/', 302)
 })

@@ -26,7 +26,6 @@ export default defineEventHandler(async (event) => {
 
   const dbUser = await upsertUserFromTelegram(entry.user)
   await setSessionCookie(event, userToJwtPayload(dbUser))
-  await storage.removeItem(key)
 
   let hasSubscription = dbUser.role === 'ADMIN'
   if (!hasSubscription) {

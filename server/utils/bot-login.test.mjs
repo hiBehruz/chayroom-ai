@@ -2,9 +2,10 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import {
-  BOT_LOGIN_SUCCESS_MESSAGE,
+  buildBotLoginSuccessMessage,
   buildAuthenticatedBotLoginEntry,
   buildBotLoginConfirmData,
+  canCompleteBotLogin,
   parseBotLoginConfirmData
 } from './bot-login.ts'
 
@@ -19,10 +20,10 @@ test('parseBotLoginConfirmData returns token only for confirm payloads', () => {
   assert.equal(parseBotLoginConfirmData('other'), null)
 })
 
-test('BOT_LOGIN_SUCCESS_MESSAGE matches the website auth confirmation copy', () => {
+test('buildBotLoginSuccessMessage links through the login callback', () => {
   assert.equal(
-    BOT_LOGIN_SUCCESS_MESSAGE,
-    '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom AI paneliga qayting va foydalanishda davom eting. 🚀'
+    buildBotLoginSuccessMessage('https://chayroom.uz/', 'abc123'),
+    '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\n<a href="https://chayroom.uz/auth/bot-callback?token=abc123">Chayroom.uz</a> saytiga qayting va foydalanishda davom eting. 🚀'
   )
 })
 
@@ -46,4 +47,12 @@ test('buildAuthenticatedBotLoginEntry returns authenticated storage payload', ()
       }
     }
   )
+})
+
+test('canCompleteBotLogin allows the same Telegram user to retry an authenticated login', () => {
+  const entry = buildAuthenticatedBotLoginEntry({ id: 42, first_name: 'Ali' }, 2000)
+
+  assert.equal(canCompleteBotLogin(entry, 42, 1000), true)
+  assert.equal(canCompleteBotLogin(entry, 99, 1000), false)
+  assert.equal(canCompleteBotLogin(entry, 42, 2001), false)
 })

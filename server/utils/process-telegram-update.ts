@@ -1,10 +1,11 @@
 import { answerTelegramCallbackQuery, sendTelegramMessage } from './telegram'
 import { buildMiniAppLoginUrl } from './telegram-bot.js'
 import {
-  BOT_LOGIN_SUCCESS_MESSAGE,
+  buildBotLoginSuccessMessage,
   buildAuthenticatedBotLoginEntry,
   botLoginKey,
   BOT_LOGIN_TTL_MS,
+  canCompleteBotLogin,
   type BotLoginEntry
 } from './bot-login'
 
@@ -69,23 +70,22 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
       console.error('[bot-login] botToken not configured')
     }
 
-    if (entry && entry.status === 'pending' && entry.exp > Date.now() && botToken) {
-      await storage.setItem(
-        key,
-        buildAuthenticatedBotLoginEntry(
-          { id: from.id, first_name: from.first_name || 'Foydalanuvchi', last_name: from.last_name, username: from.username },
-          entry.exp
-        ),
-        { ttl: Math.ceil(BOT_LOGIN_TTL_MS / 1000) }
-      )
-      const appUrl = (config.public as Record<string, string>).appUrl || 'https://chayroom.uz'
-      await sendTelegramMessage(botToken, chatId, BOT_LOGIN_SUCCESS_MESSAGE, {
-        reply_markup: {
-          inline_keyboard: [[{ text: '🌐 Panelga qaytish', url: `${appUrl}/auth/bot-callback?token=${token}` }]]
-        }
-      })
+    const appUrl = (config.public as Record<string, string>).appUrl || 'https://chayroom.uz'
+
+    if (canCompleteBotLogin(entry, from.id) && entry && botToken) {
+      if (entry.status === 'pending') {
+        await storage.setItem(
+          key,
+          buildAuthenticatedBotLoginEntry(
+            { id: from.id, first_name: from.first_name || 'Foydalanuvchi', last_name: from.last_name, username: from.username },
+            entry.exp
+          ),
+          { ttl: Math.ceil(BOT_LOGIN_TTL_MS / 1000) }
+        )
+      }
+      await sendTelegramMessage(botToken, chatId, buildBotLoginSuccessMessage(appUrl, token))
     } else if (botToken) {
-      await sendTelegramMessage(botToken, chatId, "⚠️ Kirish havolasi eskirgan. Saytda qaytadan urinib ko'ring.")
+      await sendTelegramMessage(botToken, chatId, '⚠️ Kirish havolasi eskirgan. Saytda qaytadan urinib ko\'ring.')
     }
     return
   }

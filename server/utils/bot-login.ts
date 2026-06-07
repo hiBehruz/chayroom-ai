@@ -13,7 +13,17 @@ export interface BotLoginEntry {
 }
 
 export const BOT_LOGIN_TTL_MS = 5 * 60 * 1000
-export const BOT_LOGIN_SUCCESS_MESSAGE = '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom AI paneliga qayting va foydalanishda davom eting. 🚀'
+export const BOT_LOGIN_SUCCESS_MESSAGE = '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀'
+
+export function buildBotLoginSuccessMessage(appUrl: string, token?: string): string {
+  const targetUrl = new URL('/', appUrl)
+  if (token) {
+    targetUrl.pathname = '/auth/bot-callback'
+    targetUrl.searchParams.set('token', token)
+  }
+
+  return BOT_LOGIN_SUCCESS_MESSAGE.replace('Chayroom.uz', `<a href="${targetUrl.toString()}">Chayroom.uz</a>`)
+}
 
 export function buildAuthenticatedBotLoginEntry(
   user: Pick<BotLoginUser, 'id' | 'first_name'> & Partial<Pick<BotLoginUser, 'last_name' | 'username' | 'photo_url'>>,
@@ -30,6 +40,12 @@ export function buildAuthenticatedBotLoginEntry(
       photo_url: user.photo_url
     }
   }
+}
+
+export function canCompleteBotLogin(entry: BotLoginEntry | null, telegramUserId: number, now = Date.now()): boolean {
+  if (!entry || entry.exp <= now) return false
+  if (entry.status === 'pending') return true
+  return entry.user?.id === telegramUserId
 }
 
 export function botLoginKey(token: string) {

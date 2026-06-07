@@ -33,6 +33,7 @@ const showWidget = ref(false)
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
 let botPollTimer: ReturnType<typeof window.setTimeout> | null = null
+let visibilityHandler: (() => void) | null = null
 
 function goAfterLogin() {
   return navigateTo(resolvePostLoginTarget(selectedPlan.value, redirectPath.value))
@@ -44,6 +45,15 @@ function stopBotPoll() {
     botPollTimer = null
   }
   botPollState.value = 'idle'
+}
+
+async function resumePendingBotLogin() {
+  if (authStore.user) return
+  const token = sessionStorage.getItem('bot_login_token')
+  if (!token || botPollState.value === 'waiting') return
+  sessionStorage.removeItem('bot_login_token')
+  botPollState.value = 'waiting'
+  void pollBotLoginStatus(token)
 }
 
 async function loginWithTelegram(user: TelegramUser) {
@@ -88,23 +98,29 @@ async function pollBotLoginStatus(token: string) {
 }
 
 async function loginViaBot() {
-  authError.value = ''
-  botPollState.value = 'opening'
+  authError.value = ‘’
+  botPollState.value = ‘opening’
 
   try {
-    const res = await $fetch<{ url: string, token: string }>('/api/auth/bot-login/start', {
-      method: 'POST'
+    const res = await $fetch<{ url: string, token: string }>(‘/api/auth/bot-login/start’, {
+      method: ‘POST’
     })
 
     if (import.meta.client) {
-      window.open(res.url, '_blank', 'noopener,noreferrer')
+      const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+      if (isMobile) {
+        sessionStorage.setItem(‘bot_login_token’, res.token)
+        window.location.href = res.url
+        return
+      }
+      window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
     }
 
-    botPollState.value = 'waiting'
+    botPollState.value = ‘waiting’
     await pollBotLoginStatus(res.token)
   } catch {
     stopBotPoll()
-    authError.value = 'Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko‘ring.'
+    authError.value = "Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko’ring."
   }
 }
 
@@ -169,11 +185,21 @@ onMounted(async () => {
   }
 
   window.onTelegramAuth = loginWithTelegram
+
+  // Resume bot-login polling if user returned from Telegram (mobile)
+  await resumePendingBotLogin()
+  visibilityHandler = () => {
+    if (document.visibilityState === 'visible') void resumePendingBotLogin()
+  }
+  document.addEventListener('visibilitychange', visibilityHandler)
 })
 
 onUnmounted(() => {
   delete window.onTelegramAuth
   stopBotPoll()
+  if (visibilityHandler) {
+    document.removeEventListener('visibilitychange', visibilityHandler)
+  }
 })
 
 useSeoMeta({ title: 'Kirish — Chayroom AI' })

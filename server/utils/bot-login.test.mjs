@@ -7,6 +7,7 @@ import {
   buildBotLoginConfirmData,
   canCompleteBotLogin,
   getBotLoginRedirectTarget,
+  isValidBotLoginToken,
   parseBotLoginConfirmData
 } from './bot-login.ts'
 
@@ -35,10 +36,9 @@ test('buildAuthenticatedBotLoginEntry returns authenticated storage payload', ()
       first_name: 'Ali',
       last_name: 'Valiyev',
       username: 'ali'
-    }, 123456),
+    }),
     {
       status: 'authenticated',
-      exp: 123456,
       user: {
         id: 42,
         first_name: 'Ali',
@@ -51,13 +51,18 @@ test('buildAuthenticatedBotLoginEntry returns authenticated storage payload', ()
 })
 
 test('canCompleteBotLogin allows the same Telegram user to retry an authenticated login', () => {
-  const entry = buildAuthenticatedBotLoginEntry({ id: 42, first_name: 'Ali' }, 2000)
+  const entry = buildAuthenticatedBotLoginEntry({ id: 42, first_name: 'Ali' })
 
-  assert.equal(canCompleteBotLogin(entry, 42, 1000), true)
-  assert.equal(canCompleteBotLogin(entry, 99, 1000), false)
-  assert.equal(canCompleteBotLogin(entry, 42, 2001), false)
+  assert.equal(canCompleteBotLogin(entry, 42), true)
+  assert.equal(canCompleteBotLogin(entry, 99), false)
 })
 
 test('getBotLoginRedirectTarget opens the authenticated profile', () => {
   assert.equal(getBotLoginRedirectTarget(), '/profile')
+})
+
+test('isValidBotLoginToken accepts only sufficiently long base64url tokens', () => {
+  assert.equal(isValidBotLoginToken('U8-pbu-9pgjdc_i-__azPmgdL36pHMhX'), true)
+  assert.equal(isValidBotLoginToken('short'), false)
+  assert.equal(isValidBotLoginToken('invalid token with spaces'), false)
 })

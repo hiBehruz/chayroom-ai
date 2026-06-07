@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   const key = botLoginKey(token)
   const entry = await storage.getItem<BotLoginEntry>(key)
 
-  if (!entry || entry.exp < Date.now()) {
+  if (!entry) {
     return { status: 'expired' as const }
   }
   if (entry.status !== 'authenticated' || !entry.user) {

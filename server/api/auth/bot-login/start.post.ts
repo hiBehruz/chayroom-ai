@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto'
 import type { BotLoginEntry } from '../../../utils/bot-login'
-import { botLoginKey, BOT_LOGIN_TTL_MS } from '../../../utils/bot-login'
+import { botLoginKey } from '../../../utils/bot-login'
 
 export default defineEventHandler(async (event) => {
   setResponseHeaders(event, {
@@ -16,10 +16,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const token = randomBytes(24).toString('base64url')
-  const entry: BotLoginEntry = { status: 'pending', exp: Date.now() + BOT_LOGIN_TTL_MS }
+  const entry: BotLoginEntry = { status: 'pending' }
 
   const storage = useStorage('cache')
-  await storage.setItem(botLoginKey(token), entry, { ttl: Math.ceil(BOT_LOGIN_TTL_MS / 1000) })
+  await storage.setItem(botLoginKey(token), entry)
 
   const botId = config.telegramBotToken ? config.telegramBotToken.split(':')[0] : ''
 

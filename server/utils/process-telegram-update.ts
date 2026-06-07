@@ -4,8 +4,8 @@ import {
   buildBotLoginSuccessMessage,
   buildAuthenticatedBotLoginEntry,
   botLoginKey,
-  BOT_LOGIN_TTL_MS,
   canCompleteBotLogin,
+  isValidBotLoginToken,
   type BotLoginEntry
 } from './bot-login'
 
@@ -54,35 +54,29 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
 
   if (payload.startsWith('auth_')) {
     const token = payload.slice('auth_'.length)
+    if (!isValidBotLoginToken(token)) return
+
     const storage = useStorage('cache')
     const key = botLoginKey(token)
     console.log('[bot-login] /start received, key:', key)
     const entry = await storage.getItem<BotLoginEntry>(key)
-    console.log('[bot-login] entry lookup result:', entry ? `status=${entry.status} exp=${entry.exp} now=${Date.now()} expired=${entry.exp <= Date.now()}` : 'NOT FOUND')
+    console.log('[bot-login] entry lookup result:', entry ? `status=${entry.status}` : 'NOT FOUND')
 
-    if (!entry) {
-      console.warn('[bot-login] entry not found for token', token)
-    } else if (entry.status !== 'pending') {
+    if (entry?.status === 'authenticated') {
       console.warn('[bot-login] entry already used, status:', entry.status)
-    } else if (entry.exp <= Date.now()) {
-      console.warn('[bot-login] entry expired')
     } else if (!botToken) {
       console.error('[bot-login] botToken not configured')
     }
 
     const appUrl = (config.public as Record<string, string>).appUrl || 'https://chayroom.uz'
 
-    if (canCompleteBotLogin(entry, from.id) && entry && botToken) {
-      if (entry.status === 'pending') {
-        await storage.setItem(
-          key,
-          buildAuthenticatedBotLoginEntry(
-            { id: from.id, first_name: from.first_name || 'Foydalanuvchi', last_name: from.last_name, username: from.username },
-            entry.exp
-          ),
-          { ttl: Math.ceil(BOT_LOGIN_TTL_MS / 1000) }
+    if ((!entry || canCompleteBotLogin(entry, from.id)) && botToken) {
+      await storage.setItem(
+        key,
+        buildAuthenticatedBotLoginEntry(
+          { id: from.id, first_name: from.first_name || 'Foydalanuvchi', last_name: from.last_name, username: from.username }
         )
-      }
+      )
       await sendTelegramMessage(botToken, chatId, buildBotLoginSuccessMessage(appUrl, token))
     } else if (botToken) {
       await sendTelegramMessage(botToken, chatId, '⚠️ Kirish havolasi eskirgan. Saytda qaytadan urinib ko\'ring.')

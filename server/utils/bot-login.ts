@@ -8,11 +8,9 @@ export interface BotLoginUser {
 
 export interface BotLoginEntry {
   status: 'pending' | 'authenticated'
-  exp: number
   user?: BotLoginUser
 }
 
-export const BOT_LOGIN_TTL_MS = 5 * 60 * 1000
 export const BOT_LOGIN_SUCCESS_MESSAGE = '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀'
 
 export function buildBotLoginSuccessMessage(appUrl: string, token?: string): string {
@@ -26,12 +24,10 @@ export function buildBotLoginSuccessMessage(appUrl: string, token?: string): str
 }
 
 export function buildAuthenticatedBotLoginEntry(
-  user: Pick<BotLoginUser, 'id' | 'first_name'> & Partial<Pick<BotLoginUser, 'last_name' | 'username' | 'photo_url'>>,
-  exp: number
+  user: Pick<BotLoginUser, 'id' | 'first_name'> & Partial<Pick<BotLoginUser, 'last_name' | 'username' | 'photo_url'>>
 ): BotLoginEntry {
   return {
     status: 'authenticated',
-    exp,
     user: {
       id: user.id,
       first_name: user.first_name,
@@ -42,10 +38,14 @@ export function buildAuthenticatedBotLoginEntry(
   }
 }
 
-export function canCompleteBotLogin(entry: BotLoginEntry | null, telegramUserId: number, now = Date.now()): boolean {
-  if (!entry || entry.exp <= now) return false
+export function canCompleteBotLogin(entry: BotLoginEntry | null, telegramUserId: number): boolean {
+  if (!entry) return false
   if (entry.status === 'pending') return true
   return entry.user?.id === telegramUserId
+}
+
+export function isValidBotLoginToken(token: string): boolean {
+  return /^[A-Za-z0-9_-]{24,128}$/.test(token)
 }
 
 export function getBotLoginRedirectTarget(): string {

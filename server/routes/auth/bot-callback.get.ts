@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const key = botLoginKey(token)
   const entry = await storage.getItem<BotLoginEntry>(key)
 
-  if (!entry || entry.exp < Date.now()) {
+  if (!entry) {
     return sendRedirect(event, '/login?error=expired', 302)
   }
   if (entry.status !== 'authenticated' || !entry.user) {

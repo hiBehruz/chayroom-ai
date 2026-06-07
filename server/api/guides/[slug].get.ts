@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
       badge: guides.badge,
       level: guides.level,
       isFree: guides.isFree,
+      accessLevel: guides.accessLevel,
       publishedAt: guides.publishedAt,
       createdAt: guides.createdAt,
       category: categories.name
@@ -48,7 +49,8 @@ export default defineEventHandler(async (event) => {
       }
     }
   }
-  const locked = !guide.isFree && !hasSubscription
+  const level = guide.accessLevel
+  const locked = (level === 'member' && !hasSubscription) || (level === 'free' && !jwtUser)
 
   return locked ? { ...guide, content: null, locked: true } : { ...guide, locked: false }
 })

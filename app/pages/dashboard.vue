@@ -33,7 +33,8 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
             Barcha kurslarga kirish, progress kuzatuvi va sertifikatlarga ega bo'ling.
           </p>
           <NuxtLink
-            :to="user ? '/#pricing' : '/login'"
+            :to="user ? 'https://t.me/ChayroomAiBot?start=subscribe' : '/login'"
+            :external="!!user"
             class="hero-link-btn hero-link-btn--blue paywall-btn max-md:self-center"
           >
             <UIcon

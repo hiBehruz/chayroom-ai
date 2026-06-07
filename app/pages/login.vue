@@ -105,11 +105,12 @@ async function loginViaBot() {
     botLoginUrl.value = res.tgUrl || res.url
 
     if (import.meta.client) {
-      // Desktop: open in new tab (page stays, polling continues)
-      // Mobile: window.open blocked — show tap-able <a href> link below
-      // iOS Universal Links: tapping <a href="https://t.me/..."> opens Telegram app,
-      // Safari stays on this page, polling continues uninterrupted
-      window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
+      const isMobile = ‘ontouchstart’ in window || navigator.maxTouchPoints > 0
+      if (!isMobile) {
+        // Desktop: open in new tab, polling continues on this page
+        window.open(res.url, ‘_blank’, ‘noopener,noreferrer’)
+      }
+      // Mobile: user taps the "Telegramni ochish" tg:// button shown below
     }
 
     botPollState.value = ‘waiting’

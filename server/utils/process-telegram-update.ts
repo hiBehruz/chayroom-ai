@@ -55,7 +55,9 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
     const token = payload.slice('auth_'.length)
     const storage = useStorage('cache')
     const key = botLoginKey(token)
+    console.log('[bot-login] /start received, key:', key)
     const entry = await storage.getItem<BotLoginEntry>(key)
+    console.log('[bot-login] entry lookup result:', entry ? `status=${entry.status} exp=${entry.exp} now=${Date.now()} expired=${entry.exp <= Date.now()}` : 'NOT FOUND')
 
     if (!entry) {
       console.warn('[bot-login] entry not found for token', token)

@@ -82,8 +82,8 @@ const daysLeftLabel = computed(() => {
   const n = authStore.daysLeft
   return n === null ? '—' : `${n} kun`
 })
-function logout() {
-  authStore.logout()
+async function logout() {
+  await authStore.logout()
   navigateTo('/')
 }
 

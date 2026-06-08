@@ -22,8 +22,15 @@ export function buildBotLoginSuccessMessage(appUrl: string, token?: string): { t
   }
 
   return {
-    text: BOT_LOGIN_SUCCESS_MESSAGE.replace('Chayroom.uz', `<a href="${targetUrl.toString()}">Chayroom.uz</a>`),
-    options: {}
+    text: BOT_LOGIN_SUCCESS_MESSAGE,
+    options: {
+      reply_markup: {
+        inline_keyboard: [[{
+          text: '🌐 Chayroom.uz ga kirish',
+          web_app: { url: targetUrl.toString() }
+        }]]
+      }
+    }
   }
 }
 

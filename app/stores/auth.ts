@@ -204,14 +204,14 @@ export const useAuthStore = defineStore('auth', () => {
     subscriptionCancelled.value = false
   }
 
-  function logout() {
+  async function logout() {
     user.value = null
     userCookie.value = null
     clearSubscription()
     if (import.meta.client) {
       sessionStorage.removeItem('bot_login_token')
       localStorage.removeItem('bot_login_token')
-      void $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
+      await $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
     }
   }
 

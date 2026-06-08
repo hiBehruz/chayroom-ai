@@ -41,30 +41,32 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
       <!-- Paywall CTA — tepada, obuna yo'q bo'lganda -->
       <div
         v-if="!hasCourseAccess"
-        class="mb-8 rounded-2xl bg-[#f7f7f5] px-10 py-8 flex items-center justify-center gap-8 paywall-enter sticky top-20 z-10 w-220.5 max-w-full mx-auto max-md:flex-col max-md:px-6 max-md:py-6 max-md:text-center max-md:gap-4"
+        class="mb-8 rounded-2xl bg-[#f7f7f5] px-6 py-5 flex items-center justify-between gap-6 paywall-enter sticky top-20 z-10 max-w-full mx-auto max-md:flex-col max-md:px-5 max-md:py-4 max-md:text-center max-md:gap-3"
       >
-        <div class="flex flex-col items-center text-center">
-          <h2 class="text-[40px] font-extrabold text-[#1a1a1a] mb-3 leading-tight">
+        <div class="flex flex-col max-md:items-center">
+          <h2 class="text-[20px] font-semibold text-[#1a1a1a] mb-1 leading-tight">
             O'quv dashboardingni och
           </h2>
-          <p class="text-[22px] text-cx-muted mb-6 max-w-md leading-snug">
+          <p class="text-[13px] text-cx-muted leading-snug">
             Barcha kurslarga kirish, progress kuzatuvi va sertifikatlarga ega bo'ling.
           </p>
+        </div>
+        <div class="flex flex-col items-end gap-1.5 shrink-0 max-md:items-center">
           <button
-            class="hero-link-btn hero-link-btn--blue paywall-btn max-md:self-center"
+            class="hero-link-btn hero-link-btn--blue paywall-btn"
             @click="isAccessModalOpen = true"
           >
             <UIcon
               name="i-lucide-sparkles"
-              class="size-4.5 shrink-0"
+              class="size-4 shrink-0"
             />
             <span>To'liq kirish huquqini olish</span>
             <UIcon
               name="i-lucide-arrow-right"
-              class="size-4 shrink-0"
+              class="size-3.5 shrink-0"
             />
           </button>
-          <p class="mt-3 text-[13px] text-cx-muted">
+          <p class="text-[12px] text-cx-muted">
             Telegram orqali to'lov. Barcha kurs va materiallarga kirish.
           </p>
         </div>

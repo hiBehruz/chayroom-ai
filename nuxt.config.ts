@@ -1,3 +1,5 @@
+import { useNuxt } from 'nuxt/kit'
+
 // nuxt.config.ts
 export default defineNuxtConfig({
   modules: [
@@ -86,6 +88,16 @@ export default defineNuxtConfig({
   vite: {
     server: {
       allowedHosts: ['handcart-garage-creatable.ngrok-free.dev']
+    }
+  },
+
+  hooks: {
+    'modules:done'() {
+      if (!process.env.VITEST) return
+
+      // Nuxt Test Utils structured-clones runtime config; module-added proxies are not cloneable.
+      const nuxt = useNuxt()
+      nuxt.options.runtimeConfig = JSON.parse(JSON.stringify(nuxt.options.runtimeConfig))
     }
   },
 

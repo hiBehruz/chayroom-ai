@@ -1,15 +1,67 @@
 name: ci
 
-on: push
+on:
+  push:
+  pull_request:
 
 jobs:
   ci:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgres://chayroom:chayroom@127.0.0.1:5432/chayroom_test
+      REDIS_URL: redis://127.0.0.1:6379
+      NUXT_STORAGE_ENDPOINT: http://127.0.0.1:9000
+      NUXT_STORAGE_REGION: us-east-1
+      NUXT_STORAGE_BUCKET: chayroom-test
+      NUXT_STORAGE_PUBLIC_URL: http://127.0.0.1:9000/chayroom-test
+      NUXT_STORAGE_ACCESS_KEY_ID: minioadmin
+      NUXT_STORAGE_SECRET_ACCESS_KEY: minioadmin
+      NUXT_STORAGE_FORCE_PATH_STYLE: "true"
+      NUXT_TELEGRAM_BOT_TOKEN: 123456:test-secret
+      NUXT_ADMIN_TELEGRAM_IDS: "987654321"
+      NUXT_ADMIN_SESSION_PASSWORD: integration-admin-session-password-32-chars
+      NUXT_SESSION_PASSWORD: integration-user-session-password-32-chars
+      NUXT_JWT_SECRET: integration-jwt-secret-password-32-chars
+      NUXT_PUBLIC_TELEGRAM_BOT_USERNAME: integration_test_bot
+      NUXT_PUBLIC_APP_URL: http://127.0.0.1
 
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node: [22]
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: chayroom_test
+          POSTGRES_USER: chayroom
+          POSTGRES_PASSWORD: chayroom
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U chayroom -d chayroom_test"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+
+      minio:
+        image: bitnamilegacy/minio:2025.4.22
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin
+        ports:
+          - 9000:9000
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/live"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
 
     steps:
       - name: Checkout
@@ -18,17 +70,32 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v6
 
-      - name: Install node
+      - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: pnpm run lint
+        run: pnpm lint
 
       - name: Typecheck
-        run: pnpm run typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test:unit
+
+      - name: Nuxt runtime tests
+        run: pnpm test:nuxt
+
+      - name: Database migrations
+        run: pnpm db:migrate
+
+      - name: Integration tests
+        run: pnpm test:integration
+
+      - name: Production build
+        run: pnpm build

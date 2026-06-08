@@ -42,10 +42,10 @@ async function scrollToSection(href: string) {
   if (route.path !== '/') {
     if (import.meta.client) {
       sessionStorage.setItem(SECTION_SCROLL_KEY, href)
-      window.location.assign('/')
+      window.location.assign('/' + href)
       return
     }
-    await navigateTo({ path: '/' })
+    await navigateTo({ path: '/', hash: href })
     return
   }
   await nextTick()
@@ -55,8 +55,8 @@ async function scrollToSection(href: string) {
 function doScroll(href: string) {
   const el = document.querySelector(href)
   if (!el) return
-  if (import.meta.client && window.location.hash) {
-    window.history.replaceState({}, '', '/')
+  if (import.meta.client) {
+    window.history.replaceState({}, '', href)
   }
   const navEl = document.querySelector('.nav-scroll-shell') as HTMLElement
   const navHeight = navEl ? navEl.offsetHeight : 72

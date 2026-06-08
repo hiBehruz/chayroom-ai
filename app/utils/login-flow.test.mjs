@@ -28,8 +28,8 @@ test('buildBotLoginStartRequest bypasses cache with a fresh request id', () => {
   assert.notDeepEqual(buildBotLoginStartRequest(1000), buildBotLoginStartRequest(1001))
 })
 
-test('resolvePostLoginTarget sends users to profile by default', () => {
-  assert.deepEqual(resolvePostLoginTarget('', ''), { path: '/profile' })
+test('resolvePostLoginTarget sends users to dashboard by default', () => {
+  assert.deepEqual(resolvePostLoginTarget('', ''), { path: '/dashboard' })
 })
 
 test('resolvePostLoginTarget preserves redirect query when provided', () => {
@@ -37,7 +37,7 @@ test('resolvePostLoginTarget preserves redirect query when provided', () => {
 })
 
 test('resolvePostLoginTarget keeps selected plan only for dashboard redirects', () => {
-  assert.deepEqual(resolvePostLoginTarget('pro', ''), { path: '/profile' })
+  assert.deepEqual(resolvePostLoginTarget('pro', ''), { path: '/dashboard' })
   assert.deepEqual(resolvePostLoginTarget('pro', '/dashboard'), { path: '/dashboard', query: { plan: 'pro' } })
 })
 

@@ -7,7 +7,7 @@ export function resolvePostLoginTarget(selectedPlan, redirectPath) {
     return { path: redirectPath }
   }
 
-  return { path: '/profile' }
+  return { path: '/dashboard' }
 }
 
 export function buildBotLoginStartRequest(requestId = Date.now()) {

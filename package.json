@@ -8,6 +8,10 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run --config vitest.config.ts --project unit",
+    "test:nuxt": "vitest run --config vitest.nuxt.config.ts",
+    "test:integration": "vitest run --config vitest.config.ts --project integration",
     "typecheck": "nuxt typecheck",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -50,10 +54,13 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.2",
+    "@nuxt/test-utils": "^4.0.3",
     "@types/node": "^25.9.1",
     "drizzle-kit": "^0.31.10",
     "eslint": "^10.3.0",
+    "happy-dom": "^20.10.2",
     "typescript": "^6.0.3",
+    "vitest": "^4.1.8",
     "vue-tsc": "^3.2.8"
   },
   "packageManager": "pnpm@10.33.4"

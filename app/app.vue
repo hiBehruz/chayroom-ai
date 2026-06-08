@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import gsap from 'gsap'
-import { shouldSyncServerSession } from './utils/auth-session.mjs'
+import { shouldSyncServerSessionForRoute } from './utils/auth-session.mjs'
 
 const authStore = useAuthStore()
 const route = useRoute()
@@ -33,9 +33,27 @@ onMounted(() => {
   // Sync from server so subscription state is correct on first render.
   // Skip on /login: the login flow calls authStore.login() shortly after mount, and
   // a concurrent syncMe() that returns null user would call logout() and race with it.
-  if (route.path !== '/login' && shouldSyncServerSession(authStore.user, authStore.hasSubscription)) {
+  if (shouldSyncServerSessionForRoute({
+    isMiniApp: isMiniApp.value,
+    routePath: route.path,
+    user: authStore.user,
+    hasSubscription: authStore.hasSubscription
+  })) {
     void authStore.syncMe()
   }
+})
+
+watch(() => route.fullPath, () => {
+  if (!shouldSyncServerSessionForRoute({
+    isMiniApp: isMiniApp.value,
+    routePath: route.path,
+    user: authStore.user,
+    hasSubscription: authStore.hasSubscription
+  })) {
+    return
+  }
+
+  void authStore.syncMe()
 })
 
 onUnmounted(() => {

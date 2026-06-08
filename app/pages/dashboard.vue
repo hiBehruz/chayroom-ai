@@ -1,9 +1,7 @@
 <!-- app/pages/dashboard.vue -->
 <script setup lang="ts">
-
 const authStore = useAuthStore()
 const { isMiniApp } = useTelegramApp()
-const config = useRuntimeConfig()
 
 authStore.restoreFromStorage()
 

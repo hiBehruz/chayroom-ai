@@ -144,7 +144,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (!import.meta.client) return
     try {
       const res = await $fetch<{
-        user: { id: number; telegramId: number; firstName: string; lastName: string | null; username: string | null; photoUrl: string | null; role: 'USER' | 'ADMIN' }
+        user: { id: number, telegramId: number, firstName: string, lastName: string | null, username: string | null, photoUrl: string | null, role: 'USER' | 'ADMIN' }
         hasSubscription: boolean
       }>('/api/auth/telegram', {
         method: 'POST',
@@ -263,7 +263,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const res = await $fetch<{
-        user: { id: number; telegramId: number; firstName: string; lastName: string | null; username: string | null; photoUrl: string | null; role: 'USER' | 'ADMIN' }
+        user: { id: number, telegramId: number, firstName: string, lastName: string | null, username: string | null, photoUrl: string | null, role: 'USER' | 'ADMIN' }
         hasSubscription: boolean
       }>('/api/auth/telegram-webapp', {
         method: 'POST',
@@ -310,6 +310,7 @@ export const useAuthStore = defineStore('auth', () => {
     loginFromMiniApp,
     activateSubscription,
     clearSubscription,
+    setUserSession,
     syncMe,
     setAgentVariant,
     logout,

@@ -3,7 +3,7 @@
 import {
   buildBotLoginStartRequest,
   clearPendingBotLoginToken,
-  readPendingBotLoginToken,
+  resolvePendingBotLoginToken,
   resolvePostLoginTarget,
   storePendingBotLoginToken
 } from '../utils/login-flow.mjs'
@@ -39,6 +39,7 @@ const botLinkExpired = ref(false)
 const authError = ref('')
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
+const queryBotToken = computed(() => typeof route.query.botToken === 'string' ? route.query.botToken : '')
 let botPollTimer: number | null = null
 let activePollToken = ''
 
@@ -63,7 +64,12 @@ function resetBotState() {
 
 async function loginWithTelegram(user: TelegramUser) {
   await authStore.login(user)
-  goAfterLogin()
+  if (authStore.user) {
+    goAfterLogin()
+    return
+  }
+
+  authError.value = 'Kirish amalga oshmadi. Qaytadan urinib ko\'ring.'
 }
 
 async function pollBotLoginStatus(token: string) {
@@ -116,7 +122,7 @@ async function loginViaBot() {
     }
   } catch {
     stopBotPoll()
-    authError.value = "Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko'ring."
+    authError.value = 'Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko\'ring.'
   }
 }
 
@@ -153,7 +159,11 @@ onMounted(async () => {
     const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user
     if (tgUser) {
       await authStore.loginFromMiniApp(tgUser)
-      goAfterLogin()
+      if (authStore.user) {
+        goAfterLogin()
+      } else {
+        widgetState.value = 'mini-app-error'
+      }
     } else {
       widgetState.value = 'mini-app-error'
     }
@@ -188,8 +198,13 @@ onMounted(async () => {
   }
 
   const resumePendingBotLogin = () => {
-    const savedToken = readPendingBotLoginToken({ sessionStorage, localStorage })
+    const savedToken = resolvePendingBotLoginToken({
+      queryToken: queryBotToken.value,
+      sessionStorage,
+      localStorage
+    })
     if (savedToken && !authStore.user) {
+      storePendingBotLoginToken({ sessionStorage, localStorage }, savedToken)
       botPollState.value = 'waiting'
       void pollBotLoginStatus(savedToken)
     }
@@ -208,7 +223,10 @@ onMounted(async () => {
     if (document.visibilityState !== 'visible') return
     resumePendingBotLogin()
     if (botPollState.value === 'waiting' && activePollToken) {
-      if (botPollTimer) { window.clearTimeout(botPollTimer); botPollTimer = null }
+      if (botPollTimer) {
+        window.clearTimeout(botPollTimer)
+        botPollTimer = null
+      }
       void pollBotLoginStatus(activePollToken)
     }
   })
@@ -287,7 +305,10 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
             :disabled="botPollState === 'opening'"
             @click="loginViaBot"
           >
-            <UIcon name="i-simple-icons-telegram" class="size-4" />
+            <UIcon
+              name="i-simple-icons-telegram"
+              class="size-4"
+            />
             Telegram bot orqali kirish
           </button>
 

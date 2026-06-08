@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 
 import {
   buildBotLoginSuccessMessage,
+  buildPendingBotLoginPage,
   buildAuthenticatedBotLoginEntry,
   buildBotLoginConfirmData,
   canCompleteBotLogin,
@@ -22,10 +23,17 @@ test('parseBotLoginConfirmData returns token only for confirm payloads', () => {
   assert.equal(parseBotLoginConfirmData('other'), null)
 })
 
-test('buildBotLoginSuccessMessage returns confirmation with chayroom.uz link', () => {
-  const { text, options } = buildBotLoginSuccessMessage()
-  assert.equal(text, '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\n<a href="https://chayroom.uz">Chayroom.uz</a> saytiga qayting va foydalanishda davom eting. 🚀')
+test('buildBotLoginSuccessMessage returns confirmation with tokenized callback link', () => {
+  const { text, options } = buildBotLoginSuccessMessage('https://chayroom.uz', 'abc123')
+  assert.equal(text, '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\n<a href="https://chayroom.uz/auth/bot-callback?token=abc123">Chayroom.uz</a> saytiga qayting va foydalanishda davom eting. 🚀')
   assert.deepEqual(options, {})
+})
+
+test('buildPendingBotLoginPage keeps polling the tokenized status endpoint', () => {
+  const html = buildPendingBotLoginPage('abc123')
+  assert.match(html, /\/api\/auth\/bot-login\/status\?token=abc123/)
+  assert.match(html, /window\.location\.replace\('\/profile'\)/)
+  assert.match(html, /window\.location\.replace\('\/login\?error=expired'\)/)
 })
 
 test('buildAuthenticatedBotLoginEntry returns authenticated storage payload', () => {

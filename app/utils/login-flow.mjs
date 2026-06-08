@@ -47,6 +47,10 @@ export function readPendingBotLoginToken({ sessionStorage, localStorage }) {
   return sessionStorage?.getItem(BOT_LOGIN_TOKEN_KEY) || localStorage?.getItem(BOT_LOGIN_TOKEN_KEY) || null
 }
 
+export function resolvePendingBotLoginToken({ queryToken, sessionStorage, localStorage }) {
+  return queryToken || readPendingBotLoginToken({ sessionStorage, localStorage })
+}
+
 export function clearPendingBotLoginToken({ sessionStorage, localStorage }) {
   sessionStorage?.removeItem(BOT_LOGIN_TOKEN_KEY)
   localStorage?.removeItem(BOT_LOGIN_TOKEN_KEY)

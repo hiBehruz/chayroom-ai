@@ -69,13 +69,14 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
     }
 
     if ((!entry || canCompleteBotLogin(entry, from.id)) && botToken) {
+      const appUrl = (config.public as Record<string, string>).appUrl || 'https://chayroom.uz'
       await storage.setItem(
         key,
         buildAuthenticatedBotLoginEntry(
           { id: from.id, first_name: from.first_name || 'Foydalanuvchi', last_name: from.last_name, username: from.username }
         )
       )
-      const { text: successText, options: successOptions } = buildBotLoginSuccessMessage()
+      const { text: successText, options: successOptions } = buildBotLoginSuccessMessage(appUrl, token)
       await sendTelegramMessage(botToken, chatId, successText, successOptions)
     } else if (botToken) {
       await sendTelegramMessage(botToken, chatId, '⚠️ Kirish havolasi eskirgan. Saytda qaytadan urinib ko\'ring.')

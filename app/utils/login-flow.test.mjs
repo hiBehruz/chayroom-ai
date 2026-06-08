@@ -6,6 +6,7 @@ import {
   clearPendingBotLoginToken,
   isSafariUserAgent,
   readPendingBotLoginToken,
+  resolvePendingBotLoginToken,
   resolveBotLoginLaunchUrl,
   resolvePostLoginTarget,
   storePendingBotLoginToken
@@ -93,6 +94,22 @@ test('pending bot login token is removed only after login finishes', () => {
 
   assert.equal(sessionStorage.getItem('bot_login_token'), null)
   assert.equal(localStorage.getItem('bot_login_token'), null)
+})
+
+test('resolvePendingBotLoginToken prefers query token before browser storage', () => {
+  const sessionStorage = createStorage()
+  const localStorage = createStorage()
+
+  storePendingBotLoginToken({ sessionStorage, localStorage }, 'stored-token')
+
+  assert.equal(
+    resolvePendingBotLoginToken({ queryToken: 'query-token', sessionStorage, localStorage }),
+    'query-token'
+  )
+  assert.equal(
+    resolvePendingBotLoginToken({ queryToken: '', sessionStorage, localStorage }),
+    'stored-token'
+  )
 })
 
 function createStorage() {

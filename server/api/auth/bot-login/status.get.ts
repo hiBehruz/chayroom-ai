@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm'
 import { db } from '../../../db'
 import { subscriptions } from '../../../db/schema'
 import { botLoginKey, type BotLoginEntry } from '../../../utils/bot-login'
+import { buildClientSessionUser, clientCookieOptions } from '../../../utils/client-session'
 import { upsertUserFromTelegram, userToJwtPayload } from '../../../utils/upsertUserFromTelegram'
 import { setSessionCookie } from '../../../utils/session-cookie'
 
@@ -31,6 +32,13 @@ export default defineEventHandler(async (event) => {
   if (!hasSubscription) {
     const [sub] = await db.select().from(subscriptions).where(eq(subscriptions.userId, dbUser.id)).limit(1)
     hasSubscription = sub?.status === 'ACTIVE' && sub.expiresAt > new Date()
+  }
+
+  setCookie(event, 'cx-user', JSON.stringify(buildClientSessionUser(dbUser)), clientCookieOptions())
+  if (hasSubscription) {
+    setCookie(event, 'cx-sub', 'true', clientCookieOptions())
+  } else {
+    deleteCookie(event, 'cx-sub', { path: '/' })
   }
 
   return { status: 'authenticated' as const, hasSubscription }

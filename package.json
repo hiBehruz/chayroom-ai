@@ -12,6 +12,7 @@
     "test:unit": "vitest run --config vitest.config.ts --project unit",
     "test:nuxt": "vitest run --config vitest.nuxt.config.ts",
     "test:integration": "vitest run --config vitest.config.ts --project integration",
+    "test:production": "node scripts/test-production.mjs",
     "typecheck": "nuxt typecheck",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

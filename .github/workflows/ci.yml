@@ -99,3 +99,6 @@ jobs:
 
       - name: Production build
         run: pnpm build
+
+      - name: Production smoke test
+        run: pnpm test:production

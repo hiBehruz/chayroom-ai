@@ -73,6 +73,9 @@ export default defineNuxtConfig({
 
   nitro: {
     preset: 'node-server',
+    externals: {
+      inline: ['unhead']
+    },
     storage: {
       cache: {
         driver: process.env.REDIS_URL ? 'redis' : 'memory',

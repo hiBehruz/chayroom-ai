@@ -52,7 +52,7 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
           </p>
           <button
             class="hero-link-btn hero-link-btn--blue paywall-btn max-md:self-center"
-            @click="user ? (isAccessModalOpen = true) : navigateTo('/login')"
+            @click="isAccessModalOpen = true"
           >
             <UIcon
               name="i-lucide-sparkles"

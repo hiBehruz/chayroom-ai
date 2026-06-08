@@ -1,5 +1,4 @@
-const CACHE_BASE = 'cache'
-const CACHE_GROUP = 'nitro/handlers'
+const CACHE_STORAGE_GROUP = 'nitro:handlers'
 
 export const publicApiCacheNames = {
   courseList: 'courses:list',
@@ -15,12 +14,12 @@ export const listCacheKey = (limit?: string | number | null) => `limit${normaliz
 
 export const detailCacheKey = (slug: string) => normalizeCacheKey(slug)
 
-const handlerCachePrefix = (name: string) => `${CACHE_BASE}:${CACHE_GROUP}:${name}:`
+const handlerCachePrefix = (name: string) => `${CACHE_STORAGE_GROUP}:${name}:`
 
 const handlerCacheKey = (name: string, key: string) => `${handlerCachePrefix(name)}${normalizeCacheKey(key)}.json`
 
 async function invalidateCache(name: string, keys: string[] = []) {
-  const storage = useStorage()
+  const storage = useStorage('cache')
   const prefix = handlerCachePrefix(name)
   const storedKeys = await storage.getKeys().catch(() => [])
   const matchingKeys = storedKeys.filter(key => key.startsWith(prefix))

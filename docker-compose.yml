@@ -22,6 +22,11 @@ services:
     command: redis-server --appendonly yes --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   # One-off DB migrations: docker compose --profile migrate run --rm migrate
   migrate:
@@ -50,7 +55,7 @@ services:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:

@@ -20,6 +20,8 @@ test('cache utility defines explicit public API cache names and invalidation hel
   assert.match(source, /invalidateCourseCache/)
   assert.match(source, /invalidateGuideCache/)
   assert.match(source, /invalidateCache/)
+  assert.match(source, /useStorage\(\)/)
+  assert.match(source, /CACHE_BASE\s*=\s*['"]cache['"]/)
 })
 
 test('admin course and guide mutations invalidate related public API caches', async () => {

@@ -27,6 +27,14 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     openaiApiKey: '',
+    storageProvider: 's3',
+    storageEndpoint: '',
+    storageRegion: '',
+    storageBucket: '',
+    storagePublicUrl: '',
+    storageAccessKeyId: '',
+    storageSecretAccessKey: '',
+    storageForcePathStyle: false,
     r2AccountId: '',
     r2AccessKeyId: '',
     r2SecretAccessKey: '',

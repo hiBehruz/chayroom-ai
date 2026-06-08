@@ -1,6 +1,6 @@
-import { processTelegramUpdate, type TgUpdate } from '../utils/process-telegram-update'
+import { processTelegramUpdate, type TgUpdate } from '#server/utils/process-telegram-update'
 
-export default defineNitroPlugin((nitro) => {
+export default defineNitroPlugin(() => {
   const config = useRuntimeConfig()
   const botToken = config.telegramBotToken as string | undefined
   if (!botToken) return
@@ -23,7 +23,7 @@ async function runPolling(botToken: string) {
         await sleep(5000)
         continue
       }
-      const data = await res.json() as { ok: boolean; result: TgUpdate[] }
+      const data = await res.json() as { ok: boolean, result: TgUpdate[] }
       if (!data.ok) {
         await sleep(5000)
         continue

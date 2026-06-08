@@ -1,7 +1,7 @@
-import { db } from '../../db'
-import { guides, categories } from '../../db/schema'
+import { db } from '#server/db'
+import { guides, categories } from '#server/db/schema'
 import { desc, isNotNull, eq } from 'drizzle-orm'
-import { listCacheKey, publicApiCacheNames } from '../../utils/cache'
+import { listCacheKey, publicApiCacheNames } from '#server/utils/cache'
 
 export default defineCachedEventHandler(async (event) => {
   const query = getQuery(event)

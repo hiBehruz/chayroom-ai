@@ -1,7 +1,7 @@
-import { db } from '../../db'
-import { courses, modules, lessons } from '../../db/schema'
-import { requireAdmin } from '../../utils/admin-session'
-import { invalidateCourseCache } from '../../utils/cache'
+import { db } from '#server/db'
+import { courses, modules, lessons } from '#server/db/schema'
+import { requireAdmin } from '#server/utils/admin-session'
+import { invalidateCourseCache } from '#server/utils/cache'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)

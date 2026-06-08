@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto'
-import type { BotLoginEntry } from '../../../utils/bot-login'
-import { botLoginKey } from '../../../utils/bot-login'
+import type { BotLoginEntry } from '#server/utils/bot-login'
+import { botLoginKey } from '#server/utils/bot-login'
 
 export default defineEventHandler(async (event) => {
   setResponseHeaders(event, {

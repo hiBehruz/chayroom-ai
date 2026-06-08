@@ -2,13 +2,13 @@ export default defineNuxtPlugin(async () => {
   const authStore = useAuthStore()
   if (authStore.user) return
 
-  const token =
-    localStorage.getItem('bot_login_token') ||
-    sessionStorage.getItem('bot_login_token')
+  const token
+    = localStorage.getItem('bot_login_token')
+      || sessionStorage.getItem('bot_login_token')
   if (!token) return
 
   const route = useRoute()
-  if (route.path === '/login') return  // login page handles its own polling
+  if (route.path === '/login') return // login page handles its own polling
 
   try {
     const res = await $fetch<{ status: string }>('/api/auth/bot-login/status', {
@@ -23,5 +23,7 @@ export default defineNuxtPlugin(async () => {
       localStorage.removeItem('bot_login_token')
       sessionStorage.removeItem('bot_login_token')
     }
-  } catch {}
+  } catch {
+    return
+  }
 })

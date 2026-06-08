@@ -1,18 +1,18 @@
 import { eq } from 'drizzle-orm'
-import { db } from '../../db'
-import { users, subscriptions } from '../../db/schema'
-import { verifyTelegramLoginPayload, type TelegramLoginPayload } from '../../utils/telegram-auth'
-import { upsertUserFromTelegram, userToJwtPayload } from '../../utils/upsertUserFromTelegram'
-import { setSessionCookie } from '../../utils/session-cookie'
-import { sendTelegramMessage } from '../../utils/telegram'
-import { buildMiniAppLoginUrl, buildPlatformMenuButton, setTelegramChatMenuButton } from '../../utils/telegram-bot.js'
-import { BOT_LOGIN_SUCCESS_MESSAGE } from '../../utils/bot-login'
+import { db } from '#server/db'
+import { users, subscriptions } from '#server/db/schema'
+import { verifyTelegramLoginPayload, type TelegramLoginPayload } from '#server/utils/telegram-auth'
+import { upsertUserFromTelegram, userToJwtPayload } from '#server/utils/upsertUserFromTelegram'
+import { setSessionCookie } from '#server/utils/session-cookie'
+import { sendTelegramMessage } from '#server/utils/telegram'
+import { buildMiniAppLoginUrl, buildPlatformMenuButton, setTelegramChatMenuButton } from '#server/utils/telegram-bot.js'
+import { BOT_LOGIN_SUCCESS_MESSAGE } from '#server/utils/bot-login'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody<Partial<TelegramLoginPayload>>(event)
 
-  let tgUser: { id: number; first_name: string; last_name?: string; username?: string; photo_url?: string } | null = null
+  let tgUser: { id: number, first_name: string, last_name?: string, username?: string, photo_url?: string } | null = null
 
   if (import.meta.dev && body?.hash === 'dev' && body?.id) {
     tgUser = { id: Number(body.id), first_name: body.first_name || 'Dev', last_name: body.last_name, username: body.username, photo_url: body.photo_url }

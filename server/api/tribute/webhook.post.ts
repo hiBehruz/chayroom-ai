@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
-import { db } from '../../db'
-import { users, subscriptions } from '../../db/schema'
-import { verifyTributeSignature } from '../../utils/tribute-signature'
+import { db } from '#server/db'
+import { users, subscriptions } from '#server/db/schema'
+import { verifyTributeSignature } from '#server/utils/tribute-signature'
 
 interface TributePayload {
   subscription_id: number

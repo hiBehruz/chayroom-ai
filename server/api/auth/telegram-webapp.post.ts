@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm'
-import { db } from '../../db'
-import { subscriptions } from '../../db/schema'
-import { verifyTelegramWebAppInitData } from '../../utils/telegram-auth'
-import { upsertUserFromTelegram, userToJwtPayload } from '../../utils/upsertUserFromTelegram'
-import { setSessionCookie } from '../../utils/session-cookie'
+import { db } from '#server/db'
+import { subscriptions } from '#server/db/schema'
+import { verifyTelegramWebAppInitData } from '#server/utils/telegram-auth'
+import { upsertUserFromTelegram, userToJwtPayload } from '#server/utils/upsertUserFromTelegram'
+import { setSessionCookie } from '#server/utils/session-cookie'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()

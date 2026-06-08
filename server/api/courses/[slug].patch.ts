@@ -1,8 +1,8 @@
-import { db } from '../../db'
-import { courses } from '../../db/schema'
+import { db } from '#server/db'
+import { courses } from '#server/db/schema'
 import { eq } from 'drizzle-orm'
-import { requireAdmin } from '../../utils/admin-session'
-import { invalidateCourseCache } from '../../utils/cache'
+import { requireAdmin } from '#server/utils/admin-session'
+import { invalidateCourseCache } from '#server/utils/cache'
 
 export default defineEventHandler(async (event) => {
   await requireAdmin(event)

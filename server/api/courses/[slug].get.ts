@@ -1,7 +1,7 @@
-import { db } from '../../db'
-import { courses, modules, lessons, subscriptions, users } from '../../db/schema'
+import { db } from '#server/db'
+import { courses, modules, lessons, subscriptions, users } from '#server/db/schema'
 import { eq, asc, desc } from 'drizzle-orm'
-import { readSessionUser } from '../../utils/session-cookie'
+import { readSessionUser } from '#server/utils/session-cookie'
 
 // Not publicly cached: the response is gated per viewer (subscription/admin),
 // so protected lesson content must never be served from a shared cache.

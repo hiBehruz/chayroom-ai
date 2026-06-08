@@ -1,4 +1,4 @@
-import { clearSessionCookie } from '../../utils/session-cookie'
+import { clearSessionCookie } from '#server/utils/session-cookie'
 
 export default defineEventHandler((event) => {
   clearSessionCookie(event)

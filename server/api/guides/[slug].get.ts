@@ -1,7 +1,7 @@
-import { db } from '../../db'
-import { guides, categories, subscriptions, users } from '../../db/schema'
+import { db } from '#server/db'
+import { guides, categories, subscriptions, users } from '#server/db/schema'
 import { eq, desc } from 'drizzle-orm'
-import { readSessionUser } from '../../utils/session-cookie'
+import { readSessionUser } from '#server/utils/session-cookie'
 
 // Not publicly cached: the body is gated per viewer (subscription/admin).
 export default defineEventHandler(async (event) => {

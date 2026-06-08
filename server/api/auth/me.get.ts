@@ -1,7 +1,7 @@
 import { eq, desc } from 'drizzle-orm'
-import { db } from '../../db'
-import { users, subscriptions } from '../../db/schema'
-import { readSessionUser } from '../../utils/session-cookie'
+import { db } from '#server/db'
+import { users, subscriptions } from '#server/db/schema'
+import { readSessionUser } from '#server/utils/session-cookie'
 
 export default defineEventHandler(async (event) => {
   const jwtUser = await readSessionUser(event)

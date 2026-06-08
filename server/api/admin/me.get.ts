@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
-import { db } from '../../db'
-import { users } from '../../db/schema'
-import { useAdminSession } from '../../utils/admin-session'
+import { db } from '#server/db'
+import { users } from '#server/db/schema'
+import { useAdminSession } from '#server/utils/admin-session'
 
 export default defineEventHandler(async (event) => {
   const session = await useAdminSession(event)

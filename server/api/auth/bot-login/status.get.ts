@@ -1,10 +1,10 @@
 import { eq } from 'drizzle-orm'
-import { db } from '../../../db'
-import { subscriptions } from '../../../db/schema'
-import { botLoginKey, type BotLoginEntry } from '../../../utils/bot-login'
-import { buildClientSessionUser, clientCookieOptions } from '../../../utils/client-session'
-import { upsertUserFromTelegram, userToJwtPayload } from '../../../utils/upsertUserFromTelegram'
-import { setSessionCookie } from '../../../utils/session-cookie'
+import { db } from '#server/db'
+import { subscriptions } from '#server/db/schema'
+import { botLoginKey, type BotLoginEntry } from '#server/utils/bot-login'
+import { buildClientSessionUser, clientCookieOptions } from '#server/utils/client-session'
+import { upsertUserFromTelegram, userToJwtPayload } from '#server/utils/upsertUserFromTelegram'
+import { setSessionCookie } from '#server/utils/session-cookie'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'cache-control', 'no-store')

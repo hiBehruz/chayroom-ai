@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm'
-import { db } from '../../db'
-import { users } from '../../db/schema'
-import { verifyTelegramLoginPayload, isAdminId, type TelegramLoginPayload } from '../../utils/telegram-auth'
-import { useAdminSession } from '../../utils/admin-session'
+import { db } from '#server/db'
+import { users } from '#server/db/schema'
+import { verifyTelegramLoginPayload, isAdminId, type TelegramLoginPayload } from '#server/utils/telegram-auth'
+import { useAdminSession } from '#server/utils/admin-session'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)

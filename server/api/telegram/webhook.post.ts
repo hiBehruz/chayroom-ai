@@ -1,4 +1,4 @@
-import { processTelegramUpdate, type TgUpdate } from '../../utils/process-telegram-update'
+import { processTelegramUpdate, type TgUpdate } from '#server/utils/process-telegram-update'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)

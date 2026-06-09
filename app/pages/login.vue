@@ -116,8 +116,7 @@ async function loginViaBot() {
       botTelegramUrl.value = res.url
       botPollState.value = 'waiting'
       void pollBotLoginStatus(res.token)
-      // tg:// opens Telegram app without navigating the browser tab away
-      window.location.href = res.tgUrl
+      window.open(res.url, '_blank', 'noopener,noreferrer')
     }
   } catch {
     stopBotPoll()

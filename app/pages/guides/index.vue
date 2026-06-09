@@ -348,6 +348,16 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
                 Bepul
               </span>
               <span
+                v-else-if="authStore.hasSubscription"
+                class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-green-200 bg-green-50 text-green-600"
+              >
+                <UIcon
+                  name="i-lucide-lock-open"
+                  class="size-3.5 shrink-0"
+                />
+                Obuna
+              </span>
+              <span
                 v-else
                 class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-red-200 bg-red-50 text-red-500"
               >

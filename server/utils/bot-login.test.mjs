@@ -24,10 +24,10 @@ test('parseBotLoginConfirmData returns token only for confirm payloads', () => {
   assert.equal(parseBotLoginConfirmData('other'), null)
 })
 
-test('buildBotLoginSuccessMessage returns web_app button without dialog', () => {
-  const { text, options } = buildBotLoginSuccessMessage('https://chayroom.uz', 'abc123')
+test('buildBotLoginSuccessMessage returns no inline keyboard', () => {
+  const { text, options } = buildBotLoginSuccessMessage()
   assert.equal(text, BOT_LOGIN_SUCCESS_MESSAGE)
-  assert.equal(options.reply_markup.inline_keyboard[0][0].web_app.url, 'https://chayroom.uz/auth/bot-callback?token=abc123')
+  assert.deepEqual(options, {})
 })
 
 test('buildPendingBotLoginPage keeps polling the tokenized status endpoint', () => {

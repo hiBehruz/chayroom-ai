@@ -14,23 +14,10 @@ export interface BotLoginEntry {
 export const BOT_LOGIN_SUCCESS_MESSAGE
   = '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀'
 
-export function buildBotLoginSuccessMessage(appUrl: string, token?: string): { text: string, options: Record<string, unknown> } {
-  const targetUrl = new URL('/', appUrl)
-  if (token) {
-    targetUrl.pathname = '/auth/bot-callback'
-    targetUrl.searchParams.set('token', token)
-  }
-
+export function buildBotLoginSuccessMessage(): { text: string, options: Record<string, unknown> } {
   return {
     text: BOT_LOGIN_SUCCESS_MESSAGE,
-    options: {
-      reply_markup: {
-        inline_keyboard: [[{
-          text: '🌐 Chayroom.uz ga kirish',
-          url: targetUrl.toString()
-        }]]
-      }
-    }
+    options: {}
   }
 }
 

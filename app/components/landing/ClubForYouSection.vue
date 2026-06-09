@@ -31,7 +31,7 @@ onMounted(() => {
   gsap.registerPlugin(ScrollTrigger)
 
   gsap.from(sectionRef.value!.querySelectorAll('.cfy-item'), {
-    scrollTrigger: { trigger: sectionRef.value, start: 'top 80%', once: true },
+    scrollTrigger: { trigger: sectionRef.value, start: 'top bottom', once: true },
     y: 20,
     opacity: 0,
     duration: 0.65,
@@ -48,11 +48,11 @@ onMounted(() => {
     ref="sectionRef"
     class="pt-0 pb-20 -mt-2 max-md:pb-14"
   >
-    <div class="w-[1240px] max-w-[calc(100vw-40px)] mx-auto px-0 max-md:px-5">
+    <div class="w-[1240px] max-w-[calc(100vw-48px)] mx-auto px-0 max-md:px-5">
       <div class="grid grid-cols-[1fr_1.3fr] gap-20 items-start max-lg:grid-cols-[1fr_1.2fr] max-lg:gap-14 max-md:grid-cols-1 max-md:gap-10">
         <!-- Left: sticky title -->
         <div class="md:sticky md:top-28">
-          <h2 class="text-[40px] font-bold leading-[1.15] tracking-tight text-[#14161f] max-lg:text-[34px] max-md:text-[28px] max-md:leading-[30.8px] max-md:tracking-[-0.56px]">
+          <h2 class="text-[40px] font-bold leading-[1.15] tracking-tight text-[#14161f] max-lg:text-[34px] max-md:text-[26px] max-md:leading-[1.2]">
             Bizning club sen uchun, agar...
           </h2>
           <a

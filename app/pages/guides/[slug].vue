@@ -535,8 +535,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
         <!-- Cover image -->
         <div
           v-if="guide.coverUrl && !coverError"
-          class="mb-8 rounded-2xl overflow-hidden"
-          :style="isMiniApp ? 'width:100%;height:200px' : 'width:882px;max-width:100%;height:400px'"
+          class="mb-8 w-full aspect-video rounded-2xl overflow-hidden"
         >
           <img
             :src="guide.coverUrl"

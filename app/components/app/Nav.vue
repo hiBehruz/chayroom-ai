@@ -8,8 +8,7 @@ const SECTION_SCROLL_KEY = 'cx-scroll-target'
 
 const navLinks = [
   { label: 'Panel', href: '/dashboard' },
-  { label: 'Tariflar', href: '#pricing' },
-  { label: 'FAQ', href: '#faq' }
+  { label: 'Tariflar', href: '#pricing' }
 ]
 
 function isActive(href: string) {
@@ -91,7 +90,7 @@ onUnmounted(() => {
 <template>
   <div
     :class="[
-      'nav-scroll-shell sticky top-0 z-10000 px-5 py-3',
+      'nav-scroll-shell sticky top-0 z-[10000] px-5 py-3',
       scrolled ? 'nav-scroll-shell--scrolled' : ''
     ]"
   >
@@ -104,12 +103,11 @@ onUnmounted(() => {
         :prefetch="false"
         class="flex items-center gap-2.5 shrink-0 hover:opacity-80 transition-opacity duration-200"
       >
-        <span class="nav-logo-mark">
-          <UIcon
-            name="i-ph-brain-fill"
-            class="size-[17px]"
-          />
-        </span>
+        <img
+          src="/chayroom-favicon.ico"
+          alt="Chayroom AI"
+          class="nav-logo-mark"
+        >
         <span class="nav-text text-[28px] font-extrabold whitespace-nowrap">
           Chayroom AI Club
         </span>
@@ -162,10 +160,12 @@ onUnmounted(() => {
               class="size-8 rounded-full object-cover shrink-0"
               alt=""
             >
-            <AppPixelAgentAvatar
+            <div
               v-else
-              :variant="authStore.resolvedAgentVariant"
-            />
+              class="size-8 rounded-full bg-[#3480f1] flex items-center justify-center text-white text-[13px] font-bold shrink-0"
+            >
+              {{ (authStore.user.first_name?.[0] ?? '').toUpperCase() }}
+            </div>
             <div class="flex flex-col items-start gap-0.5">
               <span class="text-[13px] font-semibold text-white leading-none">{{ authStore.displayName || authStore.user.first_name }}</span>
               <span class="text-[11px] text-white/60 leading-none">Profil</span>
@@ -202,35 +202,24 @@ onUnmounted(() => {
               class="size-8 rounded-full object-cover shrink-0"
               alt=""
             >
-            <AppPixelAgentAvatar
+            <div
               v-else
-              :variant="authStore.resolvedAgentVariant"
-            />
+              class="size-8 rounded-full bg-[#3480f1] flex items-center justify-center text-white text-[13px] font-bold shrink-0"
+            >
+              {{ (authStore.user.first_name?.[0] ?? '').toUpperCase() }}
+            </div>
           </NuxtLink>
         </template>
-        <template v-else>
-          <NuxtLink
-            to="/login"
-            class="nav-login-btn"
-          >
-            Kirish
-          </NuxtLink>
-        </template>
-
         <!-- Hamburger -->
         <button
-          class="hamburger-button relative z-10000 flex items-center justify-center w-9 h-9 rounded-xl hover:bg-[#f2f2f0] transition-colors duration-200 focus:outline-none active:scale-90"
-          style="transition: background 0.2s ease, transform 0.18s cubic-bezier(0.34,1.56,0.64,1)"
+          class="group flex items-center justify-center w-9 h-9 rounded-xl hover:bg-[#f2f2f0] transition-colors duration-200 focus:outline-none active:scale-90"
           :aria-label="isMobileMenuOpen ? 'Menyuni yopish' : 'Menyuni ochish'"
           @click="isMobileMenuOpen = !isMobileMenuOpen"
         >
-          <div
-            :class="['hamburger-icon', isMobileMenuOpen && 'is-open']"
-            aria-hidden="true"
-          >
-            <span class="hb-wrap hb-wrap-top"><span class="hb-bar" /></span>
-            <span class="hb-bar hb-mid" />
-            <span class="hb-wrap hb-wrap-bot"><span class="hb-bar" /></span>
+          <div class="grid justify-items-center gap-1.5" aria-hidden="true">
+            <span :class="['h-0.5 w-5 rounded-full bg-[#14161f] transition-all duration-300', isMobileMenuOpen ? 'rotate-45 translate-y-2' : '']" />
+            <span :class="['h-0.5 w-5 rounded-full bg-[#14161f] transition-all duration-300', isMobileMenuOpen ? 'scale-x-0' : '']" />
+            <span :class="['h-0.5 w-5 rounded-full bg-[#14161f] transition-all duration-300', isMobileMenuOpen ? '-rotate-45 -translate-y-2' : '']" />
           </div>
         </button>
       </div>
@@ -238,10 +227,15 @@ onUnmounted(() => {
 
     <!-- Mobile fullscreen menu -->
     <Teleport to="body">
-      <Transition :duration="0">
+      <Transition
+        enter-active-class="transition-all duration-[260ms] ease-out"
+        leave-active-class="transition-all duration-[200ms] ease-in"
+        enter-from-class="opacity-0 translate-x-full"
+        leave-to-class="opacity-0 translate-x-full"
+      >
         <div
           v-if="isMobileMenuOpen"
-          class="md:hidden fixed inset-0 bg-[#f7f5ef] z-[9999] flex flex-col items-center justify-center gap-1"
+          class="md:hidden fixed inset-x-0 bottom-0 top-[72px] bg-[#fffdf9] z-[9999] flex flex-col items-center justify-center gap-1"
         >
           <button
             class="text-[22px] font-semibold text-[#14161f] py-3 px-8 focus:outline-none active:scale-95"
@@ -275,9 +269,15 @@ onUnmounted(() => {
           <NuxtLink
             v-else
             to="/login"
-            class="text-[22px] font-semibold text-[#14161f] py-3 px-8"
+            class="nav-login-btn mt-4"
             @click="isMobileMenuOpen = false"
           >
+            <svg
+              viewBox="0 0 24 24"
+              class="w-4 h-4 fill-white shrink-0"
+            >
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z" />
+            </svg>
             Kirish
           </NuxtLink>
         </div>
@@ -287,6 +287,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+
 .dropdown-enter-active {
   transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.48, 0.64, 1);
 }
@@ -303,16 +304,13 @@ onUnmounted(() => {
 }
 
 .nav-logo-mark {
-  display: inline-flex;
+  display: inline-block;
   width: 32px;
   height: 32px;
-  align-items: center;
-  justify-content: center;
   border-radius: 9px;
-  color: #f5f0ea;
-  background: #0f0e16;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 1px 4px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
   flex-shrink: 0;
+  object-fit: cover;
 }
 
 .nav-text {
@@ -372,59 +370,6 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-.hamburger-icon {
-  position: relative;
-  width: 18px;
-  height: 14px;
-}
-.hb-wrap {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  top: calc(50% - 0.875px);
-  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.hb-wrap-top { transform: translateY(-4.5px); }
-.hb-wrap-bot { transform: translateY(4.5px); }
-
-.hamburger-button:hover .hb-wrap-top,
-.hamburger-button:hover .hb-wrap-bot,
-.hamburger-icon.is-open .hb-wrap-top,
-.hamburger-icon.is-open .hb-wrap-bot {
-  transform: translateY(0);
-}
-
-.hb-bar {
-  display: block;
-  width: 100%;
-  height: 1.75px;
-  background: #14161f;
-  border-radius: 1px;
-  transform-origin: center;
-  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.16s ease;
-}
-
-.hb-mid {
-  position: absolute;
-  left: 0;
-  top: calc(50% - 0.875px);
-  transition: transform 0.2s ease, opacity 0.14s ease;
-}
-
-.hamburger-button:hover .hb-wrap-top .hb-bar,
-.hamburger-icon.is-open .hb-wrap-top .hb-bar {
-  transform: rotate(45deg);
-}
-.hamburger-button:hover .hb-mid,
-.hamburger-icon.is-open .hb-mid {
-  opacity: 0;
-  transform: scaleX(0);
-}
-.hamburger-button:hover .hb-wrap-bot .hb-bar,
-.hamburger-icon.is-open .hb-wrap-bot .hb-bar {
-  transform: rotate(-45deg);
-}
 
 .nav-login-btn {
   display: inline-flex;

@@ -41,35 +41,25 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
       <!-- Paywall CTA — tepada, obuna yo'q bo'lganda -->
       <div
         v-if="!hasCourseAccess"
-        class="mb-8 rounded-2xl bg-[#f7f7f5] px-6 py-5 flex items-center justify-between gap-6 paywall-enter sticky top-20 z-10 max-w-full mx-auto max-md:flex-col max-md:px-5 max-md:py-4 max-md:text-center max-md:gap-3"
+        class="mb-8 w-full max-w-lg p-6 rounded-2xl bg-[#f7f7f5] shadow-xl text-center sticky top-20 z-10 mx-auto"
       >
-        <div class="flex flex-col max-md:items-center">
-          <h2 class="text-[20px] font-semibold text-[#1a1a1a] mb-1 leading-tight">
-            O'quv dashboardingni och
-          </h2>
-          <p class="text-[13px] text-cx-muted leading-snug">
-            Barcha kurslarga kirish, progress kuzatuvi va sertifikatlarga ega bo'ling.
-          </p>
-        </div>
-        <div class="flex flex-col items-end gap-1.5 shrink-0 max-md:items-center">
-          <button
-            class="hero-link-btn hero-link-btn--blue paywall-btn"
-            @click="isAccessModalOpen = true"
-          >
-            <UIcon
-              name="i-lucide-sparkles"
-              class="size-4 shrink-0"
-            />
-            <span>To'liq kirish huquqini olish</span>
-            <UIcon
-              name="i-lucide-arrow-right"
-              class="size-3.5 shrink-0"
-            />
-          </button>
-          <p class="text-[12px] text-cx-muted">
-            Telegram orqali to'lov. Barcha kurs va materiallarga kirish.
-          </p>
-        </div>
+        <h2 class="text-[18px] font-bold text-[#1a1a1a]">
+          O'quv panelingizni oching
+        </h2>
+        <p class="mt-2 text-[13px] text-cx-muted leading-relaxed">
+          Kurslar, qo'llanmalar va yopiq Chayroom AI Club ga to'liq kirish.
+        </p>
+        <button
+          class="mt-5 w-full py-2.5 rounded-xl font-semibold text-[13px] bg-cx-blue text-white hover:opacity-90 hover:shadow-lg transition-all flex items-center justify-center gap-2"
+          @click="isAccessModalOpen = true"
+        >
+          <UIcon name="i-lucide-sparkles" class="size-3.5 shrink-0" />
+          To'liq kirish huquqini olish
+          <UIcon name="i-lucide-arrow-right" class="size-3.5 shrink-0" />
+        </button>
+        <p class="mt-3 text-[12px] text-cx-muted">
+          Telegram orqali to'lov. Barcha kurs va materiallarga kirish.
+        </p>
       </div>
 
       <!-- Dashboard content — deactive when no subscription -->
@@ -227,9 +217,9 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
 <style scoped>
 /* Paywall CTA button */
 .paywall-btn {
-  gap: 8px;
-  padding: 12px 20px;
-  font-size: 16px;
+  gap: 6px;
+  padding: 9px 16px;
+  font-size: 14px;
   text-decoration: none;
 }
 .paywall-btn:hover  { gap: 14px; }
@@ -273,17 +263,4 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
   box-shadow: inset 0 0 0 4px rgba(255,253,249,0.7);
 }
 
-.paywall-enter {
-  animation:
-    paywall-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both,
-    paywall-float 5s ease-in-out 0.55s infinite;
-}
-@keyframes paywall-in {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes paywall-float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-6px); }
-}
 </style>

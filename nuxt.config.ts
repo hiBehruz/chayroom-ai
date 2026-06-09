@@ -12,7 +12,9 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      link: [],
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/chayroom-favicon.ico' }
+      ],
       script: [
         { src: 'https://telegram.org/js/telegram-web-app.js' }
       ]

@@ -107,7 +107,14 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
         <div class="flex flex-col gap-3">
           <!-- Avatar + name -->
           <div class="flex flex-col items-center gap-2 pb-2">
+            <img
+              v-if="user?.photo_url"
+              :src="user.photo_url"
+              alt=""
+              class="size-20 rounded-full object-cover"
+            >
             <div
+              v-else
               class="size-20 rounded-full flex items-center justify-center text-white font-black text-[26px] tracking-tight"
               style="background:linear-gradient(135deg,#f97316,#ef4444)"
             >
@@ -376,7 +383,14 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
       <div class="mx-auto w-[1240px] max-w-[calc(100vw-40px)] px-0 pb-14 pt-12 max-md:px-4">
         <!-- User header -->
         <div class="flex flex-col items-center text-center mb-8">
+          <img
+            v-if="user?.photo_url"
+            :src="user.photo_url"
+            alt=""
+            class="w-24 h-24 rounded-full object-cover mb-4"
+          >
           <div
+            v-else
             class="w-24 h-24 rounded-full flex items-center justify-center text-white font-black text-[30px] tracking-tight mb-4"
             style="background:linear-gradient(135deg,#f97316,#ef4444)"
           >

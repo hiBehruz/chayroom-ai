@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Chayroom AI teapot logo">
+  <rect width="1024" height="1024" fill="#ffffff"/>
+  <g fill="#00152c">
+    <!-- teapot body -->
+    <path d="M335 367 C388 255 636 255 689 367 L760 367 C813 283 914 334 910 423 C906 507 823 544 795 600 C782 627 746 608 765 579 C792 537 868 505 876 430 C884 358 807 345 762 431 L722 506 C715 626 639 724 512 724 C385 724 309 626 302 506 L262 431 C217 345 140 358 148 430 C156 505 232 537 259 579 C278 608 242 627 229 600 C201 544 118 507 114 423 C110 334 211 283 264 367 Z"/>
+    <!-- lid -->
+    <path d="M356 332 C400 270 624 270 668 332 C681 351 672 370 648 370 L376 370 C352 370 343 351 356 332 Z"/>
+    <circle cx="512" cy="239" r="42"/>
+    <path d="M482 285 C482 270 542 270 542 285 L542 318 L482 318 Z"/>
+    <!-- base -->
+    <rect x="338" y="737" width="348" height="54" rx="24"/>
+  </g>
+
+  <!-- white separation lines -->
+  <path d="M365 382 L659 382" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
+  <path d="M353 723 L671 723" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- front pentagon frame -->
+  <path d="M512 448 L643 529 C662 541 671 563 665 584 L621 692 C614 714 594 728 571 728 L453 728 C430 728 410 714 403 692 L359 584 C353 563 362 541 381 529 Z" fill="none" stroke="#ffffff" stroke-width="26" stroke-linejoin="round"/>
+
+  <!-- AI brain chip icon -->
+  <g fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <!-- brain left -->
+    <path d="M497 506 C476 483 434 492 431 527 C403 526 386 553 398 578 C374 596 385 634 418 635 C417 668 453 685 476 663 C485 681 512 676 512 651 L512 521 C512 512 506 506 497 506 Z"/>
+    <!-- brain right -->
+    <path d="M527 506 C548 483 590 492 593 527 C621 526 638 553 626 578 C650 596 639 634 606 635 C607 668 571 685 548 663 C539 681 512 676 512 651 L512 521 C512 512 518 506 527 506 Z"/>
+    <!-- chip -->
+    <rect x="459" y="553" width="106" height="95" rx="12" fill="#00152c"/>
+    <path d="M459 577 L431 577 M459 624 L431 624 M565 577 L593 577 M565 624 L593 624 M486 553 L486 525 M538 553 L538 525 M486 648 L486 676 M538 648 L538 676"/>
+  </g>
+  <text x="512" y="622" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="50" font-weight="700" fill="#ffffff">AI</text>
+</svg>

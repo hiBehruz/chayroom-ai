@@ -8,12 +8,11 @@
             :prefetch="false"
             class="inline-flex items-center gap-3 text-[#111318]"
           >
-            <span class="footer-logo-mark">
-              <UIcon
-                name="i-lucide-sparkles"
-                class="size-5"
-              />
-            </span>
+            <img
+              src="~/assets/icons/chayroom-ai-teapot-logo.svg"
+              alt="Chayroom AI"
+              class="footer-logo-mark"
+            >
             <span class="text-[28px] font-semibold tracking-tight leading-none">
               Chayroom AI Club
             </span>
@@ -109,14 +108,13 @@ const socials = [
 }
 
 .footer-logo-mark {
-  display: inline-flex;
+  display: inline-block;
   width: 34px;
   height: 34px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  color: #fffdf9;
-  background: #111318;
+  border-radius: 9px;
+  overflow: hidden;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .footer-link-col {

@@ -2,11 +2,11 @@
 const open = defineModel<boolean>({ default: false })
 
 const accessFeatures = [
-  'Все курсы и гайды',
-  'Закрытый чат AI Room Club',
-  'Разборы AI-инструментов',
-  'Пошаговые инструкции',
-  'Доступ к новым материалам'
+  'Barcha kurslar va qo\'llanmalar',
+  'Yopiq Chayroom AI Club chat',
+  'AI vositalarini tahlil qilish',
+  'Bosqichma-bosqich ko\'rsatmalar',
+  'Yangi materiallarga kirish'
 ]
 
 const config = useRuntimeConfig()
@@ -125,10 +125,10 @@ const tributeUrl = computed(() => config.public.tributeUrl || 'https://t.me/trib
               id="access-modal-title"
               class="text-[22px] font-extrabold leading-tight tracking-tight text-[#202023]"
             >
-              Получи доступ
+              Kirish huquqini oling
             </h2>
             <p class="mt-2 text-[15px] leading-tight text-[#707073]">
-              Оплата через Tribute в Telegram
+              Telegram orqali Tribute orqali to'lov
             </p>
           </div>
 
@@ -152,7 +152,7 @@ const tributeUrl = computed(() => config.public.tributeUrl || 'https://t.me/trib
             rel="noopener noreferrer"
             class="modal-buy-btn mb-2"
           >
-            Купить в Telegram
+            Telegramda sotib olish
             <UIcon
               name="i-lucide-arrow-right"
               class="size-4 shrink-0"
@@ -160,7 +160,7 @@ const tributeUrl = computed(() => config.public.tributeUrl || 'https://t.me/trib
           </a>
 
           <p class="text-center text-[13px] leading-tight text-[#737376]">
-            Доступ активируется автоматически после оплаты
+            Kirish to'lovdan so'ng avtomatik faollashadi
           </p>
         </div>
       </div>
@@ -189,34 +189,4 @@ const tributeUrl = computed(() => config.public.tributeUrl || 'https://t.me/trib
 .modal-buy-btn:hover  { gap: 14px; opacity: 0.9; transform: scale(1.04); background: #2570e0; }
 .modal-buy-btn:active { opacity: 0.7; transform: scale(0.98); }
 
-.modal-card {
-  animation:
-    modal-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both,
-    modal-float 5s ease-in-out 0.45s infinite;
-}
-
-@keyframes modal-in {
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes modal-float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-6px); }
-}
-
-.access-modal-icon {
-  animation: access-icon-float 2.6s ease-in-out infinite;
-  transform-origin: center;
-}
-
-@keyframes access-icon-float {
-  0%, 100% {
-    transform: translateY(0) rotate(-2deg) scale(1);
-  }
-
-  50% {
-    transform: translateY(-5px) rotate(2deg) scale(1.04);
-  }
-}
 </style>

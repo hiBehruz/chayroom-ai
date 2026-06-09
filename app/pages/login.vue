@@ -82,7 +82,6 @@ async function pollBotLoginStatus(token: string) {
     if (res.status === 'authenticated') {
       clearPendingBotLoginToken({ sessionStorage, localStorage })
       stopBotPoll()
-      await authStore.syncMe()
       await goAfterLogin()
       return
     }
@@ -99,7 +98,7 @@ async function pollBotLoginStatus(token: string) {
 
   botPollTimer = window.setTimeout(() => {
     void pollBotLoginStatus(token)
-  }, 1500)
+  }, 500)
 }
 
 async function loginViaBot() {

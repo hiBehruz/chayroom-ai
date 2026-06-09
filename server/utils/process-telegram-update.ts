@@ -75,9 +75,12 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
           { id: from.id, first_name: from.first_name || 'Foydalanuvchi', last_name: from.last_name, username: from.username }
         )
       )
+      console.log('[bot-login] key set to authenticated, userId:', from.id)
       const { text: successText, options: successOptions } = buildBotLoginSuccessMessage()
       await sendTelegramMessage(botToken, chatId, successText, successOptions)
+      console.log('[bot-login] success message sent to chatId:', chatId)
     } else if (botToken) {
+      console.warn('[bot-login] cannot complete login, entry.status:', entry?.status, 'userId:', from.id)
       await sendTelegramMessage(botToken, chatId, '⚠️ Kirish havolasi eskirgan. Saytda qaytadan urinib ko\'ring.')
     }
     return

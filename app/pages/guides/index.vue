@@ -349,13 +349,22 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
               </span>
               <span
                 v-else-if="authStore.hasSubscription"
-                class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-green-200 bg-green-50 text-green-600"
+                class="guide-meta-chip inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-[#86efac] bg-[#f0fdf4] text-[#16a34a]"
               >
-                <UIcon
-                  name="i-lucide-lock-open"
-                  class="size-3.5 shrink-0"
-                />
-                Obuna
+                <svg
+                  class="size-3 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+                  />
+                </svg>
+                Obuna asosida
               </span>
               <span
                 v-else
@@ -365,7 +374,7 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
                   name="i-lucide-lock"
                   class="size-3.5 shrink-0"
                 />
-                По подписке
+                Obuna asosida
               </span>
             </div>
 

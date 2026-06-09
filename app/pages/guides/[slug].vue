@@ -287,17 +287,6 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
               O'chirish
             </button>
           </div>
-          <button
-            v-else
-            class="guide-pill-button max-md:justify-center"
-            @click="copyGuideLink"
-          >
-            <UIcon
-              name="i-lucide-link"
-              class="size-5"
-            />
-            Copy Link
-          </button>
         </div>
 
         <!-- ── EDIT MODE ──────────────────────────────────── -->
@@ -575,13 +564,23 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
           <span
             v-else-if="hasSubscription"
             class="guide-meta-chip"
-            style="background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;"
+            style="background: #f0fdf4; color: #16a34a; border: 1px solid #86efac;"
           >
-            <UIcon
-              name="i-lucide-lock-open"
-              class="size-3"
-            />
-            Obuna
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="size-3 shrink-0"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+              />
+            </svg>
+            Obuna asosida
           </span>
           <span
             v-else
@@ -592,7 +591,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
               name="i-lucide-lock-keyhole"
               class="size-3"
             />
-            По подписке
+            Obuna asosida
           </span>
         </div>
 

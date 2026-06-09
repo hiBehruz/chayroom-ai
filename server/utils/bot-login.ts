@@ -27,7 +27,7 @@ export function buildBotLoginSuccessMessage(appUrl: string, token?: string): { t
       reply_markup: {
         inline_keyboard: [[{
           text: '🌐 Chayroom.uz ga kirish',
-          web_app: { url: targetUrl.toString() }
+          url: targetUrl.toString()
         }]]
       }
     }

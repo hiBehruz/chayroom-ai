@@ -311,10 +311,21 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
 
           <div
             v-if="botPollState === 'waiting'"
-            class="mt-2.5 flex items-center justify-center gap-2 text-[13px] text-[#6f7480]"
+            class="mt-2.5 space-y-2"
           >
-            <span class="size-3.5 shrink-0 rounded-full border-2 border-[#e0e0e4] border-t-[#229ED9] animate-spin" />
-            Bot tasdig'ini kutmoqda...
+            <div class="flex items-center justify-center gap-2 text-[13px] text-[#6f7480]">
+              <span class="size-3.5 shrink-0 rounded-full border-2 border-[#e0e0e4] border-t-[#229ED9] animate-spin" />
+              Bot tasdig'ini kutmoqda...
+            </div>
+            <a
+              v-if="botTelegramUrl"
+              :href="botTelegramUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center gap-1.5 text-[12px] text-[#3480f1] hover:underline"
+            >
+              Telegram ochilmadimi? Bu yerga bosing
+            </a>
           </div>
         </template>
 

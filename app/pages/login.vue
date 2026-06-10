@@ -107,6 +107,9 @@ async function loginViaBot() {
   resetBotState()
   botPollState.value = 'opening'
 
+  // Open window synchronously before await — iOS Safari blocks window.open after async calls
+  const win = import.meta.client ? window.open('', '_blank') : null
+
   try {
     const request = buildBotLoginStartRequest()
     const res = await $fetch<{ url: string, tgUrl: string, token: string }>(request.url, request.options)
@@ -116,9 +119,14 @@ async function loginViaBot() {
       botTelegramUrl.value = res.url
       botPollState.value = 'waiting'
       void pollBotLoginStatus(res.token)
-      window.open(res.url, '_blank', 'noopener,noreferrer')
+      if (win) {
+        win.location.href = res.url
+      } else {
+        window.open(res.url, '_blank', 'noopener,noreferrer')
+      }
     }
   } catch {
+    win?.close()
     stopBotPoll()
     authError.value = 'Bot orqali kirishda xatolik yuz berdi. Qaytadan urinib ko\'ring.'
   }

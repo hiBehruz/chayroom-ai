@@ -24,7 +24,8 @@ export const integrationEnv = {
   NUXT_SESSION_PASSWORD: 'integration-user-session-password-32-chars',
   NUXT_JWT_SECRET: 'integration-jwt-secret-password-32-chars',
   NUXT_PUBLIC_TELEGRAM_BOT_USERNAME: 'integration_test_bot',
-  NUXT_PUBLIC_APP_URL: 'http://127.0.0.1'
+  NUXT_PUBLIC_APP_URL: 'http://127.0.0.1',
+  NUXT_TELEGRAM_WEBHOOK_SECRET: 'integration-webhook-secret'
 } as const
 
 export async function setupIntegrationServer() {

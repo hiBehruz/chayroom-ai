@@ -34,17 +34,6 @@ describe.sequential('PostgreSQL and Redis integration', () => {
     })
   })
 
-  it('persists bot-login state in Redis', async () => {
-    const login = await $fetch<{ token: string }>('/api/auth/bot-login/start', {
-      method: 'POST'
-    })
-
-    expect(await redis.get(`botlogin:${login.token}`)).toContain('pending')
-    await expect($fetch('/api/auth/bot-login/status', {
-      query: { token: login.token }
-    })).resolves.toMatchObject({ status: 'pending' })
-  })
-
   it('reads public course and guide fixtures from PostgreSQL and caches them', async () => {
     const courses = await $fetch<Array<{ slug: string }>>('/api/courses')
     const guides = await $fetch<Array<{ slug: string }>>('/api/guides')

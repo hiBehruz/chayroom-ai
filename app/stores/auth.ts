@@ -209,8 +209,6 @@ export const useAuthStore = defineStore('auth', () => {
     userCookie.value = null
     clearSubscription()
     if (import.meta.client) {
-      sessionStorage.removeItem('bot_login_token')
-      localStorage.removeItem('bot_login_token')
       await $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
     }
   }

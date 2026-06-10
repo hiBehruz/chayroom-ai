@@ -17,7 +17,7 @@ function secret() {
 export async function signJwt(payload: JwtPayload): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('2d')
+    .setExpirationTime('7d')
     .setIssuedAt()
     .sign(secret())
 }

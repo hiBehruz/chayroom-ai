@@ -3,7 +3,7 @@ import type { JwtPayload } from './jwt'
 import { signJwt, verifyJwt } from './jwt'
 
 const COOKIE_NAME = 'chayroom_session'
-const MAX_AGE = 2 * 24 * 60 * 60
+const MAX_AGE = 7 * 24 * 60 * 60
 
 export async function setSessionCookie(event: H3Event, payload: JwtPayload): Promise<void> {
   const token = await signJwt(payload)

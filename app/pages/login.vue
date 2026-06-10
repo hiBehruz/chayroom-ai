@@ -1,7 +1,7 @@
 <!-- app/pages/login.vue -->
 <script setup lang="ts">
-import type { TelegramUser } from '../stores/auth'
-import { resolveLoginMountAction, resolvePostLoginTarget } from '../utils/login-flow.mjs'
+import type { TelegramUser } from '~/stores/auth'
+import { resolveLoginMountAction, resolvePostLoginTarget } from '~/utils/login-flow.mjs'
 
 const authStore = useAuthStore()
 const route = useRoute()

@@ -1,4 +1,4 @@
-import { requireAdmin } from '../utils/admin-session'
+import { requireAdmin } from '#server/utils/admin-session'
 
 const SYSTEM_PROMPT = 'Translate the HTML content from Russian to Uzbek. Preserve all HTML tags exactly as they are. Only translate the text content inside the tags. Return only the translated HTML, no explanations.'
 

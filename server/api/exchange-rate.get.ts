@@ -1,5 +1,5 @@
-import { publicApiCacheNames } from '../utils/cache'
-import { fetchUsdRate } from '../utils/exchange-rate'
+import { publicApiCacheNames } from '#server/utils/cache'
+import { fetchUsdRate } from '#server/utils/exchange-rate'
 
 export default defineCachedEventHandler(async () => {
   return { rate: await fetchUsdRate() }

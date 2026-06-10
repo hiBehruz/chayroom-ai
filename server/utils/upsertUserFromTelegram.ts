@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
-import { db } from '../db'
-import { users } from '../db/schema'
+import { db } from '#server/db'
+import { users } from '#server/db/schema'
 import { isAdminId } from './telegram-auth'
 import type { JwtPayload } from './jwt'
 

@@ -1,7 +1,7 @@
 import type { H3Event } from 'h3'
 import { eq } from 'drizzle-orm'
-import { db } from '../db'
-import { users } from '../db/schema'
+import { db } from '#server/db'
+import { users } from '#server/db/schema'
 
 interface AdminSessionData {
   telegramId?: string

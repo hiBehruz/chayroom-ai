@@ -6,7 +6,9 @@ import { upsertUserFromTelegram, userToJwtPayload } from '#server/utils/upsertUs
 import { setSessionCookie } from '#server/utils/session-cookie'
 import { sendTelegramMessage } from '#server/utils/telegram'
 import { buildMiniAppLoginUrl, buildPlatformMenuButton, setTelegramChatMenuButton } from '#server/utils/telegram-bot.js'
-import { BOT_LOGIN_SUCCESS_MESSAGE } from '#server/utils/bot-login'
+
+const LOGIN_SUCCESS_MESSAGE
+  = '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -47,7 +49,7 @@ export default defineEventHandler(async (event) => {
         }
       })
     } else {
-      await sendTelegramMessage(botToken, tgUser.id, BOT_LOGIN_SUCCESS_MESSAGE, {
+      await sendTelegramMessage(botToken, tgUser.id, LOGIN_SUCCESS_MESSAGE, {
         reply_markup: {
           inline_keyboard: [
             [{ text: '🌐 Panelni ochish', web_app: { url: buildMiniAppLoginUrl(config.public.appUrl || 'https://chayroom.uz') } }]

@@ -55,3 +55,19 @@ export function clearPendingBotLoginToken({ sessionStorage, localStorage }) {
   sessionStorage?.removeItem(BOT_LOGIN_TOKEN_KEY)
   localStorage?.removeItem(BOT_LOGIN_TOKEN_KEY)
 }
+
+/**
+ * Decide what the login page should do on mount.
+ * Order matters: a fresh Telegram auth payload in the URL must win over an
+ * existing session so users can switch accounts (otherwise the old cookie
+ * short-circuits to a redirect and the new id&hash is ignored).
+ *
+ * @param {{ isMiniApp: boolean, hasAuthPayload: boolean, hasSession: boolean }} input
+ * @returns {'mini-app' | 'process-auth' | 'redirect' | 'show-widget'}
+ */
+export function resolveLoginMountAction({ isMiniApp, hasAuthPayload, hasSession }) {
+  if (isMiniApp) return 'mini-app'
+  if (hasAuthPayload) return 'process-auth'
+  if (hasSession) return 'redirect'
+  return 'show-widget'
+}

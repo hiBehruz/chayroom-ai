@@ -29,7 +29,7 @@ onMounted(() => {
     return
   }
 
-  // JWT cookie may be set (e.g. after bot-callback redirect) without cx-sub cookie.
+  // The httpOnly JWT cookie may be present without an up-to-date cx-sub cookie.
   // Sync from server so subscription state is correct on first render.
   // Skip on /login: the login flow calls authStore.login() shortly after mount, and
   // a concurrent syncMe() that returns null user would call logout() and race with it.

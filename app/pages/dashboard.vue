@@ -6,7 +6,7 @@ const { isMiniApp } = useTelegramApp()
 authStore.restoreFromStorage()
 
 // Fetch from server so SSR renders with correct subscription state.
-// Needed when bot-callback login sets only the JWT cookie, not cx-sub.
+// Needed when the httpOnly JWT cookie is set without an up-to-date cx-sub cookie.
 const { data: meData } = await useAsyncData('dashboard-me', () => $fetch('/api/auth/me'))
 if (meData.value?.hasSubscription && !authStore.hasSubscription) {
   authStore.activateSubscription(meData.value.subscription ?? undefined)

@@ -177,11 +177,6 @@ function onEditTagKeydown(event: KeyboardEvent) {
   addEditTag()
 }
 
-async function copyGuideLink() {
-  if (!import.meta.client) return
-  await navigator.clipboard?.writeText(window.location.href)
-}
-
 const deleteConfirmOpen = ref(false)
 const deleting = ref(false)
 

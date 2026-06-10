@@ -53,9 +53,15 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
           class="mt-5 w-full py-2.5 rounded-xl font-semibold text-[13px] bg-cx-blue text-white hover:opacity-90 hover:shadow-lg transition-all flex items-center justify-center gap-2"
           @click="isAccessModalOpen = true"
         >
-          <UIcon name="i-lucide-sparkles" class="size-3.5 shrink-0" />
+          <UIcon
+            name="i-lucide-sparkles"
+            class="size-3.5 shrink-0"
+          />
           To'liq kirish huquqini olish
-          <UIcon name="i-lucide-arrow-right" class="size-3.5 shrink-0" />
+          <UIcon
+            name="i-lucide-arrow-right"
+            class="size-3.5 shrink-0"
+          />
         </button>
         <p class="mt-3 text-[12px] text-cx-muted">
           Telegram orqali to'lov. Barcha kurs va materiallarga kirish.
@@ -262,5 +268,4 @@ useSeoMeta({ title: 'Panel — Chayroom AI' })
   transform: rotate(45deg);
   box-shadow: inset 0 0 0 4px rgba(255,253,249,0.7);
 }
-
 </style>

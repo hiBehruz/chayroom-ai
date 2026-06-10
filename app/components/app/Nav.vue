@@ -216,7 +216,10 @@ onUnmounted(() => {
           :aria-label="isMobileMenuOpen ? 'Menyuni yopish' : 'Menyuni ochish'"
           @click="isMobileMenuOpen = !isMobileMenuOpen"
         >
-          <div class="grid justify-items-center gap-1.5" aria-hidden="true">
+          <div
+            class="grid justify-items-center gap-1.5"
+            aria-hidden="true"
+          >
             <span :class="['h-0.5 w-5 rounded-full bg-[#14161f] transition-all duration-300', isMobileMenuOpen ? 'rotate-45 translate-y-2' : '']" />
             <span :class="['h-0.5 w-5 rounded-full bg-[#14161f] transition-all duration-300', isMobileMenuOpen ? 'scale-x-0' : '']" />
             <span :class="['h-0.5 w-5 rounded-full bg-[#14161f] transition-all duration-300', isMobileMenuOpen ? '-rotate-45 -translate-y-2' : '']" />
@@ -287,7 +290,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-
 .dropdown-enter-active {
   transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.48, 0.64, 1);
 }
@@ -369,7 +371,6 @@ onUnmounted(() => {
 .backdrop-fade-leave-to {
   opacity: 0;
 }
-
 
 .nav-login-btn {
   display: inline-flex;

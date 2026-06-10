@@ -89,46 +89,107 @@ function scrollToFeatures() {
             class="h-[420px] w-auto object-contain max-[734px]:h-64"
           >
           <!-- Spout smoke -->
-          <div class="hero-smoke hero-smoke--spout" aria-hidden="true">
+          <div
+            class="hero-smoke hero-smoke--spout"
+            aria-hidden="true"
+          >
             <span class="hero-smoke-puff hero-smoke-puff-1" />
             <span class="hero-smoke-puff hero-smoke-puff-2" />
             <span class="hero-smoke-puff hero-smoke-puff-3" />
           </div>
 
           <!-- Lid smoke -->
-          <div class="hero-smoke hero-smoke--lid" aria-hidden="true">
+          <div
+            class="hero-smoke hero-smoke--lid"
+            aria-hidden="true"
+          >
             <span class="hero-smoke-puff hero-smoke-puff-1" />
             <span class="hero-smoke-puff hero-smoke-puff-2" />
             <span class="hero-smoke-puff hero-smoke-puff-3" />
           </div>
 
-          <div class="hero-ai-icons" aria-hidden="true">
+          <div
+            class="hero-ai-icons"
+            aria-hidden="true"
+          >
             <span class="hero-ai-icon hero-ai-icon-1">
-              <UIcon name="i-lucide-brain-circuit" class="hero-ai-symbol" />
+              <UIcon
+                name="i-lucide-brain-circuit"
+                class="hero-ai-symbol"
+              />
             </span>
             <span class="hero-ai-icon hero-ai-icon-2">
-              <UIcon name="i-lucide-bot" class="hero-ai-symbol" />
+              <UIcon
+                name="i-lucide-bot"
+                class="hero-ai-symbol"
+              />
             </span>
             <span class="hero-ai-icon hero-ai-icon-3">
-              <UIcon name="i-lucide-sparkles" class="hero-ai-symbol" />
+              <UIcon
+                name="i-lucide-sparkles"
+                class="hero-ai-symbol"
+              />
             </span>
             <span class="hero-ai-icon hero-ai-icon-4">
-              <UIcon name="i-lucide-cpu" class="hero-ai-symbol" />
+              <UIcon
+                name="i-lucide-cpu"
+                class="hero-ai-symbol"
+              />
             </span>
             <span class="hero-ai-icon hero-ai-icon-5">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="hero-ai-symbol"><g fill="none"><path fill="currentColor" d="M13.604 2.006a1 1 0 0 1 .89 1.099l-.643 6.104l3.868-4.834a1 1 0 0 1 1.562 1.25l-4.19 5.237l5.68-1.336a1.001 1.001 0 0 1 .458 1.948l-3.77.886l3.715.656a1 1 0 1 1-.348 1.968l-4.901-.865l4.225 3.622a.999.999 0 1 1-1.3 1.518l-2.324-1.991l1.331 2.217a1 1 0 0 1-1.715 1.03l-2.992-4.988l-.657 5.59a1 1 0 0 1-1.986-.234l.556-4.732l-3.256 4.44a1 1 0 0 1-1.614-1.183l2.564-3.497l-3.242 1.947a1 1 0 0 1-1.03-1.715l4.693-2.817L2.948 13a1 1 0 0 1 .105-1.998l6.218.327L3.901 7.3A1 1 0 1 1 5.1 5.7l4.446 3.335l-2.93-5.57a1 1 0 0 1 1.769-.93l3.466 6.584l.655-6.223a1 1 0 0 1 1.098-.89"/></g></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="hero-ai-symbol"
+              ><g fill="none"><path
+                fill="currentColor"
+                d="M13.604 2.006a1 1 0 0 1 .89 1.099l-.643 6.104l3.868-4.834a1 1 0 0 1 1.562 1.25l-4.19 5.237l5.68-1.336a1.001 1.001 0 0 1 .458 1.948l-3.77.886l3.715.656a1 1 0 1 1-.348 1.968l-4.901-.865l4.225 3.622a.999.999 0 1 1-1.3 1.518l-2.324-1.991l1.331 2.217a1 1 0 0 1-1.715 1.03l-2.992-4.988l-.657 5.59a1 1 0 0 1-1.986-.234l.556-4.732l-3.256 4.44a1 1 0 0 1-1.614-1.183l2.564-3.497l-3.242 1.947a1 1 0 0 1-1.03-1.715l4.693-2.817L2.948 13a1 1 0 0 1 .105-1.998l6.218.327L3.901 7.3A1 1 0 1 1 5.1 5.7l4.446 3.335l-2.93-5.57a1 1 0 0 1 1.769-.93l3.466 6.584l.655-6.223a1 1 0 0 1 1.098-.89"
+              /></g></svg>
             </span>
             <span class="hero-ai-icon hero-ai-icon-6">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="hero-ai-symbol hero-ai-symbol--raw">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 100 100"
+                class="hero-ai-symbol hero-ai-symbol--raw"
+              >
                 <defs>
-                  <linearGradient id="_codex_g" x1="0.1" y1="0.1" x2="0.9" y2="0.9">
-                    <stop offset="0%" stop-color="#a78bfa"/>
-                    <stop offset="100%" stop-color="#5b8ef8"/>
+                  <linearGradient
+                    id="_codex_g"
+                    x1="0.1"
+                    y1="0.1"
+                    x2="0.9"
+                    y2="0.9"
+                  >
+                    <stop
+                      offset="0%"
+                      stop-color="#a78bfa"
+                    />
+                    <stop
+                      offset="100%"
+                      stop-color="#5b8ef8"
+                    />
                   </linearGradient>
                 </defs>
-                <path fill="url(#_codex_g)" d="M 96 50 Q 80.7 35.3 78.8 14 Q 57.6 16.9 39.8 5.2 Q 28.7 23.4 8.5 30.2 Q 16 50 8.5 69.8 Q 28.7 76.6 39.8 94.8 Q 57.6 83.1 78.8 86 Q 80.7 64.7 96 50 Z"/>
-                <path fill="none" stroke="white" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M 28 40 L 43 50 L 28 60"/>
-                <rect fill="white" x="51" y="46" width="19" height="8" rx="4"/>
+                <path
+                  fill="url(#_codex_g)"
+                  d="M 96 50 Q 80.7 35.3 78.8 14 Q 57.6 16.9 39.8 5.2 Q 28.7 23.4 8.5 30.2 Q 16 50 8.5 69.8 Q 28.7 76.6 39.8 94.8 Q 57.6 83.1 78.8 86 Q 80.7 64.7 96 50 Z"
+                />
+                <path
+                  fill="none"
+                  stroke="white"
+                  stroke-width="9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M 28 40 L 43 50 L 28 60"
+                />
+                <rect
+                  fill="white"
+                  x="51"
+                  y="46"
+                  width="19"
+                  height="8"
+                  rx="4"
+                />
               </svg>
             </span>
           </div>
@@ -220,7 +281,6 @@ function scrollToFeatures() {
 .keyword-enter-from   { opacity: 0; transform: translateY(14px);  }
 .keyword-leave-to     { opacity: 0; transform: translateY(-14px); }
 
-
 /* ── Smoke ── */
 .hero-smoke {
   position: absolute;
@@ -282,7 +342,6 @@ function scrollToFeatures() {
   55%  { opacity: 0.35; transform: translate(calc(-50% + var(--smoke-drift)),       -36px)    scale(1.5); filter: blur(7px); }
   100% { opacity: 0;    transform: translate(calc(-50% + var(--smoke-drift) * 1.6), -64px)    scale(2.2); filter: blur(12px); }
 }
-
 
 /* ── Floating icons ── */
 .hero-ai-icons {

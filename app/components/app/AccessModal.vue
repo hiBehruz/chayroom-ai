@@ -188,5 +188,4 @@ const tributeUrl = computed(() => config.public.tributeUrl || 'https://t.me/trib
 }
 .modal-buy-btn:hover  { gap: 14px; opacity: 0.9; transform: scale(1.04); background: #2570e0; }
 .modal-buy-btn:active { opacity: 0.7; transform: scale(0.98); }
-
 </style>

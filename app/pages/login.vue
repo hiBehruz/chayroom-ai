@@ -23,6 +23,13 @@ const canUseTelegramWidget = computed(() => {
 })
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
 const authError = ref('')
+const botInitiated = ref(false)
+const botDeepLink = computed(() =>
+  telegramBotUsername.value ? `https://t.me/${telegramBotUsername.value}?start=login` : ''
+)
+function onBotLoginClick() {
+  botInitiated.value = true
+}
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
 
@@ -79,6 +86,12 @@ async function handleMiniAppLogin() {
 
 onMounted(async () => {
   authStore.restoreFromStorage()
+
+  if (route.query.error === 'expired') {
+    authError.value = 'Kirish havolasi muddati tugagan. Qaytadan urinib ko\'ring.'
+  } else if (route.query.error === 'invalid') {
+    authError.value = 'Kirish havolasi yaroqsiz. Qaytadan urinib ko\'ring.'
+  }
 
   const q = route.query
   const hasAuthPayload = Boolean(q.id && q.hash)
@@ -166,6 +179,33 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           id="telegram-widget-container"
           class="mt-3 flex min-h-13 items-center justify-center"
         />
+
+        <!-- Bot login (token-callback) -->
+        <div
+          v-if="telegramBotUsername"
+          class="mt-4"
+        >
+          <div class="my-4 flex items-center gap-3">
+            <span class="h-px flex-1 bg-[#e8e8e6]" />
+            <span class="text-[12px] text-[#a0a0a8]">yoki</span>
+            <span class="h-px flex-1 bg-[#e8e8e6]" />
+          </div>
+          <a
+            :href="botDeepLink"
+            target="_blank"
+            rel="noopener"
+            class="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#3480f1] text-[15px] font-semibold text-white transition-opacity duration-200 hover:opacity-90"
+            @click="onBotLoginClick"
+          >
+            Telegram bot orqali kirish
+          </a>
+          <p
+            v-if="botInitiated"
+            class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
+          >
+            Botga o'tdingiz. Bot yuborgan "Saytga kirish" tugmasini bosing.
+          </p>
+        </div>
 
         <p
           v-if="authError"

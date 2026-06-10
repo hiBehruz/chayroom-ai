@@ -1,13 +1,5 @@
-import { answerTelegramCallbackQuery, sendTelegramMessage } from './telegram'
+import { sendTelegramMessage } from './telegram'
 import { buildMiniAppLoginUrl } from './telegram-bot.js'
-import {
-  buildBotLoginSuccessMessage,
-  buildAuthenticatedBotLoginEntry,
-  botLoginKey,
-  canCompleteBotLogin,
-  isValidBotLoginToken,
-  type BotLoginEntry
-} from './bot-login'
 
 interface TgFrom {
   id: number
@@ -34,58 +26,14 @@ export interface TgUpdate {
 export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
   const config = useRuntimeConfig()
   const message = update.message
-  const callbackQuery = update.callback_query
   const text = message?.text?.trim()
   const from = message?.from
   const chatId = message?.chat?.id ?? from?.id
   const botToken = config.telegramBotToken as string | undefined
 
-  if (callbackQuery?.id && botToken) {
-    await answerTelegramCallbackQuery(botToken, callbackQuery.id, {
-      text: 'Kirish allaqachon tasdiqlangan. Saytga qayting.',
-      show_alert: false
-    })
-    return
-  }
-
   if (!text || !from || !chatId || !text.startsWith('/start')) return
 
   const payload = text.slice('/start'.length).trim()
-
-  if (payload.startsWith('auth_')) {
-    const token = payload.slice('auth_'.length)
-    if (!isValidBotLoginToken(token)) return
-
-    const storage = useStorage('cache')
-    const key = botLoginKey(token)
-    console.log('[bot-login] /start received, key:', key)
-    const entry = await storage.getItem<BotLoginEntry>(key)
-    console.log('[bot-login] entry lookup result:', entry ? `status=${entry.status}` : 'NOT FOUND')
-
-    if (entry?.status === 'authenticated') {
-      console.warn('[bot-login] entry already used, status:', entry.status)
-    } else if (!botToken) {
-      console.error('[bot-login] botToken not configured')
-    }
-
-    if ((!entry || canCompleteBotLogin(entry, from.id)) && botToken) {
-      await storage.setItem(
-        key,
-        buildAuthenticatedBotLoginEntry(
-          { id: from.id, first_name: from.first_name || 'Foydalanuvchi', last_name: from.last_name, username: from.username }
-        )
-      )
-      console.log('[bot-login] key set to authenticated, userId:', from.id)
-      const { text: successText, options: successOptions } = buildBotLoginSuccessMessage()
-      await sendTelegramMessage(botToken, chatId, successText, successOptions)
-      console.log('[bot-login] success message sent to chatId:', chatId)
-    } else if (botToken) {
-      console.warn('[bot-login] cannot complete login, entry.status:', entry?.status, 'userId:', from.id)
-      await sendTelegramMessage(botToken, chatId, '⚠️ Kirish havolasi eskirgan. Saytda qaytadan urinib ko\'ring.')
-    }
-    return
-  }
-
   if (payload) return
 
   if (botToken) {

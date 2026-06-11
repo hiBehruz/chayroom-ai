@@ -47,13 +47,9 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
       username: from.username
     })
     if (ok) {
-      await sendTelegramMessage(botToken, chatId, '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀', {
-        reply_markup: {
-          inline_keyboard: [[{ text: '🌐 Saytni ochish', url: appUrl }]]
-        }
-      })
+      await sendTelegramMessage(botToken, chatId, `✅ Kirish muvaffaqiyatli amalga oshirildi!\n\n<a href="${appUrl}">Chayroom.uz</a> saytiga qayting va foydalanishda davom eting. 🚀`)
     } else {
-      await sendTelegramMessage(botToken, chatId, 'Havola muddati tugagan yoki allaqachon ishlatilgan.\n\nchayroom.uz saytiga qaytib, yangi havola oling.')
+      await sendTelegramMessage(botToken, chatId, `Havola muddati tugagan yoki allaqachon ishlatilgan.\n\n<a href="${appUrl}">chayroom.uz</a> saytiga qaytib, yangi havola oling.`)
     }
     return
   }

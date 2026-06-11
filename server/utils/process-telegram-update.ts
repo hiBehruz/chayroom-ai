@@ -1,7 +1,6 @@
 import { sendTelegramMessage } from './telegram'
 import { buildMiniAppLoginUrl } from './telegram-bot.js'
-import { upsertUserFromTelegram } from './upsertUserFromTelegram'
-import { createBotLoginToken } from './bot-login-token'
+import { authenticateBotLoginToken } from './bot-login-token'
 
 interface TgFrom {
   id: number
@@ -37,21 +36,18 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
 
   const payload = text.slice('/start'.length).trim()
 
-  if (payload === 'login') {
+  if (payload.startsWith('auth_')) {
     if (!botToken) return
-    const appUrl = (config.public as Record<string, string>).appUrl || 'https://chayroom.uz'
-    const dbUser = await upsertUserFromTelegram({
+    const token = payload.slice('auth_'.length)
+    const ok = await authenticateBotLoginToken(token, {
       id: from.id,
       first_name: from.first_name || 'Foydalanuvchi',
       last_name: from.last_name,
       username: from.username
     })
-    const token = await createBotLoginToken(dbUser.id)
-    await sendTelegramMessage(botToken, chatId, '✅ Tasdiqlandi! Saytga kirish uchun quyidagi tugmani bosing:', {
-      reply_markup: {
-        inline_keyboard: [[{ text: '🔓 Saytga kirish', url: `${appUrl}/auth/callback?token=${token}` }]]
-      }
-    })
+    await sendTelegramMessage(botToken, chatId, ok
+      ? '✅ Tasdiqlandi! Saytga qayting — bir necha soniyada avtomatik kirasiz. 🚀'
+      : '⚠️ Havola eskirgan. Saytga qaytib qaytadan urinib ko\'ring.')
     return
   }
 

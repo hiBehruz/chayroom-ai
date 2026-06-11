@@ -1,7 +1,7 @@
 import postgres from 'postgres'
 import Redis from 'ioredis'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { fetch as nuxtFetch } from '@nuxt/test-utils/e2e'
+import { $fetch, fetch as nuxtFetch } from '@nuxt/test-utils/e2e'
 import { integrationEnv, setupIntegrationServer } from './helpers/server'
 
 await setupIntegrationServer()
@@ -15,6 +15,24 @@ async function cleanup() {
   await sql`DELETE FROM users WHERE telegram_id = ${String(TG_ID)}`
 }
 
+function startBotLogin() {
+  return $fetch<{ token: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
+}
+
+function sendStart(text: string) {
+  return nuxtFetch('/api/telegram/webhook', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-telegram-bot-api-secret-token': integrationEnv.NUXT_TELEGRAM_WEBHOOK_SECRET
+    },
+    body: JSON.stringify({
+      update_id: Math.floor(Math.random() * 1_000_000),
+      message: { text, chat: { id: TG_ID }, from: { id: TG_ID, first_name: 'BotLogin', username: 'botlogin_test' } }
+    })
+  })
+}
+
 beforeAll(async () => {
   await cleanup()
   await redis.flushdb()
@@ -26,78 +44,39 @@ afterAll(async () => {
   await redis.quit()
 })
 
-describe.sequential('bot login token callback', () => {
-  it('mints a token on /start login and exchanges it for a session', async () => {
-    const webhookRes = await nuxtFetch('/api/telegram/webhook', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-telegram-bot-api-secret-token': integrationEnv.NUXT_TELEGRAM_WEBHOOK_SECRET
-      },
-      body: JSON.stringify({
-        update_id: 1,
-        message: {
-          text: '/start login',
-          chat: { id: TG_ID },
-          from: { id: TG_ID, first_name: 'BotLogin', username: 'botlogin_test' }
-        }
-      })
-    })
-    expect(webhookRes.status).toBe(200)
+describe.sequential('bot login polling flow', () => {
+  it('start -> bot authenticates -> status authenticated with a session', async () => {
+    const { token, url } = await startBotLogin()
+    expect(url).toContain(`start=auth_${token}`)
 
-    const keys = await redis.keys('*bot-login:*')
-    expect(keys.length).toBe(1)
-    const token = keys[0].split('bot-login:')[1]
+    const pending = await $fetch<{ status: string }>('/api/auth/bot-login/status', { params: { token } })
+    expect(pending.status).toBe('pending')
 
-    const callbackRes = await nuxtFetch('/api/auth/bot-callback', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ token })
-    })
-    expect(callbackRes.status).toBe(200)
-    expect(callbackRes.headers.get('set-cookie')).toContain('chayroom_session=')
+    const wh = await sendStart(`/start auth_${token}`)
+    expect(wh.status).toBe(200)
 
-    const data = await callbackRes.json()
+    const done = await nuxtFetch(`/api/auth/bot-login/status?token=${token}`)
+    expect(done.status).toBe(200)
+    expect(done.headers.get('set-cookie')).toContain('chayroom_session=')
+    const data = await done.json()
+    expect(data.status).toBe('authenticated')
     expect(data.user.telegramId).toBe(TG_ID)
 
-    const second = await nuxtFetch('/api/auth/bot-callback', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ token })
-    })
-    expect(second.status).toBe(401)
+    // token consumed: a second poll no longer authenticates
+    const after = await $fetch<{ status: string }>('/api/auth/bot-login/status', { params: { token } })
+    expect(after.status).toBe('expired')
   })
 
-  it('rejects malformed and unknown tokens', async () => {
-    const bad = await nuxtFetch('/api/auth/bot-callback', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ token: 'short' })
-    })
+  it('rejects malformed tokens', async () => {
+    const bad = await nuxtFetch('/api/auth/bot-login/status?token=short')
     expect(bad.status).toBe(400)
-
-    const unknown = await nuxtFetch('/api/auth/bot-callback', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ token: 'z'.repeat(43) })
-    })
-    expect(unknown.status).toBe(401)
   })
 
-  it('does not mint a token for a plain /start', async () => {
-    await redis.flushdb()
-    const res = await nuxtFetch('/api/telegram/webhook', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-telegram-bot-api-secret-token': integrationEnv.NUXT_TELEGRAM_WEBHOOK_SECRET
-      },
-      body: JSON.stringify({
-        update_id: 2,
-        message: { text: '/start', chat: { id: TG_ID }, from: { id: TG_ID, first_name: 'BotLogin' } }
-      })
-    })
-    expect(res.status).toBe(200)
-    expect(await redis.keys('*bot-login:*')).toEqual([])
+  it('does not authenticate a plain /start', async () => {
+    const { token } = await startBotLogin()
+    const wh = await sendStart('/start')
+    expect(wh.status).toBe(200)
+    const res = await $fetch<{ status: string }>('/api/auth/bot-login/status', { params: { token } })
+    expect(res.status).toBe('pending')
   })
 })

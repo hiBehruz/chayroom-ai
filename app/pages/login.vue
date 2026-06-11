@@ -23,10 +23,15 @@ const canUseTelegramWidget = computed(() => {
 })
 const widgetState = ref<'loading' | 'ready' | 'missing-bot' | 'mini-app' | 'mini-app-error'>('loading')
 const authError = ref('')
-const botInitiated = ref(false)
-const botDeepLink = computed(() =>
-  telegramBotUsername.value ? `https://t.me/${telegramBotUsername.value}?start=login` : ''
-)
+// Bot login (one-step polling flow):
+// 1. POST /start creates a pending token + deep link (t.me/bot?start=auth_TOKEN)
+// 2. user opens the bot and presses START -> bot authenticates the token
+// 3. this tab polls /status and, once authenticated, the server sets the session
+//    cookie in THIS browser and we advance. No second link to click, so the
+//    session lands in the original browser (not a Telegram in-app webview).
+const botState = ref<'idle' | 'waiting' | 'expired'>('idle')
+const botLoginUrl = ref('')
+let botToken = ''
 let botPollTimer: ReturnType<typeof setInterval> | null = null
 
 function stopBotPoll() {
@@ -36,51 +41,64 @@ function stopBotPoll() {
   }
 }
 
-// Cosmetic poll: after the user heads to the bot, watch for the session that the
-// bot's "Saytga kirish" link establishes (in this same browser) and advance the
-// original tab too. Login does NOT depend on this — it completes in the callback
-// context regardless — so a frozen/backgrounded tab degrades gracefully.
-async function checkBotLogin() {
+async function pollBotStatus() {
+  if (!botToken) return
   try {
     const res = await $fetch<{
-      user: { telegramId: number, firstName: string, lastName: string | null, username: string | null, photoUrl: string | null, role: 'USER' | 'ADMIN' } | null
-      hasSubscription: boolean
-      subscription: { period: string | null, expiresAt: string, cancelledAt: string | null } | null
-    }>('/api/auth/me')
-    if (!res.user) return
-    authStore.setUserSession({
-      id: res.user.telegramId,
-      telegramId: res.user.telegramId,
-      first_name: res.user.firstName,
-      last_name: res.user.lastName ?? undefined,
-      username: res.user.username ?? undefined,
-      photo_url: res.user.photoUrl ?? undefined,
-      role: res.user.role,
-      hash: 'session'
-    })
-    if (res.hasSubscription) {
-      authStore.activateSubscription(res.subscription
-        ? { period: res.subscription.period, expiresAt: res.subscription.expiresAt, cancelledAt: res.subscription.cancelledAt }
-        : undefined)
-    } else {
-      authStore.clearSubscription()
+      status: 'pending' | 'authenticated' | 'expired'
+      user?: { telegramId: number, firstName: string, lastName: string | null, username: string | null, photoUrl: string | null, role: 'USER' | 'ADMIN' }
+      hasSubscription?: boolean
+      subscription?: { period: string | null, expiresAt: string, cancelledAt: string | null } | null
+    }>('/api/auth/bot-login/status', { params: { token: botToken } })
+
+    if (res.status === 'authenticated' && res.user) {
+      stopBotPoll()
+      authStore.setUserSession({
+        id: res.user.telegramId,
+        telegramId: res.user.telegramId,
+        first_name: res.user.firstName,
+        last_name: res.user.lastName ?? undefined,
+        username: res.user.username ?? undefined,
+        photo_url: res.user.photoUrl ?? undefined,
+        role: res.user.role,
+        hash: 'session'
+      })
+      if (res.hasSubscription) {
+        authStore.activateSubscription(res.subscription ?? undefined)
+      } else {
+        authStore.clearSubscription()
+      }
+      await navigateTo('/')
+    } else if (res.status === 'expired') {
+      stopBotPoll()
+      botState.value = 'expired'
     }
-    stopBotPoll()
-    await navigateTo('/')
   } catch {
-    // ignore — keep waiting
+    // network hiccup — keep polling
   }
 }
 
-function onBotLoginClick() {
-  botInitiated.value = true
-  stopBotPoll()
-  botPollTimer = setInterval(checkBotLogin, 2500)
+async function startBotLogin() {
+  authError.value = ''
+  // Open the tab synchronously (before the await) so mobile Safari does not block it.
+  const popup = window.open('', '_blank')
+  try {
+    const { token, url } = await $fetch<{ token: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
+    botToken = token
+    botLoginUrl.value = url
+    botState.value = 'waiting'
+    if (popup && !popup.closed) popup.location.href = url
+    stopBotPoll()
+    botPollTimer = setInterval(pollBotStatus, 2500)
+  } catch {
+    if (popup && !popup.closed) popup.close()
+    authError.value = 'Kirishni boshlab bo\'lmadi. Qaytadan urinib ko\'ring.'
+  }
 }
 
 function onVisibilityChange() {
-  if (botInitiated.value && document.visibilityState === 'visible') {
-    void checkBotLogin()
+  if (botState.value === 'waiting' && document.visibilityState === 'visible') {
+    void pollBotStatus()
   }
 }
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
@@ -239,7 +257,7 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           class="mt-3 flex min-h-13 items-center justify-center"
         />
 
-        <!-- Bot login (token-callback) -->
+        <!-- Bot login (one-step polling) -->
         <div
           v-if="telegramBotUsername"
           class="mt-4"
@@ -249,26 +267,48 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
             <span class="text-[12px] text-[#a0a0a8]">yoki</span>
             <span class="h-px flex-1 bg-[#e8e8e6]" />
           </div>
-          <a
-            :href="botDeepLink"
-            target="_blank"
-            rel="noopener"
+
+          <button
+            v-if="botState === 'idle'"
+            type="button"
             class="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#3480f1] text-[15px] font-semibold text-white transition-opacity duration-200 hover:opacity-90"
-            @click="onBotLoginClick"
+            @click="startBotLogin"
           >
             Telegram bot orqali kirish
-          </a>
+          </button>
+
           <div
-            v-if="botInitiated"
-            class="mt-4 flex flex-col items-center gap-2"
+            v-else-if="botState === 'waiting'"
+            class="flex flex-col items-center gap-2"
           >
             <div class="flex items-center gap-2 text-[13px] text-[#6f7480]">
               <span class="size-3.5 animate-spin rounded-full border-2 border-[#e0e0e4] border-t-[#3480f1]" />
               Botdan tasdiq kutilyapti…
             </div>
-            <p class="text-center text-[12px] leading-5 text-[#a0a0a8]">
-              Bot yuborgan "Saytga kirish" tugmasini bosing.
+            <a
+              :href="botLoginUrl"
+              target="_blank"
+              rel="noopener"
+              class="text-[13px] font-medium text-[#3480f1] hover:underline"
+            >
+              Telegram ochilmadimi? Shu yerni bosing
+            </a>
+          </div>
+
+          <div
+            v-else
+            class="flex flex-col items-center gap-3"
+          >
+            <p class="text-[13px] text-[#6f7480]">
+              Havola muddati tugadi.
             </p>
+            <button
+              type="button"
+              class="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#3480f1] text-[15px] font-semibold text-white transition-opacity duration-200 hover:opacity-90"
+              @click="startBotLogin"
+            >
+              Yangilash
+            </button>
           </div>
         </div>
 

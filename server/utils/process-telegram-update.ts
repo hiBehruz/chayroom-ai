@@ -53,7 +53,7 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
         }
       })
     } else {
-      await sendTelegramMessage(botToken, chatId, 'Срок действия ссылки истёк или она уже была использована. Вернитесь на chayroom.uz и сгенерируйте новую.')
+      await sendTelegramMessage(botToken, chatId, 'Havola muddati tugagan yoki allaqachon ishlatilgan.\n\nchayroom.uz saytiga qaytib, yangi havola oling.')
     }
     return
   }

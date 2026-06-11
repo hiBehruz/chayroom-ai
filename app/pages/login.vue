@@ -306,17 +306,14 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
 
           <div
             v-else
-            class="flex flex-col items-center gap-3"
+            class="flex justify-center"
           >
-            <p class="text-[13px] text-[#6f7480]">
-              Havola muddati tugadi.
-            </p>
             <button
               type="button"
-              class="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#3480f1] text-[15px] font-semibold text-white transition-opacity duration-200 hover:opacity-90"
+              class="w-[226px] rounded-[12px] bg-[#3480f1]/10 py-2 text-sm font-medium text-[#3480f1] transition-colors hover:bg-[#3480f1]/20"
               @click="startBotLogin"
             >
-              Yangilash
+              Havola muddati tugadi — yangilash
             </button>
           </div>
         </div>

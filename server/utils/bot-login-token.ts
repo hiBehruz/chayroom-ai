@@ -44,6 +44,16 @@ export async function authenticateBotLoginToken(token: string, user: BotLoginUse
   return true
 }
 
+// Separate already-authenticated token for the bot's "return to site" link, so
+// the link logs the user in wherever it is opened (e.g. the Telegram in-app
+// webview) independently of the polling token used by the original browser tab.
+export async function createAuthenticatedBotLoginToken(user: BotLoginUser): Promise<string> {
+  const token = randomBytes(24).toString('base64url')
+  const entry: BotLoginEntry = { status: 'authenticated', user, exp: Date.now() + TOKEN_TTL_SECONDS * 1000 }
+  await useStorage('cache').setItem(botLoginTokenKey(token), entry, { ttl: TOKEN_TTL_SECONDS })
+  return token
+}
+
 export async function readBotLoginToken(token: string): Promise<BotLoginEntry | null> {
   if (!isValidBotLoginToken(token)) return null
   const entry = await useStorage('cache').getItem<BotLoginEntry>(botLoginTokenKey(token))

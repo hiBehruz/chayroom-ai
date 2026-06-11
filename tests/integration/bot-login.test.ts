@@ -67,6 +67,23 @@ describe.sequential('bot login polling flow', () => {
     expect(after.status).toBe('expired')
   })
 
+  it('bot link token signs in via /auth/enter', async () => {
+    await redis.flushdb()
+    const { token } = await startBotLogin()
+    await sendStart(`/start auth_${token}`)
+
+    // the bot created a separate authenticated token for the "return to site" link
+    const keys = await redis.keys('*bot-login:*')
+    const linkToken = keys
+      .map(k => k.slice(k.indexOf('bot-login:') + 'bot-login:'.length))
+      .find(t => t !== token)
+    expect(linkToken).toBeTruthy()
+
+    const res = await nuxtFetch(`/auth/enter?token=${linkToken}`, { redirect: 'manual' })
+    expect([301, 302]).toContain(res.status)
+    expect(res.headers.get('set-cookie')).toContain('chayroom_session=')
+  })
+
   it('rejects malformed tokens', async () => {
     const bad = await nuxtFetch('/api/auth/bot-login/status?token=short')
     expect(bad.status).toBe(400)

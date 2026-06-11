@@ -1,6 +1,6 @@
 import { sendTelegramMessage } from './telegram'
 import { buildMiniAppLoginUrl } from './telegram-bot.js'
-import { authenticateBotLoginToken } from './bot-login-token'
+import { authenticateBotLoginToken, createAuthenticatedBotLoginToken } from './bot-login-token'
 
 interface TgFrom {
   id: number
@@ -40,16 +40,24 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
     if (!botToken) return
     const appUrl = (config.public as Record<string, string>).appUrl || 'https://chayroom.uz'
     const token = payload.slice('auth_'.length)
-    const ok = await authenticateBotLoginToken(token, {
+    const user = {
       id: from.id,
       first_name: from.first_name || 'Foydalanuvchi',
       last_name: from.last_name,
       username: from.username
-    })
+    }
+    const ok = await authenticateBotLoginToken(token, user)
     if (ok) {
-      await sendTelegramMessage(botToken, chatId, `✅ Kirish muvaffaqiyatli amalga oshirildi!\n\n<a href="${appUrl}">Chayroom.uz</a> saytiga qayting va foydalanishda davom eting. 🚀`)
+      // Fresh login link so opening it (in any browser, incl. the Telegram
+      // in-app webview) signs the user in there too — not just the polling tab.
+      const linkToken = await createAuthenticatedBotLoginToken(user)
+      await sendTelegramMessage(botToken, chatId, `✅ Kirish muvaffaqiyatli amalga oshirildi!\n\n<a href="${appUrl}/auth/enter?token=${linkToken}">Chayroom.uz</a> saytiga qayting va foydalanishda davom eting. 🚀`, {
+        disable_web_page_preview: true
+      })
     } else {
-      await sendTelegramMessage(botToken, chatId, `Havola muddati tugagan yoki allaqachon ishlatilgan.\n\n<a href="${appUrl}">chayroom.uz</a> saytiga qaytib, yangi havola oling.`)
+      await sendTelegramMessage(botToken, chatId, `Havola muddati tugagan yoki allaqachon ishlatilgan.\n\n<a href="${appUrl}">chayroom.uz</a> saytiga qaytib, yangi havola oling.`, {
+        disable_web_page_preview: true
+      })
     }
     return
   }

@@ -38,6 +38,7 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
 
   if (payload.startsWith('auth_')) {
     if (!botToken) return
+    const appUrl = (config.public as Record<string, string>).appUrl || 'https://chayroom.uz'
     const token = payload.slice('auth_'.length)
     const ok = await authenticateBotLoginToken(token, {
       id: from.id,
@@ -45,9 +46,15 @@ export async function processTelegramUpdate(update: TgUpdate): Promise<void> {
       last_name: from.last_name,
       username: from.username
     })
-    await sendTelegramMessage(botToken, chatId, ok
-      ? '✅ Tasdiqlandi! Saytga qayting — bir necha soniyada avtomatik kirasiz. 🚀'
-      : '⚠️ Havola eskirgan. Saytga qaytib qaytadan urinib ko\'ring.')
+    if (ok) {
+      await sendTelegramMessage(botToken, chatId, '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀', {
+        reply_markup: {
+          inline_keyboard: [[{ text: '🌐 Saytni ochish', url: appUrl }]]
+        }
+      })
+    } else {
+      await sendTelegramMessage(botToken, chatId, '⚠️ Havola eskirgan. Saytga qaytib qaytadan urinib ko\'ring.')
+    }
     return
   }
 

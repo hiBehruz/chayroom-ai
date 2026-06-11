@@ -271,7 +271,7 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           <button
             v-if="botState === 'idle'"
             type="button"
-            class="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#54A9EB] text-[15px] font-semibold text-white transition-colors duration-200 hover:bg-[#3d8fc9]"
+            class="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#54A9EB] text-[15px] font-semibold text-white transition-colors duration-200 hover:bg-[#3d8fc9] max-md:h-11 max-md:text-[13px]"
             @click="startBotLogin"
           >
             <svg
@@ -288,7 +288,7 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
             v-else-if="botState === 'waiting'"
             class="flex flex-col items-center gap-2"
           >
-            <div class="flex items-center justify-center gap-2 text-xs text-[#a0a0a8]">
+            <div class="flex items-center justify-center gap-2 text-xs text-[#a0a0a8] max-md:text-[10px]">
               <svg
                 class="h-3.5 w-3.5 animate-spin"
                 viewBox="0 0 24 24"
@@ -305,7 +305,7 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
               :href="botLoginUrl"
               target="_blank"
               rel="noopener"
-              class="text-[13px] font-medium text-[#3480f1] hover:underline"
+              class="text-[13px] font-medium text-[#3480f1] hover:underline max-md:text-[11px]"
             >
               Telegram ochilmadimi? Shu yerni bosing
             </a>
@@ -317,7 +317,7 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           >
             <button
               type="button"
-              class="w-[226px] rounded-[12px] bg-[#3480f1]/10 py-2 text-sm font-medium text-[#3480f1] transition-colors hover:bg-[#3480f1]/20"
+              class="w-[226px] rounded-[12px] bg-[#3480f1]/10 py-2 text-sm font-medium text-[#3480f1] transition-colors hover:bg-[#3480f1]/20 max-md:w-[190px] max-md:py-1.5 max-md:text-xs"
               @click="startBotLogin"
             >
               Havola muddati tugadi — yangilash

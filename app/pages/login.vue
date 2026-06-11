@@ -281,8 +281,17 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
             v-else-if="botState === 'waiting'"
             class="flex flex-col items-center gap-2"
           >
-            <div class="flex items-center gap-2 text-[13px] text-[#6f7480]">
-              <span class="size-3.5 animate-spin rounded-full border-2 border-[#e0e0e4] border-t-[#3480f1]" />
+            <div class="flex items-center justify-center gap-2 text-xs text-[#a0a0a8]">
+              <svg
+                class="h-3.5 w-3.5 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" opacity="0.2" />
+                <path d="M22 12a10 10 0 0 1-10 10" />
+              </svg>
               Botdan tasdiq kutilyapti…
             </div>
             <a

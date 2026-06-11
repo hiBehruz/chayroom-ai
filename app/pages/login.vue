@@ -27,8 +27,61 @@ const botInitiated = ref(false)
 const botDeepLink = computed(() =>
   telegramBotUsername.value ? `https://t.me/${telegramBotUsername.value}?start=login` : ''
 )
+let botPollTimer: ReturnType<typeof setInterval> | null = null
+
+function stopBotPoll() {
+  if (botPollTimer) {
+    clearInterval(botPollTimer)
+    botPollTimer = null
+  }
+}
+
+// Cosmetic poll: after the user heads to the bot, watch for the session that the
+// bot's "Saytga kirish" link establishes (in this same browser) and advance the
+// original tab too. Login does NOT depend on this — it completes in the callback
+// context regardless — so a frozen/backgrounded tab degrades gracefully.
+async function checkBotLogin() {
+  try {
+    const res = await $fetch<{
+      user: { telegramId: number, firstName: string, lastName: string | null, username: string | null, photoUrl: string | null, role: 'USER' | 'ADMIN' } | null
+      hasSubscription: boolean
+      subscription: { period: string | null, expiresAt: string, cancelledAt: string | null } | null
+    }>('/api/auth/me')
+    if (!res.user) return
+    authStore.setUserSession({
+      id: res.user.telegramId,
+      telegramId: res.user.telegramId,
+      first_name: res.user.firstName,
+      last_name: res.user.lastName ?? undefined,
+      username: res.user.username ?? undefined,
+      photo_url: res.user.photoUrl ?? undefined,
+      role: res.user.role,
+      hash: 'session'
+    })
+    if (res.hasSubscription) {
+      authStore.activateSubscription(res.subscription
+        ? { period: res.subscription.period, expiresAt: res.subscription.expiresAt, cancelledAt: res.subscription.cancelledAt }
+        : undefined)
+    } else {
+      authStore.clearSubscription()
+    }
+    stopBotPoll()
+    await navigateTo('/')
+  } catch {
+    // ignore — keep waiting
+  }
+}
+
 function onBotLoginClick() {
   botInitiated.value = true
+  stopBotPoll()
+  botPollTimer = setInterval(checkBotLogin, 2500)
+}
+
+function onVisibilityChange() {
+  if (botInitiated.value && document.visibilityState === 'visible') {
+    void checkBotLogin()
+  }
 }
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
@@ -86,6 +139,7 @@ async function handleMiniAppLogin() {
 
 onMounted(async () => {
   authStore.restoreFromStorage()
+  document.addEventListener('visibilitychange', onVisibilityChange)
 
   if (route.query.error === 'expired') {
     authError.value = 'Kirish havolasi muddati tugagan. Qaytadan urinib ko\'ring.'
@@ -129,6 +183,11 @@ onMounted(async () => {
   if (canUseTelegramWidget.value) {
     mountTelegramWidget()
   }
+})
+
+onUnmounted(() => {
+  stopBotPoll()
+  if (import.meta.client) document.removeEventListener('visibilitychange', onVisibilityChange)
 })
 
 useSeoMeta({ title: 'Kirish — Chayroom AI' })
@@ -199,12 +258,18 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           >
             Telegram bot orqali kirish
           </a>
-          <p
+          <div
             v-if="botInitiated"
-            class="mt-3 text-center text-[13px] leading-5 text-[#6f7480]"
+            class="mt-4 flex flex-col items-center gap-2"
           >
-            Botga o'tdingiz. Bot yuborgan "Saytga kirish" tugmasini bosing.
-          </p>
+            <div class="flex items-center gap-2 text-[13px] text-[#6f7480]">
+              <span class="size-3.5 animate-spin rounded-full border-2 border-[#e0e0e4] border-t-[#3480f1]" />
+              Botdan tasdiq kutilyapti…
+            </div>
+            <p class="text-center text-[12px] leading-5 text-[#a0a0a8]">
+              Bot yuborgan "Saytga kirish" tugmasini bosing.
+            </p>
+          </div>
         </div>
 
         <p

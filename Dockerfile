@@ -12,6 +12,10 @@ RUN pnpm install --frozen-lockfile
 
 # Production build -> .output
 FROM source AS build
+# Bake the redis cache driver into the build. nuxt.config picks the storage
+# driver at build time via `process.env.REDIS_URL ? 'redis' : 'memory'`, so
+# REDIS_URL must be present here or the prod bundle silently uses in-memory cache.
+ENV REDIS_URL=redis://redis:6379
 RUN pnpm build
 
 # Minimal runtime image — only the built server output
@@ -23,3 +27,5 @@ ENV NODE_ENV=production \
 COPY --from=build /app/.output ./.output
 EXPOSE 3000
 CMD ["node", ".output/server/index.mjs"]
+
+

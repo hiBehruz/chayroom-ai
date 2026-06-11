@@ -1,6 +1,11 @@
 import { processTelegramUpdate, type TgUpdate } from '#server/utils/process-telegram-update'
 
 export default defineNitroPlugin(() => {
+  // Never poll in dev: a local `pnpm dev` would compete with production for the
+  // same bot's getUpdates, stealing login updates and minting tokens the prod
+  // process can't see. Only the deployed prod server polls.
+  if (import.meta.dev) return
+
   const config = useRuntimeConfig()
   const botToken = config.telegramBotToken as string | undefined
   if (!botToken) return

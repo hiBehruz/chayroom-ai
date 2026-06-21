@@ -32,9 +32,11 @@ async function handleLogin() {
       await navigateTo('/dashboard')
     }
   } catch (err) {
-    console.error('Login error:', err)
-    // Fallback to login page on error
-    await navigateTo('/login')
+    // Silently ignore if user closed the popup or cancelled
+    // Only navigate to login page on unexpected errors
+    if (err instanceof Error && !err.message.includes('yopildi') && !err.message.includes('bekor qilindi')) {
+      await navigateTo('/login')
+    }
   }
 }
 

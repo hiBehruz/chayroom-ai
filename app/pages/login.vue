@@ -7,7 +7,12 @@ const authStore = useAuthStore()
 const route = useRoute()
 const config = useRuntimeConfig()
 const { isMiniApp } = useTelegramApp()
-const { openOAuthPopup, isWaiting } = useTelegramOAuth()
+
+// OAuth composable - client side only
+const { openOAuthPopup, isWaiting } = import.meta.client
+  ? useTelegramOAuth()
+  : { openOAuthPopup: async () => ({} as TelegramUser), isWaiting: ref(false) }
+
 const telegramBotUsername = computed(() => config.public.telegramBotUsername)
 const widgetState = ref<'loading' | 'ready' | 'mini-app' | 'mini-app-error'>('loading')
 const authError = ref('')

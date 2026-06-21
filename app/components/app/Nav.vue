@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
+const { openOAuthPopup, isWaiting: isOAuthWaiting } = useTelegramOAuth()
 const isProfileOpen = ref(false)
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
@@ -13,6 +14,20 @@ const navLinks = [
 
 function isActive(href: string) {
   return href.startsWith('/') && route.path === href
+}
+
+async function handleLogin() {
+  try {
+    const user = await openOAuthPopup()
+    await authStore.login(user)
+    if (authStore.user) {
+      await navigateTo('/dashboard')
+    }
+  } catch (err) {
+    console.error('Login error:', err)
+    // Fallback to login page on error
+    await navigateTo('/login')
+  }
 }
 
 async function goToHomeTop() {
@@ -174,18 +189,31 @@ onUnmounted(() => {
         </template>
 
         <template v-else>
-          <NuxtLink
-            to="/login"
+          <button
+            :disabled="isOAuthWaiting"
             class="nav-login-btn"
+            @click="handleLogin"
           >
             <svg
+              v-if="!isOAuthWaiting"
               viewBox="0 0 24 24"
               class="w-4 h-4 fill-white shrink-0"
             >
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z" />
             </svg>
-            Kirish
-          </NuxtLink>
+            <svg
+              v-else
+              class="w-4 h-4 animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+            >
+              <circle cx="12" cy="12" r="10" opacity="0.2" />
+              <path d="M22 12a10 10 0 0 1-10 10" fill="white" />
+            </svg>
+            {{ isOAuthWaiting ? 'Ochilmoqda...' : 'Kirish' }}
+          </button>
         </template>
       </div>
 
@@ -261,28 +289,40 @@ onUnmounted(() => {
           >
             {{ link.label }}
           </button>
-          <NuxtLink
+          <button
             v-if="authStore.user"
             to="/profile"
-            class="text-[22px] font-semibold text-[#14161f] py-3 px-8"
-            @click="isMobileMenuOpen = false"
+            class="text-[22px] font-semibold text-[#14161f] py-3 px-8 focus:outline-none active:scale-95"
+            @click="navigateTo('/profile'); isMobileMenuOpen = false"
           >
             Profil
-          </NuxtLink>
-          <NuxtLink
+          </button>
+          <button
             v-else
-            to="/login"
+            :disabled="isOAuthWaiting"
             class="nav-login-btn mt-4"
-            @click="isMobileMenuOpen = false"
+            @click="handleLogin(); isMobileMenuOpen = false"
           >
             <svg
+              v-if="!isOAuthWaiting"
               viewBox="0 0 24 24"
               class="w-4 h-4 fill-white shrink-0"
             >
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z" />
             </svg>
-            Kirish
-          </NuxtLink>
+            <svg
+              v-else
+              class="w-4 h-4 animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+            >
+              <circle cx="12" cy="12" r="10" opacity="0.2" />
+              <path d="M22 12a10 10 0 0 1-10 10" fill="white" />
+            </svg>
+            {{ isOAuthWaiting ? 'Ochilmoqda...' : 'Kirish' }}
+          </button>
         </div>
       </Transition>
     </Teleport>
@@ -386,7 +426,9 @@ onUnmounted(() => {
   text-decoration: none;
   box-shadow: 0 10px 24px rgba(52,128,241,0.18);
   transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
 }
 .nav-login-btn:hover  { opacity: 0.9; transform: scale(1.04); background: #256fe0; }
 .nav-login-btn:active { opacity: 0.7; transform: scale(0.98); }
+.nav-login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 </style>

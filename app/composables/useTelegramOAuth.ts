@@ -32,11 +32,10 @@ export function useTelegramOAuth() {
       : config.public.appUrl
 
     const params = new URLSearchParams({
-      response_type: 'post_message',
-      client_id: botId,
-      redirect_uri: redirectUri,
-      scope: 'openid profile telegram:bot_access',
-      origin: redirectUri // Add explicit origin parameter
+      bot_id: botId,
+      origin: redirectUri,
+      request_access: 'write',
+      return_to: redirectUri
     })
 
     return `https://oauth.telegram.org/auth?${params.toString()}`
@@ -55,6 +54,7 @@ export function useTelegramOAuth() {
       const left = (screen.width - width) / 2
       const top = (screen.height - height) / 2
 
+      // Open popup IMMEDIATELY (synchronously) to avoid popup blocker
       popup.value = window.open(
         oauthUrl,
         'telegram-oauth',

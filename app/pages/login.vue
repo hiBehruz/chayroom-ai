@@ -7,7 +7,7 @@ const authStore = useAuthStore()
 const route = useRoute()
 const config = useRuntimeConfig()
 const { isMiniApp } = useTelegramApp()
-const { openOAuthPopup, isWaiting: isOAuthWaiting } = useTelegramOAuth()
+const { openOAuthPopup, isWaiting } = useTelegramOAuth()
 const telegramBotUsername = computed(() => config.public.telegramBotUsername)
 const widgetState = ref<'loading' | 'ready' | 'mini-app' | 'mini-app-error'>('loading')
 const authError = ref('')
@@ -27,14 +27,17 @@ async function loginWithTelegram(user: TelegramUser) {
   authError.value = 'Kirish amalga oshmadi. Qaytadan urinib ko\'ring.'
 }
 
-async function loginWithOAuth() {
+async function handleOAuthLogin() {
   authError.value = ''
   try {
     const user = await openOAuthPopup()
     await loginWithTelegram(user)
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Xatolik yuz berdi'
-    authError.value = message
+  } catch (error) {
+    if (error instanceof Error) {
+      authError.value = error.message
+    } else {
+      authError.value = 'Kirish amalga oshmadi. Qaytadan urinib ko\'ring.'
+    }
   }
 }
 
@@ -96,6 +99,10 @@ onMounted(async () => {
   widgetState.value = 'ready'
 })
 
+onUnmounted(() => {
+  delete (window as unknown as { onTelegramLogin?: unknown }).onTelegramLogin
+})
+
 useSeoMeta({ title: 'Kirish — Chayroom AI' })
 </script>
 
@@ -120,11 +127,19 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
       <div class="px-10 pt-10 pb-8 text-center max-md:px-7 max-md:pt-8 max-md:pb-6">
         <!-- Telegram Icons -->
         <div class="flex items-center justify-center gap-2 mb-6">
-          <svg class="size-10 text-[#54A9EB]" viewBox="0 0 24 24" fill="currentColor">
+          <svg
+            class="size-10 text-[#54A9EB]"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
             <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
           </svg>
-          <svg class="size-10 text-[#14161f]" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+          <svg
+            class="size-10 text-[#14161f]"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
           </svg>
         </div>
 
@@ -154,39 +169,33 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
 
         <!-- OAuth login button -->
         <div
-          v-else-if="widgetState === 'ready' && telegramBotUsername"
+          v-else-if="widgetState === 'ready'"
           class="flex flex-col items-center"
         >
           <button
             type="button"
-            :disabled="isOAuthWaiting"
-            class="flex h-13 w-full items-center justify-center gap-2.5 rounded-[16px] bg-[#54A9EB] text-[16px] font-semibold text-white transition-all duration-200 hover:bg-[#3d8fc9] hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed max-md:h-11.5 max-md:text-[14px]"
-            @click="loginWithOAuth"
+            :disabled="isWaiting"
+            class="w-full rounded-2xl bg-[#54A9EB] px-6 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 hover:bg-[#4A9DD9] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
+            @click="handleOAuthLogin"
           >
             <svg
-              v-if="!isOAuthWaiting"
-              class="size-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-            >
-              <path d="M9 11l3 3L22 4"/>
-              <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-            </svg>
-            <svg
-              v-else
+              v-if="isWaiting"
               class="size-4 animate-spin"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
             >
-              <circle cx="12" cy="12" r="10" opacity="0.2" />
-              <path d="M22 12a10 10 0 0 1-10 10" />
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            <span v-if="!isOAuthWaiting">Telegram bilan davom etish</span>
-            <span v-else>Telegram ochilmoqda...</span>
+            <svg
+              v-else
+              class="size-5"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+            </svg>
+            <span>{{ isWaiting ? 'Ochilmoqda...' : 'Telegram orqali kirish' }}</span>
           </button>
 
           <p class="mt-5 text-[13px] text-[#54A9EB] text-center leading-relaxed hover:underline cursor-pointer max-md:text-[12px] max-md:mt-4">

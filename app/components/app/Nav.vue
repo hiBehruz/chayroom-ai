@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { TelegramUser } from '~/stores/auth'
+
 const authStore = useAuthStore()
 const isProfileOpen = ref(false)
 const isMobileMenuOpen = ref(false)
@@ -9,7 +11,7 @@ const SECTION_SCROLL_KEY = 'cx-scroll-target'
 // OAuth composable - client side only
 const { openOAuthPopup, isWaiting: isOAuthWaiting } = import.meta.client
   ? useTelegramOAuth()
-  : { openOAuthPopup: async () => {}, isWaiting: ref(false) }
+  : { openOAuthPopup: async () => ({} as TelegramUser), isWaiting: ref(false) }
 
 const navLinks = [
   { label: 'Panel', href: '/dashboard' },

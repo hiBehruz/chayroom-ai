@@ -1,11 +1,15 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
-const { openOAuthPopup, isWaiting: isOAuthWaiting } = useTelegramOAuth()
 const isProfileOpen = ref(false)
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
 const scrolled = ref(false)
 const SECTION_SCROLL_KEY = 'cx-scroll-target'
+
+// OAuth composable - client side only
+const { openOAuthPopup, isWaiting: isOAuthWaiting } = import.meta.client
+  ? useTelegramOAuth()
+  : { openOAuthPopup: async () => {}, isWaiting: ref(false) }
 
 const navLinks = [
   { label: 'Panel', href: '/dashboard' },
@@ -17,6 +21,8 @@ function isActive(href: string) {
 }
 
 async function handleLogin() {
+  if (!import.meta.client) return
+
   try {
     const user = await openOAuthPopup()
     await authStore.login(user)

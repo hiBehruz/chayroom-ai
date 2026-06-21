@@ -28,14 +28,20 @@ export function useTelegramOAuth() {
 
     // Use current origin for redirect_uri (works for both localhost and production)
     const redirectUri = import.meta.client
+      ? window.location.origin + '/'
+      : config.public.appUrl + '/'
+
+    const origin = import.meta.client
       ? window.location.origin
       : config.public.appUrl
 
     const params = new URLSearchParams({
-      bot_id: botId,
-      origin: redirectUri,
-      request_access: 'write',
-      return_to: redirectUri
+      client_id: botId,
+      origin: origin,
+      return_to: redirectUri,
+      scope: 'openid profile telegram:bot_access',
+      redirect_uri: redirectUri,
+      response_type: 'post_message'
     })
 
     return `https://oauth.telegram.org/auth?${params.toString()}`

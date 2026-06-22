@@ -6,9 +6,6 @@ import { setSessionCookie } from '#server/utils/session-cookie'
 import { sendTelegramMessage } from '#server/utils/telegram'
 import { buildMiniAppLoginUrl, buildPlatformMenuButton, setTelegramChatMenuButton } from '#server/utils/telegram-bot.js'
 
-const LOGIN_SUCCESS_MESSAGE
-  = '✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀'
-
 /**
  * Verify JWT token from Telegram Login Widget
  * Reference: https://core.telegram.org/bots/telegram-login
@@ -104,10 +101,12 @@ export default defineEventHandler(async (event) => {
         }
       })
     } else {
-      await sendTelegramMessage(botToken, tgUser.id, LOGIN_SUCCESS_MESSAGE, {
+      const appUrl = config.public.appUrl || 'https://chayroom.uz'
+      const platformUrl = buildMiniAppLoginUrl(appUrl)
+      await sendTelegramMessage(botToken, tgUser.id, `✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀`, {
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🌐 Panelni ochish', web_app: { url: buildMiniAppLoginUrl(config.public.appUrl || 'https://chayroom.uz') } }]
+            [{ text: '🌐 Panelni ochish', web_app: { url: platformUrl } }]
           ]
         }
       })

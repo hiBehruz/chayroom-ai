@@ -74,7 +74,7 @@ const subscriptionExpiresAt = computed(() => {
 })
 const tariffLabel = computed(() => authStore.tariffLabel ?? 'Obunasiz')
 const subscriptionStatusLabel = computed(() => {
-  if (authStore.isAdmin) return 'Admin'
+  if (user.value?.role === 'ADMIN') return 'Admin'
   if (!authStore.hasSubscription) return 'Yo\'q'
   if (authStore.subscriptionCancelled) return 'Bekor qilingan'
   return 'Faol'

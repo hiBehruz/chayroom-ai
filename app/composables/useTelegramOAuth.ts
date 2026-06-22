@@ -92,48 +92,54 @@ export function useTelegramOAuth() {
           redirect_uri: redirectUri,
           request_access: ['write'],
           lang: 'uz'
-        }, (data: any) => {
-          isWaiting.value = false
-
+        }, async (data: any) => {
           if (data.error) {
+            isWaiting.value = false
             reject(new Error(data.error))
             return
           }
 
           if (!data.user || !data.id_token) {
+            isWaiting.value = false
             reject(new Error('Kirish ma\'lumotlari topilmadi'))
             return
           }
 
-          // Parse JWT token to get auth_date and hash
-          // JWT format: header.payload.signature
-          const parts = data.id_token.split('.')
-          if (parts.length !== 3) {
-            reject(new Error('Noto\'g\'ri token formati'))
-            return
-          }
-
           try {
-            const payload = JSON.parse(atob(parts[1]))
+            // Send JWT token to server for verification and session creation
+            const response = await $fetch('/api/auth/telegram-jwt', {
+              method: 'POST',
+              body: {
+                id_token: data.id_token,
+                user: data.user
+              }
+            })
 
-            // Extract name parts
+            isWaiting.value = false
+
+            if (!response || !response.user) {
+              reject(new Error('Server xatosi'))
+              return
+            }
+
+            // Return user data in format expected by auth store
             const nameParts = data.user.name.split(' ')
-            const firstName = nameParts[0] || ''
-            const lastName = nameParts.slice(1).join(' ') || undefined
-
             const user: TelegramUser = {
-              id: data.user.id,
-              first_name: firstName,
-              last_name: lastName,
-              username: data.user.preferred_username,
-              photo_url: data.user.picture,
-              auth_date: payload.iat || Math.floor(Date.now() / 1000),
-              hash: parts[2] // Use signature as hash
+              id: response.user.telegramId,
+              telegramId: response.user.telegramId,
+              first_name: nameParts[0] || response.user.firstName,
+              last_name: nameParts.slice(1).join(' ') || response.user.lastName || undefined,
+              username: data.user.preferred_username || response.user.username || undefined,
+              photo_url: data.user.picture || response.user.photoUrl || undefined,
+              auth_date: Math.floor(Date.now() / 1000),
+              hash: 'jwt-auth',
+              role: response.user.role
             }
 
             resolve(user)
-          } catch (parseError) {
-            reject(new Error('Token tahlil qilinmadi'))
+          } catch (error) {
+            isWaiting.value = false
+            reject(error instanceof Error ? error : new Error('Server bilan bog\'lanishda xato'))
           }
         })
       } catch (error) {

@@ -1,27 +1,27 @@
 // app/composables/useTelegramOAuth.ts
 import type { TelegramUser } from '~/stores/auth'
 
+interface TelegramLoginSDK {
+  auth: (params: {
+    client_id: number
+    request_access?: string[]
+    lang?: string
+  }, callback: (data: {
+    id_token?: string
+    user?: {
+      id: number
+      name: string
+      preferred_username?: string
+      picture?: string
+      phone_number?: string
+    }
+    error?: string
+  }) => void) => void
+}
+
 declare global {
   interface Window {
-    Telegram?: {
-      Login: {
-        auth: (params: {
-          client_id: number
-          request_access?: string[]
-          lang?: string
-        }, callback: (data: {
-          id_token?: string
-          user?: {
-            id: number
-            name: string
-            preferred_username?: string
-            picture?: string
-            phone_number?: string
-          }
-          error?: string
-        }) => void) => void
-      }
-    }
+    TelegramLoginWidget?: TelegramLoginSDK
   }
 }
 
@@ -31,7 +31,14 @@ export function useTelegramOAuth() {
 
   function loadTelegramScript(): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (scriptLoaded.value || window.Telegram?.Login) {
+      if (scriptLoaded.value) {
+        resolve()
+        return
+      }
+
+      // Check if script already loaded via other means
+      const existingScript = document.querySelector('script[src*="telegram-login.js"]')
+      if (existingScript) {
         scriptLoaded.value = true
         resolve()
         return
@@ -43,7 +50,8 @@ export function useTelegramOAuth() {
 
       script.onload = () => {
         scriptLoaded.value = true
-        resolve()
+        // Wait a bit for SDK to initialize
+        setTimeout(resolve, 100)
       }
 
       script.onerror = () => {
@@ -65,7 +73,10 @@ export function useTelegramOAuth() {
         // Load Telegram Login script first
         await loadTelegramScript()
 
-        if (!window.Telegram?.Login) {
+        // Access Telegram Login from window (SDK sets it globally)
+        const TelegramLogin = (window as any).Telegram?.Login
+
+        if (!TelegramLogin || typeof TelegramLogin.auth !== 'function') {
           reject(new Error('Telegram Login SDK yuklanmadi'))
           return
         }
@@ -75,11 +86,11 @@ export function useTelegramOAuth() {
         // Bot ID from token: 8921379022:AAFXiyb03WLmXO2CeXS5SH-RnrNKZUDZvQQ
         const botId = 8921379022
 
-        window.Telegram.Login.auth({
+        TelegramLogin.auth({
           client_id: botId,
           request_access: ['write'],
           lang: 'uz'
-        }, (data) => {
+        }, (data: any) => {
           isWaiting.value = false
 
           if (data.error) {

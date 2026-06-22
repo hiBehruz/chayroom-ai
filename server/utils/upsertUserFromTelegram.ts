@@ -18,6 +18,8 @@ export async function upsertUserFromTelegram(input: TelegramUserInput): Promise<
   const shouldBeAdmin = isAdminId(input.id, config.adminTelegramIds)
   const adminRole = shouldBeAdmin ? { role: 'ADMIN' as const } : {}
 
+  console.log('[UpsertUser] Input:', { telegramId, shouldBeAdmin, adminTelegramIds: config.adminTelegramIds })
+
   const [existing] = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1)
 
   if (!existing) {
@@ -29,6 +31,7 @@ export async function upsertUserFromTelegram(input: TelegramUserInput): Promise<
       photoUrl: input.photo_url ?? null,
       ...adminRole
     }).returning()
+    console.log('[UpsertUser] Inserted new user:', { id: inserted!.id, telegramId: inserted!.telegramId, role: inserted!.role })
     return inserted!
   }
 
@@ -40,6 +43,7 @@ export async function upsertUserFromTelegram(input: TelegramUserInput): Promise<
     ...(input.photo_url !== undefined ? { photoUrl: input.photo_url ?? null } : {}),
     ...(shouldBeAdmin ? { role: 'ADMIN' as const } : {})
   }).where(eq(users.telegramId, telegramId)).returning()
+  console.log('[UpsertUser] Updated existing user:', { id: updated!.id, telegramId: updated!.telegramId, role: updated!.role })
   return updated!
 }
 

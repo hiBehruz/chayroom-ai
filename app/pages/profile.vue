@@ -289,7 +289,7 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
             </button>
 
             <!-- Admin actions -->
-            <template v-if="authStore.isAdmin">
+            <template v-if="user?.role === 'ADMIN'">
               <div style="height:1px;background:#e8e4da" />
               <NuxtLink
                 to="/guides/new"
@@ -593,7 +593,7 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
 
           <!-- Admin actions -->
           <div
-            v-if="authStore.isAdmin"
+            v-if="user?.role === 'ADMIN'"
             class="grid grid-cols-2 gap-5 max-md:grid-cols-1"
           >
             <NuxtLink

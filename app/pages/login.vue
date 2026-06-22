@@ -96,7 +96,14 @@ onMounted(async () => {
   }
 
   if (action === 'redirect') {
-    await goAfterLogin()
+    // Verify session is still valid before redirecting
+    await authStore.syncMe()
+    if (authStore.user) {
+      await goAfterLogin()
+      return
+    }
+    // Session expired, show login button
+    widgetState.value = 'ready'
     return
   }
 

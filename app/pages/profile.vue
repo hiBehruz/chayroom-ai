@@ -74,6 +74,7 @@ const subscriptionExpiresAt = computed(() => {
 })
 const tariffLabel = computed(() => authStore.tariffLabel ?? 'Obunasiz')
 const subscriptionStatusLabel = computed(() => {
+  if (authStore.isAdmin) return 'Admin'
   if (!authStore.hasSubscription) return 'Yo\'q'
   if (authStore.subscriptionCancelled) return 'Bekor qilingan'
   return 'Faol'
@@ -286,6 +287,54 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
                 style="color:#a0a0a8;background:#efefef"
               >TEZDA</span>
             </button>
+
+            <!-- Admin actions -->
+            <template v-if="authStore.isAdmin">
+              <div style="height:1px;background:#e8e4da" />
+              <NuxtLink
+                to="/guides/new"
+                class="tg-press-sm profile-action-btn"
+              >
+                <span
+                  class="size-7 rounded-[8px] flex-none flex items-center justify-center"
+                  style="background:rgba(251,146,60,0.1)"
+                >
+                  <UIcon
+                    name="solar:document-add-bold"
+                    class="size-3.5"
+                    style="color:#fb923c"
+                  />
+                </span>
+                <span class="flex-1">Qo'llanma qo'shish</span>
+                <UIcon
+                  name="solar:alt-arrow-right-bold"
+                  class="size-4 shrink-0"
+                  style="color:#c0c0c8"
+                />
+              </NuxtLink>
+              <div style="height:1px;background:#e8e4da" />
+              <NuxtLink
+                to="/courses/new"
+                class="tg-press-sm profile-action-btn"
+              >
+                <span
+                  class="size-7 rounded-[8px] flex-none flex items-center justify-center"
+                  style="background:rgba(139,92,246,0.1)"
+                >
+                  <UIcon
+                    name="solar:library-bold"
+                    class="size-3.5"
+                    style="color:#8b5cf6"
+                  />
+                </span>
+                <span class="flex-1">Kurs qo'shish</span>
+                <UIcon
+                  name="solar:alt-arrow-right-bold"
+                  class="size-4 shrink-0"
+                  style="color:#c0c0c8"
+                />
+              </NuxtLink>
+            </template>
           </div>
 
           <!-- O'zim haqimda -->
@@ -540,6 +589,41 @@ useSeoMeta({ title: 'Profil — Chayroom AI' })
               <span class="flex-1 text-[14px] font-semibold text-[#a0a0a8]">O'z AI agentni ulash</span>
               <span class="text-[10px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full bg-[#e8e6e1] text-[#a0a0a8]">TEZDA</span>
             </button>
+          </div>
+
+          <!-- Admin actions -->
+          <div
+            v-if="authStore.isAdmin"
+            class="grid grid-cols-2 gap-5 max-md:grid-cols-1"
+          >
+            <NuxtLink
+              to="/guides/new"
+              class="bg-[#fff7ed] rounded-2xl px-6 py-5 flex items-center gap-3 border border-transparent hover:border-[#fed7aa] transition-all duration-200"
+            >
+              <UIcon
+                name="solar:document-add-bold"
+                class="size-5 shrink-0 text-[#fb923c]"
+              />
+              <span class="flex-1 text-[14px] font-semibold text-[#14161f]">Qo'llanma qo'shish</span>
+              <UIcon
+                name="solar:alt-arrow-right-bold"
+                class="size-4 shrink-0 text-cx-muted"
+              />
+            </NuxtLink>
+            <NuxtLink
+              to="/courses/new"
+              class="bg-[#f5f3ff] rounded-2xl px-6 py-5 flex items-center gap-3 border border-transparent hover:border-[#ddd6fe] transition-all duration-200"
+            >
+              <UIcon
+                name="solar:library-bold"
+                class="size-5 shrink-0 text-[#8b5cf6]"
+              />
+              <span class="flex-1 text-[14px] font-semibold text-[#14161f]">Kurs qo'shish</span>
+              <UIcon
+                name="solar:alt-arrow-right-bold"
+                class="size-4 shrink-0 text-cx-muted"
+              />
+            </NuxtLink>
           </div>
 
           <!-- O'zim haqimda -->

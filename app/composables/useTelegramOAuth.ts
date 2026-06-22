@@ -1,130 +1,137 @@
 // app/composables/useTelegramOAuth.ts
 import type { TelegramUser } from '~/stores/auth'
 
-export function useTelegramOAuth() {
-  const config = useRuntimeConfig()
-  const popup = ref<Window | null>(null)
-  const isWaiting = ref(false)
-  const checkInterval = ref<number | null>(null)
-
-  function buildLoginUrl(): string {
-    const botUsername = config.public.telegramBotUsername
-    if (!botUsername) {
-      throw new Error('Telegram bot username is not configured')
+declare global {
+  interface Window {
+    Telegram?: {
+      Login: {
+        auth: (params: {
+          client_id: number
+          request_access?: string[]
+          lang?: string
+        }, callback: (data: {
+          id_token?: string
+          user?: {
+            id: number
+            name: string
+            preferred_username?: string
+            picture?: string
+            phone_number?: string
+          }
+          error?: string
+        }) => void) => void
+      }
     }
+  }
+}
 
-    // Use current origin for auth callback
-    const origin = import.meta.client
-      ? window.location.origin
-      : config.public.appUrl
+export function useTelegramOAuth() {
+  const isWaiting = ref(false)
+  const scriptLoaded = ref(false)
 
-    const authUrl = `https://oauth.telegram.org/auth?bot_id=8921379022&origin=${encodeURIComponent(origin)}&request_access=write&return_to=${encodeURIComponent(origin + '/login')}`
+  function loadTelegramScript(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (scriptLoaded.value || window.Telegram?.Login) {
+        scriptLoaded.value = true
+        resolve()
+        return
+      }
 
-    return authUrl
+      const script = document.createElement('script')
+      script.src = 'https://telegram.org/js/telegram-login.js'
+      script.async = true
+
+      script.onload = () => {
+        scriptLoaded.value = true
+        resolve()
+      }
+
+      script.onerror = () => {
+        reject(new Error('Telegram Login script yuklanmadi'))
+      }
+
+      document.head.appendChild(script)
+    })
   }
 
   function openOAuthPopup(): Promise<TelegramUser> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (isWaiting.value) {
         reject(new Error('OAuth flow already in progress'))
         return
       }
 
       try {
-        const loginUrl = buildLoginUrl()
-        const width = 550
-        const height = 650
-        const left = (screen.width - width) / 2
-        const top = (screen.height - height) / 2
+        // Load Telegram Login script first
+        await loadTelegramScript()
 
-        // Open popup IMMEDIATELY (synchronously) to avoid popup blocker
-        popup.value = window.open(
-          loginUrl,
-          'telegram-login',
-          `width=${width},height=${height},left=${left},top=${top},popup=yes,scrollbars=yes`
-        )
-
-        if (!popup.value) {
-          reject(new Error('Popup ochilmadi. Popup blocker o\'chirilganligini tekshiring.'))
+        if (!window.Telegram?.Login) {
+          reject(new Error('Telegram Login SDK yuklanmadi'))
           return
         }
 
         isWaiting.value = true
 
-        // Poll the popup URL to detect when it returns to our domain with auth data
-        checkInterval.value = window.setInterval(() => {
+        // Bot ID from token: 8921379022:AAFXiyb03WLmXO2CeXS5SH-RnrNKZUDZvQQ
+        const botId = 8921379022
+
+        window.Telegram.Login.auth({
+          client_id: botId,
+          request_access: ['write'],
+          lang: 'uz'
+        }, (data) => {
+          isWaiting.value = false
+
+          if (data.error) {
+            reject(new Error(data.error))
+            return
+          }
+
+          if (!data.user || !data.id_token) {
+            reject(new Error('Kirish ma\'lumotlari topilmadi'))
+            return
+          }
+
+          // Parse JWT token to get auth_date and hash
+          // JWT format: header.payload.signature
+          const parts = data.id_token.split('.')
+          if (parts.length !== 3) {
+            reject(new Error('Noto\'g\'ri token formati'))
+            return
+          }
+
           try {
-            if (!popup.value || popup.value.closed) {
-              cleanup()
-              reject(new Error('Kirish oynasi yopildi'))
-              return
+            const payload = JSON.parse(atob(parts[1]))
+
+            // Extract name parts
+            const nameParts = data.user.name.split(' ')
+            const firstName = nameParts[0] || ''
+            const lastName = nameParts.slice(1).join(' ') || undefined
+
+            const user: TelegramUser = {
+              id: data.user.id,
+              first_name: firstName,
+              last_name: lastName,
+              username: data.user.preferred_username,
+              photo_url: data.user.picture,
+              auth_date: payload.iat || Math.floor(Date.now() / 1000),
+              hash: parts[2] // Use signature as hash
             }
 
-            // Check if popup has returned to our domain
-            const popupUrl = popup.value.location.href
-            if (popupUrl.includes(window.location.origin)) {
-              const url = new URL(popupUrl)
-              const id = url.searchParams.get('id')
-              const hash = url.searchParams.get('hash')
-
-              if (id && hash) {
-                cleanup()
-                popup.value.close()
-
-                const user: TelegramUser = {
-                  id: Number(id),
-                  first_name: url.searchParams.get('first_name') || '',
-                  last_name: url.searchParams.get('last_name') || undefined,
-                  username: url.searchParams.get('username') || undefined,
-                  photo_url: url.searchParams.get('photo_url') || undefined,
-                  auth_date: Number(url.searchParams.get('auth_date') || 0),
-                  hash: hash
-                }
-
-                resolve(user)
-              }
-            }
-          } catch (e) {
-            // Cross-origin error - popup is still on telegram.org, continue polling
+            resolve(user)
+          } catch (parseError) {
+            reject(new Error('Token tahlil qilinmadi'))
           }
-        }, 500)
-
-        // Timeout after 5 minutes
-        setTimeout(() => {
-          if (isWaiting.value) {
-            cleanup()
-            reject(new Error('Kirish vaqti tugadi'))
-          }
-        }, 300000)
+        })
       } catch (error) {
-        cleanup()
-        reject(error instanceof Error ? error : new Error('Kirish xatosi'))
-      }
-
-      function cleanup() {
         isWaiting.value = false
-        if (checkInterval.value) {
-          clearInterval(checkInterval.value)
-          checkInterval.value = null
-        }
-        if (popup.value && !popup.value.closed) {
-          popup.value.close()
-        }
-        popup.value = null
+        reject(error instanceof Error ? error : new Error('Kirish xatosi'))
       }
     })
   }
 
   function cancel() {
-    if (popup.value && !popup.value.closed) {
-      popup.value.close()
-    }
-    if (checkInterval.value) {
-      clearInterval(checkInterval.value)
-      checkInterval.value = null
-    }
     isWaiting.value = false
-    popup.value = null
   }
 
   return {

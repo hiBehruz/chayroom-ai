@@ -19,6 +19,7 @@ if (meData.value?.user) {
     role: apiUser.role,
     hash: 'session'
   })
+  console.log('[Profile] User role:', apiUser.role, 'isAdmin:', apiUser.role === 'ADMIN')
 }
 if (meData.value?.hasSubscription && !authStore.hasSubscription) {
   authStore.activateSubscription(meData.value.subscription ?? undefined)

@@ -85,9 +85,11 @@ export function useTelegramOAuth() {
 
         // Bot ID from token: 8921379022:AAFXiyb03WLmXO2CeXS5SH-RnrNKZUDZvQQ
         const botId = 8921379022
+        const redirectUri = window.location.origin + '/login'
 
         TelegramLogin.auth({
           client_id: botId,
+          redirect_uri: redirectUri,
           request_access: ['write'],
           lang: 'uz'
         }, (data: any) => {

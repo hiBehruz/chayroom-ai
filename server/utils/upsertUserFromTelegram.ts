@@ -15,7 +15,8 @@ interface TelegramUserInput {
 export async function upsertUserFromTelegram(input: TelegramUserInput): Promise<typeof users.$inferSelect> {
   const config = useRuntimeConfig()
   const telegramId = String(input.id)
-  const adminRole = isAdminId(input.id, config.adminTelegramIds) ? { role: 'ADMIN' as const } : {}
+  const shouldBeAdmin = isAdminId(input.id, config.adminTelegramIds)
+  const adminRole = shouldBeAdmin ? { role: 'ADMIN' as const } : {}
 
   const [existing] = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1)
 
@@ -31,12 +32,13 @@ export async function upsertUserFromTelegram(input: TelegramUserInput): Promise<
     return inserted!
   }
 
+  // Always update role if admin status should be applied
   const [updated] = await db.update(users).set({
     ...(input.first_name ? { firstName: input.first_name } : {}),
     ...(input.last_name !== undefined ? { lastName: input.last_name ?? null } : {}),
     ...(input.username !== undefined ? { username: input.username ?? null } : {}),
     ...(input.photo_url !== undefined ? { photoUrl: input.photo_url ?? null } : {}),
-    ...adminRole
+    ...(shouldBeAdmin ? { role: 'ADMIN' as const } : {})
   }).where(eq(users.telegramId, telegramId)).returning()
   return updated!
 }

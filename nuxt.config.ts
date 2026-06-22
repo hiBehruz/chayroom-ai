@@ -45,6 +45,7 @@ export default defineNuxtConfig({
     r2BucketName: '',
     r2PublicUrl: '',
     telegramBotToken: '',
+    telegramClientSecret: '',
     telegramWebhookSecret: '',
     tributeApiKey: '',
     adminTelegramIds: '',

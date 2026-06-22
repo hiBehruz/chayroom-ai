@@ -21,8 +21,14 @@ function verifyTelegramJWT(idToken: string, clientSecret: string): any {
       return null
     }
 
-    // Decode payload
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString())
+    // Decode payload (base64url decode)
+    const base64Payload = parts[1]
+    if (!base64Payload) {
+      return null
+    }
+
+    const base64 = base64Payload.replace(/-/g, '+').replace(/_/g, '/')
+    const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'))
 
     // Basic validation
     if (!payload.sub || !payload.iss || payload.iss !== 'https://oauth.telegram.org') {

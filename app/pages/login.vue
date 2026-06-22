@@ -60,8 +60,6 @@ async function handleMiniAppLogin() {
 }
 
 onMounted(async () => {
-  authStore.restoreFromStorage()
-
   if (route.query.error === 'expired') {
     authError.value = 'Kirish havolasi muddati tugagan. Qaytadan urinib ko\'ring.'
   } else if (route.query.error === 'invalid') {
@@ -71,18 +69,8 @@ onMounted(async () => {
   const q = route.query
   const hasAuthPayload = Boolean(q.id && q.hash)
 
-  const action = resolveLoginMountAction({
-    isMiniApp: isMiniApp.value,
-    hasAuthPayload,
-    hasSession: Boolean(authStore.user)
-  })
-
-  if (action === 'mini-app') {
-    await handleMiniAppLogin()
-    return
-  }
-
-  if (action === 'process-auth') {
+  // Check if coming from OAuth callback
+  if (hasAuthPayload) {
     await loginWithTelegram({
       id: Number(q.id),
       first_name: String(q.first_name || ''),
@@ -95,19 +83,26 @@ onMounted(async () => {
     return
   }
 
-  if (action === 'redirect') {
-    // Verify session is still valid before redirecting
+  // Check if Mini App
+  if (isMiniApp.value) {
+    await handleMiniAppLogin()
+    return
+  }
+
+  // Restore session from cookie
+  authStore.restoreFromStorage()
+
+  // If session exists in cookie, verify it's still valid
+  if (authStore.user) {
     await authStore.syncMe()
+    // After syncMe, if user is still logged in, redirect
     if (authStore.user) {
       await goAfterLogin()
       return
     }
-    // Session expired, show login button
-    widgetState.value = 'ready'
-    return
   }
 
-  // action === 'show-widget'
+  // No valid session - show login button
   widgetState.value = 'ready'
 })
 

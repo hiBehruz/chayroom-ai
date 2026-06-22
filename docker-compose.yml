@@ -51,6 +51,7 @@ services:
     environment:
       - DATABASE_URL=postgres://chayroom:${POSTGRES_PASSWORD}@postgres:5432/chayroom
       - REDIS_URL=redis://redis:6379
+      - NUXT_ADMIN_TELEGRAM_IDS=${NUXT_ADMIN_TELEGRAM_IDS}
     depends_on:
       postgres:
         condition: service_healthy

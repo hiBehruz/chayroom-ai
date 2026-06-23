@@ -19,6 +19,11 @@ const authError = ref('')
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
 const redirectPath = computed(() => typeof route.query.redirect === 'string' ? route.query.redirect : '')
 
+// Bot-based login state
+const botLoginToken = ref<string | null>(null)
+const botLoginUrl = ref<string | null>(null)
+const isBotLoginPolling = ref(false)
+
 function goAfterLogin() {
   return navigateTo(resolvePostLoginTarget(selectedPlan.value, redirectPath.value))
 }
@@ -57,6 +62,76 @@ async function handleMiniAppLogin() {
     }
   }
   widgetState.value = 'mini-app-error'
+}
+
+async function startBotLogin() {
+  try {
+    authError.value = ''
+    const res = await $fetch<{ token: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
+    botLoginToken.value = res.token
+    botLoginUrl.value = res.url
+    isBotLoginPolling.value = true
+
+    // Open Telegram bot in new tab
+    window.open(res.url, '_blank')
+
+    // Start polling for authentication
+    pollBotLoginStatus()
+  } catch (error) {
+    authError.value = 'Bot login boshlanmadi. Qaytadan urinib ko\'ring.'
+  }
+}
+
+async function pollBotLoginStatus() {
+  if (!botLoginToken.value || !isBotLoginPolling.value) return
+
+  try {
+    const res = await $fetch<{
+      status: 'pending' | 'authenticated' | 'expired'
+      user?: any
+      hasSubscription?: boolean
+      subscription?: any
+    }>(`/api/auth/bot-login/status?token=${botLoginToken.value}`)
+
+    if (res.status === 'authenticated' && res.user) {
+      isBotLoginPolling.value = false
+      authStore.setUserSession({
+        id: res.user.telegramId,
+        telegramId: res.user.telegramId,
+        first_name: res.user.firstName,
+        last_name: res.user.lastName ?? undefined,
+        username: res.user.username ?? undefined,
+        photo_url: res.user.photoUrl ?? undefined,
+        role: res.user.role,
+        hash: 'bot-login'
+      })
+      if (res.hasSubscription) {
+        authStore.activateSubscription(res.subscription)
+      }
+      await goAfterLogin()
+      return
+    }
+
+    if (res.status === 'expired') {
+      isBotLoginPolling.value = false
+      authError.value = 'Kirish havolasi muddati tugagan. Qaytadan boshlang.'
+      return
+    }
+
+    // Continue polling if pending
+    if (res.status === 'pending') {
+      setTimeout(() => pollBotLoginStatus(), 2000)
+    }
+  } catch (error) {
+    // Continue polling on error
+    setTimeout(() => pollBotLoginStatus(), 2000)
+  }
+}
+
+function cancelBotLogin() {
+  isBotLoginPolling.value = false
+  botLoginToken.value = null
+  botLoginUrl.value = null
 }
 
 onMounted(async () => {
@@ -108,6 +183,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   delete (window as unknown as { onTelegramLogin?: unknown }).onTelegramLogin
+  isBotLoginPolling.value = false
 })
 
 useSeoMeta({ title: 'Kirish — Chayroom AI' })
@@ -174,6 +250,27 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           Telegramni yangilang va qaytadan kiring.
         </div>
 
+        <!-- Bot login polling state -->
+        <div
+          v-if="isBotLoginPolling"
+          class="flex flex-col items-center gap-4"
+        >
+          <div class="flex items-center gap-2 text-[14px] text-[#6b6b78]">
+            <span class="size-4 rounded-full border-2 border-[#e0e0e4] border-t-[#54A9EB] animate-spin" />
+            Telegram botda kirish kutilmoqda...
+          </div>
+          <p class="text-[13px] text-center text-[#6b6b78] leading-relaxed max-md:text-[12px]">
+            Telegramda botni ochib, <span class="font-semibold">/start</span> buyrug'ini yuboring
+          </p>
+          <button
+            type="button"
+            class="text-[13px] text-red-500 hover:underline"
+            @click="cancelBotLogin"
+          >
+            Bekor qilish
+          </button>
+        </div>
+
         <!-- OAuth login button -->
         <div
           v-else-if="widgetState === 'ready'"
@@ -205,9 +302,13 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
             <span>{{ isWaiting ? 'Ochilmoqda...' : 'Telegram orqali kirish' }}</span>
           </button>
 
-          <p class="mt-5 text-[13px] text-[#54A9EB] text-center leading-relaxed hover:underline cursor-pointer max-md:text-[12px] max-md:mt-4">
-            Yoki telefon raqam orqali kirish →
-          </p>
+          <button
+            type="button"
+            class="mt-5 text-[13px] text-[#54A9EB] text-center leading-relaxed hover:underline cursor-pointer max-md:text-[12px] max-md:mt-4"
+            @click="startBotLogin"
+          >
+            Yoki boshqa akkount orqali kirish →
+          </button>
         </div>
 
         <p

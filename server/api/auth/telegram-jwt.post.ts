@@ -82,10 +82,7 @@ export default defineEventHandler(async (event) => {
   const isFirstLogin = !existing
 
   const dbUser = await upsertUserFromTelegram(tgUser)
-  console.log('[Login] User after upsert:', { id: dbUser.id, telegramId: dbUser.telegramId, role: dbUser.role })
-  const jwtPayload = userToJwtPayload(dbUser)
-  console.log('[Login] JWT payload:', { id: jwtPayload.id, telegramId: jwtPayload.telegramId, role: jwtPayload.role })
-  await setSessionCookie(event, jwtPayload)
+  await setSessionCookie(event, userToJwtPayload(dbUser))
 
   const botToken = config.telegramBotToken
   if (botToken) {

@@ -23,6 +23,8 @@ const redirectPath = computed(() => typeof route.query.redirect === 'string' ? r
 const botLoginToken = ref<string | null>(null)
 const botLoginUrl = ref<string | null>(null)
 const isBotLoginPolling = ref(false)
+let pollTimeoutId: NodeJS.Timeout | null = null
+let pollErrorCount = 0
 
 function goAfterLogin() {
   return navigateTo(resolvePostLoginTarget(selectedPlan.value, redirectPath.value))
@@ -65,15 +67,24 @@ async function handleMiniAppLogin() {
 }
 
 async function startBotLogin() {
+  // Prevent multiple polling loops
+  if (isBotLoginPolling.value) return
+
   try {
     authError.value = ''
+    pollErrorCount = 0
     const res = await $fetch<{ token: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
     botLoginToken.value = res.token
     botLoginUrl.value = res.url
     isBotLoginPolling.value = true
 
     // Open Telegram bot in new tab
-    window.open(res.url, '_blank')
+    const popup = window.open(res.url, '_blank')
+    if (!popup || popup.closed) {
+      authError.value = 'Popup bloklandi. Brauzer sozlamalarini tekshiring yoki havolani qo\'lda oching.'
+      isBotLoginPolling.value = false
+      return
+    }
 
     // Start polling for authentication
     pollBotLoginStatus()
@@ -82,16 +93,34 @@ async function startBotLogin() {
   }
 }
 
+interface BotLoginUser {
+  telegramId: number
+  firstName: string
+  lastName: string | null
+  username: string | null
+  photoUrl: string | null
+  role: 'USER' | 'ADMIN'
+}
+
+interface BotLoginResponse {
+  status: 'pending' | 'authenticated' | 'expired'
+  user?: BotLoginUser
+  hasSubscription?: boolean
+  subscription?: {
+    period: string | null
+    expiresAt: string
+    cancelledAt: string | null
+  } | null
+}
+
 async function pollBotLoginStatus() {
   if (!botLoginToken.value || !isBotLoginPolling.value) return
 
   try {
-    const res = await $fetch<{
-      status: 'pending' | 'authenticated' | 'expired'
-      user?: any
-      hasSubscription?: boolean
-      subscription?: any
-    }>(`/api/auth/bot-login/status?token=${botLoginToken.value}`)
+    const res = await $fetch<BotLoginResponse>(`/api/auth/bot-login/status?token=${botLoginToken.value}`)
+
+    // Reset error count on successful request
+    pollErrorCount = 0
 
     if (res.status === 'authenticated' && res.user) {
       isBotLoginPolling.value = false
@@ -106,7 +135,7 @@ async function pollBotLoginStatus() {
         hash: 'bot-login'
       })
       if (res.hasSubscription) {
-        authStore.activateSubscription(res.subscription)
+        authStore.activateSubscription(res.subscription ?? undefined)
       }
       await goAfterLogin()
       return
@@ -120,18 +149,36 @@ async function pollBotLoginStatus() {
 
     // Continue polling if pending
     if (res.status === 'pending') {
-      setTimeout(() => pollBotLoginStatus(), 2000)
+      pollTimeoutId = setTimeout(() => pollBotLoginStatus(), 2000)
     }
   } catch (error) {
+    console.error('[BotLogin] Polling error:', error)
+    pollErrorCount++
+
+    // Stop after 5 consecutive errors
+    if (pollErrorCount > 5) {
+      isBotLoginPolling.value = false
+      authError.value = 'Ulanishda xatolik yuz berdi. Qaytadan urinib ko\'ring.'
+      return
+    }
+
     // Continue polling on error
-    setTimeout(() => pollBotLoginStatus(), 2000)
+    pollTimeoutId = setTimeout(() => pollBotLoginStatus(), 2000)
   }
 }
 
 function cancelBotLogin() {
   isBotLoginPolling.value = false
+
+  // Clear polling timeout to prevent memory leak
+  if (pollTimeoutId) {
+    clearTimeout(pollTimeoutId)
+    pollTimeoutId = null
+  }
+
   botLoginToken.value = null
   botLoginUrl.value = null
+  pollErrorCount = 0
 }
 
 onMounted(async () => {
@@ -183,7 +230,9 @@ onMounted(async () => {
 
 onUnmounted(() => {
   delete (window as unknown as { onTelegramLogin?: unknown }).onTelegramLogin
-  isBotLoginPolling.value = false
+
+  // Clean up bot login polling on unmount
+  cancelBotLogin()
 })
 
 useSeoMeta({ title: 'Kirish — Chayroom AI' })
@@ -305,6 +354,7 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           <button
             type="button"
             class="mt-5 text-[13px] text-[#54A9EB] text-center leading-relaxed hover:underline cursor-pointer max-md:text-[12px] max-md:mt-4"
+            aria-label="Boshqa Telegram akkaunti orqali kirish"
             @click="startBotLogin"
           >
             Yoki boshqa akkount orqali kirish →

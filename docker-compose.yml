@@ -52,6 +52,9 @@ services:
       - DATABASE_URL=postgres://chayroom:${POSTGRES_PASSWORD}@postgres:5432/chayroom
       - REDIS_URL=redis://redis:6379
       - NUXT_ADMIN_TELEGRAM_IDS=${NUXT_ADMIN_TELEGRAM_IDS}
+      - NUXT_TELEGRAM_BOT_TOKEN=${NUXT_TELEGRAM_BOT_TOKEN}
+      - NUXT_TELEGRAM_CLIENT_SECRET=${NUXT_TELEGRAM_CLIENT_SECRET}
+      - NUXT_TELEGRAM_WEBHOOK_SECRET=${NUXT_TELEGRAM_WEBHOOK_SECRET}
     depends_on:
       postgres:
         condition: service_healthy

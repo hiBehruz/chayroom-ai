@@ -102,7 +102,8 @@ export function useTelegramOAuth() {
 
         TelegramLogin.auth({
           client_id: botId,
-          lang: 'uz'
+          lang: 'uz',
+          redirect_uri: window.location.origin
           // NOTE: request_access o'chirilgan - OAuth bot xabar yubormasligi uchun
           // Xabarni faqat @chayroobai_bot (asosiy bot) yuboradi
         }, async (data: any) => {

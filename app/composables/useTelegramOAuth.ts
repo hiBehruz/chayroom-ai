@@ -85,13 +85,26 @@ export function useTelegramOAuth() {
 
         // Bot ID from token: 8921379022:AAFXiyb03WLmXO2CeXS5SH-RnrNKZUDZvQQ
         const botId = 8921379022
-        const redirectUri = window.location.origin + '/login'
+
+        // YECHIM: Oldin logout qilamiz - eski session o'chiriladi
+        // Bu brauzer cookie'larini tozalaydi va yangi login flow'ni boshlaydi
+        const logoutUrl = `https://oauth.telegram.org/auth/logout?bot_id=${botId}&origin=${encodeURIComponent(window.location.origin)}`
+
+        // Yashirin iframe orqali logout qilamiz
+        const iframe = document.createElement('iframe')
+        iframe.style.display = 'none'
+        iframe.src = logoutUrl
+        document.body.appendChild(iframe)
+
+        // Logout bajarilishini kutamiz (1 sekund yetarli)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        document.body.removeChild(iframe)
 
         TelegramLogin.auth({
           client_id: botId,
-          redirect_uri: redirectUri,
-          request_access: ['write'],
           lang: 'uz'
+          // NOTE: request_access o'chirilgan - OAuth bot xabar yubormasligi uchun
+          // Xabarni faqat @chayroobai_bot (asosiy bot) yuboradi
         }, async (data: any) => {
           if (data.error) {
             isWaiting.value = false

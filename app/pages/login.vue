@@ -25,6 +25,12 @@ const botLoginUrl = ref<string | null>(null)
 const isBotLoginPolling = ref(false)
 let pollTimeoutId: NodeJS.Timeout | null = null
 let pollErrorCount = 0
+let pollStartTime: number | null = null
+
+// Constants
+const POLL_INTERVAL = 2000
+const MAX_POLL_ERRORS = 5
+const POLLING_TIMEOUT = 5 * 60 * 1000 // 5 daqiqa
 
 function goAfterLogin() {
   return navigateTo(resolvePostLoginTarget(selectedPlan.value, redirectPath.value))
@@ -73,6 +79,7 @@ async function startBotLogin() {
   try {
     authError.value = ''
     pollErrorCount = 0
+    pollStartTime = Date.now()
     const res = await $fetch<{ token: string, url: string }>('/api/auth/bot-login/start', { method: 'POST' })
     botLoginToken.value = res.token
     botLoginUrl.value = res.url
@@ -83,6 +90,7 @@ async function startBotLogin() {
     if (!popup || popup.closed) {
       authError.value = 'Popup bloklandi. Brauzer sozlamalarini tekshiring yoki havolani qo\'lda oching.'
       isBotLoginPolling.value = false
+      pollStartTime = null
       return
     }
 
@@ -90,6 +98,7 @@ async function startBotLogin() {
     pollBotLoginStatus()
   } catch (error) {
     authError.value = 'Bot login boshlanmadi. Qaytadan urinib ko\'ring.'
+    pollStartTime = null
   }
 }
 
@@ -116,6 +125,14 @@ interface BotLoginResponse {
 async function pollBotLoginStatus() {
   if (!botLoginToken.value || !isBotLoginPolling.value) return
 
+  // Check timeout
+  if (pollStartTime && Date.now() - pollStartTime > POLLING_TIMEOUT) {
+    isBotLoginPolling.value = false
+    authError.value = 'Kirish vaqti tugadi (5 daqiqa). Qaytadan boshlang.'
+    pollStartTime = null
+    return
+  }
+
   try {
     const res = await $fetch<BotLoginResponse>(`/api/auth/bot-login/status?token=${botLoginToken.value}`)
 
@@ -124,6 +141,7 @@ async function pollBotLoginStatus() {
 
     if (res.status === 'authenticated' && res.user) {
       isBotLoginPolling.value = false
+      pollStartTime = null
       authStore.setUserSession({
         id: res.user.telegramId,
         telegramId: res.user.telegramId,
@@ -143,27 +161,29 @@ async function pollBotLoginStatus() {
 
     if (res.status === 'expired') {
       isBotLoginPolling.value = false
+      pollStartTime = null
       authError.value = 'Kirish havolasi muddati tugagan. Qaytadan boshlang.'
       return
     }
 
     // Continue polling if pending
     if (res.status === 'pending') {
-      pollTimeoutId = setTimeout(() => pollBotLoginStatus(), 2000)
+      pollTimeoutId = setTimeout(() => pollBotLoginStatus(), POLL_INTERVAL)
     }
   } catch (error) {
     console.error('[BotLogin] Polling error:', error)
     pollErrorCount++
 
-    // Stop after 5 consecutive errors
-    if (pollErrorCount > 5) {
+    // Stop after max consecutive errors
+    if (pollErrorCount > MAX_POLL_ERRORS) {
       isBotLoginPolling.value = false
+      pollStartTime = null
       authError.value = 'Ulanishda xatolik yuz berdi. Qaytadan urinib ko\'ring.'
       return
     }
 
     // Continue polling on error
-    pollTimeoutId = setTimeout(() => pollBotLoginStatus(), 2000)
+    pollTimeoutId = setTimeout(() => pollBotLoginStatus(), POLL_INTERVAL)
   }
 }
 
@@ -179,6 +199,7 @@ function cancelBotLogin() {
   botLoginToken.value = null
   botLoginUrl.value = null
   pollErrorCount = 0
+  pollStartTime = null
 }
 
 onMounted(async () => {
@@ -359,6 +380,10 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           >
             Yoki boshqa akkount orqali kirish →
           </button>
+
+          <p class="mt-4 text-center text-[12px] text-[#a0a0a8] leading-relaxed max-md:text-[11px]">
+            💡 Noto'g'ri akkaunt chiqsa, brauzer cookie'larini tozalang yoki incognito mode'da oching
+          </p>
         </div>
 
         <p

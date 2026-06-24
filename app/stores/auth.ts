@@ -16,6 +16,7 @@ export interface TelegramUser {
   role?: 'USER' | 'ADMIN'
   auth_date?: number
   hash: string
+  hasSubscription?: boolean
 }
 
 export type AgentVariant = 'auto' | 'male' | 'female'
@@ -142,6 +143,22 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login(telegramUser: TelegramUser) {
     if (!import.meta.client) return
+
+    // JWT OAuth login - user allaqachon server'da verify qilingan
+    // Faqat client state'ni yangilaymiz, yana API so'rov yubormaymiz
+    if (telegramUser.hash === 'jwt-auth') {
+      setUserSession(telegramUser)
+      // Subscription holatini user object'dan olamiz
+      if (telegramUser.hasSubscription) {
+        activateSubscription()
+      } else {
+        hasSubscription.value = false
+        subCookie.value = null
+      }
+      return
+    }
+
+    // Telegram Widget login - eski usul
     try {
       const res = await $fetch<{
         user: { id: number, telegramId: number, firstName: string, lastName: string | null, username: string | null, photoUrl: string | null, role: 'USER' | 'ADMIN' }

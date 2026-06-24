@@ -146,7 +146,8 @@ export function useTelegramOAuth() {
               photo_url: data.user.picture || response.user.photoUrl || undefined,
               auth_date: Math.floor(Date.now() / 1000),
               hash: 'jwt-auth',
-              role: response.user.role
+              role: response.user.role,
+              hasSubscription: response.hasSubscription // Subscription holatini qo'shamiz
             }
 
             resolve(user)

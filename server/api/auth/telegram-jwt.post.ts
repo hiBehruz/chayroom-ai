@@ -126,33 +126,53 @@ export default defineEventHandler(async (event) => {
   const dbUser = await upsertUserFromTelegram(tgUser)
   await setSessionCookie(event, userToJwtPayload(dbUser))
 
-  const botToken = config.telegramBotToken
-  if (botToken) {
-    if (isFirstLogin) {
-      const appUrl = config.public.appUrl || 'https://chayroom.uz'
-      const platformUrl = buildMiniAppLoginUrl(appUrl)
-      const supportUsername = config.public.supportUsername || 'hellobehruz'
-      await setTelegramChatMenuButton(botToken, buildPlatformMenuButton(appUrl))
-      await sendTelegramMessage(botToken, tgUser.id, `Salom, ${tgUser.first_name}! 👋\n\nChayroom AI Club'ga xush kelibsiz — bu yerda biz AI'ni hayot, ish va biznesga joriy qilamiz.\n\nIchida: AI-agentlar, vibe coding, neyrotarmoqlar va boshqa amaliy materiallar.\n\nBoshlaylikmi?`, {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '🚀 Platformani ochish', web_app: { url: platformUrl } }],
-            [{ text: '💳 Obunani boshqarish', url: `${appUrl}/profile` }],
-            [{ text: '💬 Qo\'llab-quvvatlash', url: `https://t.me/${supportUsername}` }]
-          ]
-        }
-      })
-    } else {
-      const appUrl = config.public.appUrl || 'https://chayroom.uz'
-      const platformUrl = buildMiniAppLoginUrl(appUrl)
-      await sendTelegramMessage(botToken, tgUser.id, `✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀`, {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '🌐 Panelni ochish', web_app: { url: platformUrl } }]
-          ]
-        }
-      })
+  // OAuth bot token (chayroomai_bot - 8921379022)
+  const oauthBotToken = '8921379022:AAFXiyb03WLmXO2CeXS5SH-RnrNKZUDZvQQ'
+
+  // Main bot token (chayroobai_bot)
+  const mainBotToken = config.telegramBotToken
+
+  const appUrl = config.public.appUrl || 'https://chayroom.uz'
+  const platformUrl = buildMiniAppLoginUrl(appUrl)
+  const supportUsername = config.public.supportUsername || 'hellobehruz'
+
+  // Xabar mazmuni
+  const successMessage = `✅ Kirish muvaffaqiyatli amalga oshirildi!\n\nChayroom.uz saytiga qayting va foydalanishda davom eting. 🚀`
+  const welcomeMessage = `Salom, ${tgUser.first_name}! 👋\n\nChayroom AI Club'ga xush kelibsiz — bu yerda biz AI'ni hayot, ish va biznesga joriy qilamiz.\n\nIchida: AI-agentlar, vibe coding, neyrotarmoqlar va boshqa amaliy materiallar.\n\nBoshlaylikmi?`
+
+  if (isFirstLogin) {
+    // First login - welcome message
+    const keyboard = {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '🚀 Platformani ochish', web_app: { url: platformUrl } }],
+          [{ text: '💳 Obunani boshqarish', url: `${appUrl}/profile` }],
+          [{ text: '💬 Qo\'llab-quvvatlash', url: `https://t.me/${supportUsername}` }]
+        ]
+      }
     }
+
+    // Send from both bots
+    if (mainBotToken) {
+      await setTelegramChatMenuButton(mainBotToken, buildPlatformMenuButton(appUrl))
+      await sendTelegramMessage(mainBotToken, tgUser.id, welcomeMessage, keyboard)
+    }
+    await sendTelegramMessage(oauthBotToken, tgUser.id, welcomeMessage, keyboard)
+  } else {
+    // Returning user - success message
+    const keyboard = {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '🌐 Panelni ochish', web_app: { url: platformUrl } }]
+        ]
+      }
+    }
+
+    // Send from both bots
+    if (mainBotToken) {
+      await sendTelegramMessage(mainBotToken, tgUser.id, successMessage, keyboard)
+    }
+    await sendTelegramMessage(oauthBotToken, tgUser.id, successMessage, keyboard)
   }
 
   let hasSubscription = dbUser.role === 'ADMIN'

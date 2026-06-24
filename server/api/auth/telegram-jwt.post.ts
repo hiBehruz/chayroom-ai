@@ -126,11 +126,30 @@ export default defineEventHandler(async (event) => {
   const dbUser = await upsertUserFromTelegram(tgUser)
   await setSessionCookie(event, userToJwtPayload(dbUser))
 
-  // OAuth bot token (chayroomai_bot - 8921379022)
-  const oauthBotToken = '8921379022:AAFXiyb03WLmXO2CeXS5SH-RnrNKZUDZvQQ'
+  // Telegram bot token (chayroomai_bot - 8921379022)
+  const botToken = config.telegramBotToken
 
-  // Main bot token (chayroobai_bot)
-  const mainBotToken = config.telegramBotToken
+  if (!botToken) {
+    // Return early if no bot token configured
+    let hasSubscription = dbUser.role === 'ADMIN'
+    if (!hasSubscription) {
+      const [sub] = await db.select().from(subscriptions).where(eq(subscriptions.userId, dbUser.id)).limit(1)
+      hasSubscription = sub?.status === 'ACTIVE' && sub.expiresAt > new Date()
+    }
+
+    return {
+      user: {
+        id: dbUser.id,
+        telegramId: Number(dbUser.telegramId),
+        firstName: dbUser.firstName,
+        lastName: dbUser.lastName,
+        username: dbUser.username,
+        photoUrl: dbUser.photoUrl,
+        role: dbUser.role
+      },
+      hasSubscription
+    }
+  }
 
   const appUrl = config.public.appUrl || 'https://chayroom.uz'
   const platformUrl = buildMiniAppLoginUrl(appUrl)
@@ -152,12 +171,8 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Send from both bots
-    if (mainBotToken) {
-      await setTelegramChatMenuButton(mainBotToken, buildPlatformMenuButton(appUrl))
-      await sendTelegramMessage(mainBotToken, tgUser.id, welcomeMessage, keyboard)
-    }
-    await sendTelegramMessage(oauthBotToken, tgUser.id, welcomeMessage, keyboard)
+    await setTelegramChatMenuButton(botToken, buildPlatformMenuButton(appUrl))
+    await sendTelegramMessage(botToken, tgUser.id, welcomeMessage, keyboard)
   } else {
     // Returning user - success message
     const keyboard = {
@@ -168,11 +183,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Send from both bots
-    if (mainBotToken) {
-      await sendTelegramMessage(mainBotToken, tgUser.id, successMessage, keyboard)
-    }
-    await sendTelegramMessage(oauthBotToken, tgUser.id, successMessage, keyboard)
+    await sendTelegramMessage(botToken, tgUser.id, successMessage, keyboard)
   }
 
   let hasSubscription = dbUser.role === 'ADMIN'

@@ -1,11 +1,10 @@
 <!-- app/pages/login.vue -->
 <script setup lang="ts">
 import type { TelegramUser } from '~/stores/auth'
-import { resolveLoginMountAction, resolvePostLoginTarget } from '~/utils/login-flow.mjs'
+import { resolvePostLoginTarget } from '~/utils/login-flow.mjs'
 
 const authStore = useAuthStore()
 const route = useRoute()
-const config = useRuntimeConfig()
 const { isMiniApp } = useTelegramApp()
 
 // OAuth composable - client side only
@@ -13,7 +12,6 @@ const { openOAuthPopup, isWaiting } = import.meta.client
   ? useTelegramOAuth()
   : { openOAuthPopup: async () => ({} as TelegramUser), isWaiting: ref(false) }
 
-const telegramBotUsername = computed(() => config.public.telegramBotUsername)
 const widgetState = ref<'loading' | 'ready' | 'mini-app' | 'mini-app-error'>('loading')
 const authError = ref('')
 const selectedPlan = computed(() => typeof route.query.plan === 'string' ? route.query.plan : '')
@@ -96,7 +94,7 @@ async function startBotLogin() {
 
     // Start polling for authentication
     pollBotLoginStatus()
-  } catch (error) {
+  } catch {
     authError.value = 'Bot login boshlanmadi. Qaytadan urinib ko\'ring.'
     pollStartTime = null
   }

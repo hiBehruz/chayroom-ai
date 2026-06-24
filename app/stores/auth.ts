@@ -155,6 +155,7 @@ export const useAuthStore = defineStore('auth', () => {
         hasSubscription.value = false
         subCookie.value = null
       }
+      await syncMe()
       return
     }
 

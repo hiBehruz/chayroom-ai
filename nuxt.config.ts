@@ -20,9 +20,9 @@ export default defineNuxtConfig({
       ],
       meta: [
         // Cache busting - browser har safar yangi versiyani yuklaydi
-        { 'http-equiv': 'Cache-Control', content: 'no-cache, no-store, must-revalidate' },
-        { 'http-equiv': 'Pragma', content: 'no-cache' },
-        { 'http-equiv': 'Expires', content: '0' }
+        { 'http-equiv': 'Cache-Control', 'content': 'no-cache, no-store, must-revalidate' },
+        { 'http-equiv': 'Pragma', 'content': 'no-cache' },
+        { 'http-equiv': 'Expires', 'content': '0' }
       ]
     },
     // Build hash'ni qo'shamiz - har build'da yangi URL

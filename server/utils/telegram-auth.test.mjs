@@ -1,8 +1,9 @@
 import { test } from 'vitest'
 import assert from 'node:assert/strict'
 import { createHash, createHmac } from 'node:crypto'
+import { SignJWT } from 'jose'
 
-import { verifyTelegramLoginPayload, parseAdminIds, isAdminId, verifyTelegramWebAppInitData } from './telegram-auth.ts'
+import { verifyTelegramLoginPayload, parseAdminIds, isAdminId, verifyTelegramWebAppInitData, verifyTelegramOAuthJwt } from './telegram-auth.ts'
 
 const BOT_TOKEN = '123456:test-bot-token'
 
@@ -88,4 +89,24 @@ test('verifyTelegramWebAppInitData rejects stale and wrong-token initData', () =
   assert.equal(verifyTelegramWebAppInitData(stale, BOT_TOKEN), null)
   const fresh = signInitData({ auth_date: String(now), user: JSON.stringify({ id: 1, first_name: 'A' }) })
   assert.equal(verifyTelegramWebAppInitData(fresh, 'other-token'), null)
+})
+
+test('verifyTelegramOAuthJwt rejects tokens signed with the wrong secret', async () => {
+  const token = await new SignJWT({ sub: '222333444', iss: 'https://oauth.telegram.org' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('5m')
+    .sign(new TextEncoder().encode('wrong-secret'))
+
+  assert.equal(await verifyTelegramOAuthJwt(token, 'correct-secret'), null)
+})
+
+test('verifyTelegramOAuthJwt accepts a valid signed token', async () => {
+  const token = await new SignJWT({ sub: '222333444', iss: 'https://oauth.telegram.org' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('5m')
+    .sign(new TextEncoder().encode('correct-secret'))
+
+  const payload = await verifyTelegramOAuthJwt(token, 'correct-secret')
+  assert.ok(payload)
+  assert.equal(payload.sub, '222333444')
 })

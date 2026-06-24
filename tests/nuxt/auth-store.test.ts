@@ -44,3 +44,42 @@ describe('auth store session restoration', () => {
     expect(store.displayName).toBe('Behruz Zaripov')
   })
 })
+
+describe('auth store OAuth login', () => {
+  it('uses the already-verified JWT OAuth user without posting it to widget auth', async () => {
+    fetchMock.mockResolvedValue({
+      user: {
+        id: 8,
+        telegramId: 222333444,
+        firstName: 'OAuth',
+        lastName: 'User',
+        username: 'oauth_user',
+        photoUrl: null,
+        role: 'USER'
+      },
+      hasSubscription: false,
+      subscription: null
+    })
+    const store = useAuthStore()
+
+    await store.login({
+      id: 222333444,
+      telegramId: 222333444,
+      first_name: 'OAuth',
+      last_name: 'User',
+      username: 'oauth_user',
+      photo_url: '',
+      role: 'USER',
+      hash: 'jwt-auth'
+    })
+
+    expect(fetchMock).not.toHaveBeenCalledWith('/api/auth/telegram', expect.anything())
+    expect(fetchMock).toHaveBeenCalledWith('/api/auth/me')
+    expect(store.user).toMatchObject({
+      id: 222333444,
+      telegramId: 222333444,
+      first_name: 'OAuth',
+      last_name: 'User'
+    })
+  })
+})

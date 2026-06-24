@@ -1,4 +1,5 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
+import { jwtVerify, type JWTPayload } from 'jose'
 
 export interface TelegramLoginPayload {
   id: number | string
@@ -100,6 +101,24 @@ export function verifyTelegramWebAppInitData(
   try {
     const user = JSON.parse(userRaw) as TelegramWebAppUser
     return user?.id ? user : null
+  } catch {
+    return null
+  }
+}
+
+export async function verifyTelegramOAuthJwt(
+  idToken: string,
+  clientSecret: string
+): Promise<JWTPayload | null> {
+  if (!idToken || !clientSecret) return null
+
+  try {
+    const { payload } = await jwtVerify(idToken, new TextEncoder().encode(clientSecret), {
+      issuer: 'https://oauth.telegram.org',
+      algorithms: ['HS256']
+    })
+
+    return payload.sub ? payload : null
   } catch {
     return null
   }

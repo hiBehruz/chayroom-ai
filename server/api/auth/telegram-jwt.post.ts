@@ -1,87 +1,16 @@
-import { createHmac, timingSafeEqual } from 'node:crypto'
 import { eq } from 'drizzle-orm'
 import { db } from '#server/db'
 import { users, subscriptions } from '#server/db/schema'
+import { verifyTelegramOAuthJwt } from '#server/utils/telegram-auth'
 import { upsertUserFromTelegram, userToJwtPayload } from '#server/utils/upsertUserFromTelegram'
 import { setSessionCookie } from '#server/utils/session-cookie'
 import { sendTelegramMessage } from '#server/utils/telegram'
 import { buildMiniAppLoginUrl, buildPlatformMenuButton, setTelegramChatMenuButton } from '#server/utils/telegram-bot.js'
 
-interface TelegramJWTPayload {
-  sub: string
-  iss: string
-  exp?: number
-  [key: string]: unknown
-}
-
 interface TelegramOAuthUser {
   name?: string
   preferred_username?: string
   picture?: string
-}
-
-/**
- * Verify JWT token from Telegram Login Widget
- * Reference: https://core.telegram.org/bots/telegram-login
- */
-function verifyTelegramJWT(idToken: string, clientSecret: string): TelegramJWTPayload | null {
-  try {
-    if (!clientSecret) {
-      return null
-    }
-
-    // JWT format: header.payload.signature
-    const parts = idToken.split('.')
-    if (parts.length !== 3) {
-      return null
-    }
-
-    const [header, payloadPart, signature] = parts
-
-    // Decode payload (base64url decode)
-    if (!payloadPart) {
-      return null
-    }
-
-    const base64 = payloadPart.replace(/-/g, '+').replace(/_/g, '/')
-    const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8')) as TelegramJWTPayload
-
-    // Basic validation
-    if (!payload.sub || !payload.iss || payload.iss !== 'https://oauth.telegram.org') {
-      return null
-    }
-
-    // Check expiration
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-      return null
-    }
-
-    // Verify signature with client_secret (HMAC-SHA256)
-    const data = `${header}.${payloadPart}`
-    const expectedSignature = createHmac('sha256', clientSecret)
-      .update(data)
-      .digest('base64url')
-
-    // Timing-safe comparison to prevent timing attacks
-    if (!signature || signature.length !== expectedSignature.length) {
-      return null
-    }
-
-    try {
-      const signatureBuffer = Buffer.from(signature, 'base64url')
-      const expectedBuffer = Buffer.from(expectedSignature, 'base64url')
-
-      if (!timingSafeEqual(signatureBuffer, expectedBuffer)) {
-        return null
-      }
-    } catch {
-      return null
-    }
-
-    return payload
-  } catch (error) {
-    return null
-  }
 }
 
 export default defineEventHandler(async (event) => {
@@ -93,7 +22,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Verify JWT token
-  const payload = verifyTelegramJWT(body.id_token, config.telegramClientSecret || '')
+  const payload = await verifyTelegramOAuthJwt(body.id_token, config.telegramClientSecret || '')
 
   if (!payload || !payload.sub) {
     throw createError({ statusCode: 401, statusMessage: 'Invalid token' })
@@ -106,16 +35,12 @@ export default defineEventHandler(async (event) => {
   }
 
   // Use user data from callback if available, otherwise from token
-  const userData: TelegramOAuthUser = body.user || {}
-
-  // Parse name with fallback
-  const firstName = userData.name?.split(' ')[0] || `User${telegramId}`
-  const lastNameParts = userData.name?.split(' ').slice(1).join(' ')
-
+  const userData = body.user || {}
+  const nameParts = userData.name?.trim().split(/\s+/).filter(Boolean) ?? []
   const tgUser = {
     id: telegramId,
-    first_name: firstName,
-    last_name: lastNameParts || undefined,
+    first_name: nameParts[0] || `User${telegramId}`,
+    last_name: nameParts.slice(1).join(' ') || undefined,
     username: userData.preferred_username,
     photo_url: userData.picture
   }

@@ -86,9 +86,7 @@ async function startBotLogin() {
     // Open Telegram bot in new tab
     const popup = window.open(res.url, '_blank')
     if (!popup || popup.closed) {
-      authError.value = 'Popup bloklandi. Brauzer sozlamalarini tekshiring yoki havolani qo\'lda oching.'
-      isBotLoginPolling.value = false
-      pollStartTime = null
+      window.location.href = res.url
       return
     }
 
@@ -339,19 +337,19 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
           </button>
         </div>
 
-        <!-- OAuth login button -->
+        <!-- Telegram bot login button -->
         <div
           v-else-if="widgetState === 'ready'"
           class="flex flex-col items-center"
         >
           <button
             type="button"
-            :disabled="isWaiting"
+            :disabled="isBotLoginPolling"
             class="w-full rounded-2xl bg-[#54A9EB] px-6 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 hover:bg-[#4A9DD9] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2.5"
-            @click="handleOAuthLogin"
+            @click="startBotLogin"
           >
             <svg
-              v-if="isWaiting"
+              v-if="isBotLoginPolling"
               class="size-4 animate-spin"
               viewBox="0 0 24 24"
               fill="none"
@@ -367,20 +365,21 @@ useSeoMeta({ title: 'Kirish — Chayroom AI' })
             >
               <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
             </svg>
-            <span>{{ isWaiting ? 'Ochilmoqda...' : 'Telegram orqali kirish' }}</span>
+            <span>{{ isBotLoginPolling ? 'Tasdiq kutilmoqda...' : 'Telegram orqali kirish' }}</span>
           </button>
 
           <button
             type="button"
             class="mt-5 text-[13px] text-[#54A9EB] text-center leading-relaxed hover:underline cursor-pointer max-md:text-[12px] max-md:mt-4"
-            aria-label="Boshqa Telegram akkaunti orqali kirish"
-            @click="startBotLogin"
+            :disabled="isWaiting"
+            aria-label="OAuth orqali kirish"
+            @click="handleOAuthLogin"
           >
-            Yoki boshqa akkount orqali kirish →
+            OAuth orqali kirish →
           </button>
 
           <p class="mt-4 text-center text-[12px] text-[#a0a0a8] leading-relaxed max-md:text-[11px]">
-            💡 Noto'g'ri akkaunt chiqsa, brauzer cookie'larini tozalang yoki incognito mode'da oching
+            Telegram qaysi akkauntda tasdiqlansa, saytga ham o'sha akkaunt bilan kirasiz.
           </p>
         </div>
 

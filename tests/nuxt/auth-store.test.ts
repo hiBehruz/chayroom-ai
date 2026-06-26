@@ -82,4 +82,32 @@ describe('auth store OAuth login', () => {
       last_name: 'User'
     })
   })
+
+  it('keeps the verified JWT OAuth user when the immediate session sync misses the cookie', async () => {
+    fetchMock.mockResolvedValue({
+      user: null,
+      hasSubscription: false,
+      subscription: null
+    })
+    const store = useAuthStore()
+
+    await store.login({
+      id: 333444555,
+      telegramId: 333444555,
+      first_name: 'Cookie',
+      last_name: 'Race',
+      username: 'cookie_race',
+      photo_url: '',
+      role: 'USER',
+      hash: 'jwt-auth'
+    })
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/auth/me')
+    expect(store.user).toMatchObject({
+      id: 333444555,
+      telegramId: 333444555,
+      first_name: 'Cookie',
+      last_name: 'Race'
+    })
+  })
 })

@@ -132,6 +132,7 @@ export function useTelegramOAuth() {
     // Send JWT token to server for verification and session creation
     const response = await $fetch<TelegramJwtAuthResponse>('/api/auth/telegram-jwt', {
       method: 'POST',
+      credentials: 'include',
       body: {
         id_token: data.id_token,
         user: data.user

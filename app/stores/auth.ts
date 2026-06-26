@@ -96,8 +96,9 @@ export const useAuthStore = defineStore('auth', () => {
     userCookie.value = user.value
   }
 
-  async function syncMe() {
+  async function syncMe(options: { clearOnMissing?: boolean } = {}) {
     if (!import.meta.client) return
+    const clearOnMissing = options.clearOnMissing ?? true
     try {
       const res = await $fetch<{
         user: {
@@ -114,7 +115,9 @@ export const useAuthStore = defineStore('auth', () => {
       }>('/api/auth/me')
 
       if (!res.user) {
-        logout()
+        if (clearOnMissing) {
+          logout()
+        }
         return
       }
 
@@ -155,7 +158,7 @@ export const useAuthStore = defineStore('auth', () => {
         hasSubscription.value = false
         subCookie.value = null
       }
-      await syncMe()
+      await syncMe({ clearOnMissing: false })
       return
     }
 

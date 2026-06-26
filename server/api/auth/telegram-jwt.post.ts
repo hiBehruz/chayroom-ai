@@ -21,14 +21,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'id_token is required' })
   }
 
-  // Verify JWT token
-  const botTokenSecret = config.telegramBotToken?.includes(':')
-    ? config.telegramBotToken.split(':').slice(1).join(':')
+  // Verify OIDC JWT token signed by Telegram.
+  const clientId = config.telegramBotToken?.includes(':')
+    ? config.telegramBotToken.split(':')[0]
     : ''
-  const payload = await verifyTelegramOAuthJwt(body.id_token, [
-    config.telegramClientSecret || '',
-    botTokenSecret
-  ])
+  const payload = await verifyTelegramOAuthJwt(body.id_token, clientId)
 
   if (!payload || !payload.sub) {
     throw createError({ statusCode: 401, statusMessage: 'Invalid token' })

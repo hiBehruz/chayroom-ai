@@ -1,5 +1,8 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
-import { jwtVerify, type JWTPayload } from 'jose'
+import { createRemoteJWKSet, jwtVerify, type JWTPayload, type JWTVerifyGetKey } from 'jose'
+
+const TELEGRAM_OAUTH_ISSUER = 'https://oauth.telegram.org'
+const TELEGRAM_OAUTH_JWKS = createRemoteJWKSet(new URL('https://oauth.telegram.org/.well-known/jwks.json'))
 
 export interface TelegramLoginPayload {
   id: number | string
@@ -108,23 +111,19 @@ export function verifyTelegramWebAppInitData(
 
 export async function verifyTelegramOAuthJwt(
   idToken: string,
-  clientSecret: string | string[]
+  clientId: string | number,
+  getKey: JWTVerifyGetKey = TELEGRAM_OAUTH_JWKS
 ): Promise<JWTPayload | null> {
-  if (!idToken || !clientSecret) return null
-  const secrets = Array.isArray(clientSecret) ? clientSecret : [clientSecret]
+  if (!idToken || !clientId) return null
 
-  for (const secret of secrets.map(value => value.trim()).filter(Boolean)) {
-    try {
-      const { payload } = await jwtVerify(idToken, new TextEncoder().encode(secret), {
-        issuer: 'https://oauth.telegram.org',
-        algorithms: ['HS256']
-      })
+  try {
+    const { payload } = await jwtVerify(idToken, getKey, {
+      issuer: TELEGRAM_OAUTH_ISSUER,
+      audience: String(clientId)
+    })
 
-      if (payload.sub) return payload
-    } catch {
-      // Try the next configured secret.
-    }
+    return payload.sub ? payload : null
+  } catch {
+    return null
   }
-
-  return null
 }

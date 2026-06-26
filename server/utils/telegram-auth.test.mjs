@@ -1,7 +1,7 @@
 import { test } from 'vitest'
 import assert from 'node:assert/strict'
 import { createHash, createHmac } from 'node:crypto'
-import { SignJWT } from 'jose'
+import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT } from 'jose'
 
 import { verifyTelegramLoginPayload, parseAdminIds, isAdminId, verifyTelegramWebAppInitData, verifyTelegramOAuthJwt } from './telegram-auth.ts'
 
@@ -91,33 +91,45 @@ test('verifyTelegramWebAppInitData rejects stale and wrong-token initData', () =
   assert.equal(verifyTelegramWebAppInitData(fresh, 'other-token'), null)
 })
 
-test('verifyTelegramOAuthJwt rejects tokens signed with the wrong secret', async () => {
-  const token = await new SignJWT({ sub: '222333444', iss: 'https://oauth.telegram.org' })
+async function createTelegramOidcToken(fields = {}, clientId = '8921379022') {
+  const { publicKey, privateKey } = await generateKeyPair('RS256')
+  const jwk = await exportJWK(publicKey)
+  jwk.kid = 'telegram-test-key'
+  const getKey = createLocalJWKSet({ keys: [jwk] })
+  const token = await new SignJWT({
+    sub: '222333444',
+    iss: 'https://oauth.telegram.org',
+    aud: clientId,
+    ...fields
+  })
+    .setProtectedHeader({ alg: 'RS256', kid: jwk.kid })
+    .setExpirationTime('5m')
+    .setIssuedAt()
+    .sign(privateKey)
+
+  return { token, getKey }
+}
+
+test('verifyTelegramOAuthJwt rejects tokens signed with the old shared-secret method', async () => {
+  const token = await new SignJWT({ sub: '222333444', iss: 'https://oauth.telegram.org', aud: '8921379022' })
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime('5m')
     .sign(new TextEncoder().encode('wrong-secret'))
 
-  assert.equal(await verifyTelegramOAuthJwt(token, 'correct-secret'), null)
+  const { getKey } = await createTelegramOidcToken()
+  assert.equal(await verifyTelegramOAuthJwt(token, '8921379022', getKey), null)
 })
 
-test('verifyTelegramOAuthJwt accepts a valid signed token', async () => {
-  const token = await new SignJWT({ sub: '222333444', iss: 'https://oauth.telegram.org' })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('5m')
-    .sign(new TextEncoder().encode('correct-secret'))
+test('verifyTelegramOAuthJwt accepts a valid Telegram OIDC token', async () => {
+  const { token, getKey } = await createTelegramOidcToken()
 
-  const payload = await verifyTelegramOAuthJwt(token, 'correct-secret')
+  const payload = await verifyTelegramOAuthJwt(token, '8921379022', getKey)
   assert.ok(payload)
   assert.equal(payload.sub, '222333444')
 })
 
-test('verifyTelegramOAuthJwt accepts any configured valid secret', async () => {
-  const token = await new SignJWT({ sub: '222333444', iss: 'https://oauth.telegram.org' })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('5m')
-    .sign(new TextEncoder().encode('bot-token-secret'))
+test('verifyTelegramOAuthJwt rejects a Telegram OIDC token for a different client', async () => {
+  const { token, getKey } = await createTelegramOidcToken({}, '111111111')
 
-  const payload = await verifyTelegramOAuthJwt(token, ['wrong-client-secret', 'bot-token-secret'])
-  assert.ok(payload)
-  assert.equal(payload.sub, '222333444')
+  assert.equal(await verifyTelegramOAuthJwt(token, '8921379022', getKey), null)
 })

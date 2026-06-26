@@ -231,14 +231,12 @@ onMounted(async () => {
   // Restore session from cookie
   authStore.restoreFromStorage()
 
-  // If session exists in cookie, verify it's still valid
+  // OAuth may leave only the httpOnly server session cookie. Sync it before
+  // showing the login button so returning users do not get stuck on /login.
+  await authStore.syncMe()
   if (authStore.user) {
-    await authStore.syncMe()
-    // After syncMe, if user is still logged in, redirect
-    if (authStore.user) {
-      await goAfterLogin()
-      return
-    }
+    await goAfterLogin()
+    return
   }
 
   // No valid session - show login button

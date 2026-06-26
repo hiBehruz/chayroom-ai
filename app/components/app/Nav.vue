@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import type { TelegramUser } from '~/stores/auth'
-
 const authStore = useAuthStore()
 const isProfileOpen = ref(false)
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
 const scrolled = ref(false)
 const SECTION_SCROLL_KEY = 'cx-scroll-target'
-
-// OAuth composable - client side only
-const { openOAuthPopup, isWaiting: isOAuthWaiting } = import.meta.client
-  ? useTelegramOAuth()
-  : { openOAuthPopup: async () => ({} as TelegramUser), isWaiting: ref(false) }
 
 const navLinks = [
   { label: 'Panel', href: '/dashboard' },
@@ -23,21 +16,7 @@ function isActive(href: string) {
 }
 
 async function handleLogin() {
-  if (!import.meta.client) return
-
-  try {
-    const user = await openOAuthPopup()
-    await authStore.login(user)
-    if (authStore.user) {
-      await navigateTo('/dashboard')
-    }
-  } catch (err) {
-    // Silently ignore if user closed the popup or cancelled
-    // Only navigate to login page on unexpected errors
-    if (err instanceof Error && !err.message.includes('yopildi') && !err.message.includes('bekor qilindi')) {
-      await navigateTo('/login')
-    }
-  }
+  await navigateTo('/login')
 }
 
 async function goToHomeTop() {
@@ -96,6 +75,11 @@ watch(route, () => {
 
 let scrollHandler: () => void
 onMounted(() => {
+  authStore.restoreFromStorage()
+  if (!authStore.user) {
+    void authStore.syncMe()
+  }
+
   scrollHandler = () => {
     scrolled.value = window.scrollY > 16
   }
@@ -200,29 +184,16 @@ onUnmounted(() => {
 
         <template v-else>
           <button
-            :disabled="isOAuthWaiting"
             class="nav-login-btn"
             @click="handleLogin"
           >
             <svg
-              v-if="!isOAuthWaiting"
               viewBox="0 0 24 24"
               class="w-4 h-4 fill-white shrink-0"
             >
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z" />
             </svg>
-            <svg
-              v-else
-              class="w-4 h-4 animate-spin"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="3"
-            >
-              <circle cx="12" cy="12" r="10" opacity="0.2" />
-              <path d="M22 12a10 10 0 0 1-10 10" fill="white" />
-            </svg>
-            {{ isOAuthWaiting ? 'Ochilmoqda...' : 'Kirish' }}
+            Kirish
           </button>
         </template>
       </div>
@@ -309,29 +280,16 @@ onUnmounted(() => {
           </button>
           <button
             v-else
-            :disabled="isOAuthWaiting"
             class="nav-login-btn mt-4"
             @click="handleLogin(); isMobileMenuOpen = false"
           >
             <svg
-              v-if="!isOAuthWaiting"
               viewBox="0 0 24 24"
               class="w-4 h-4 fill-white shrink-0"
             >
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z" />
             </svg>
-            <svg
-              v-else
-              class="w-4 h-4 animate-spin"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="3"
-            >
-              <circle cx="12" cy="12" r="10" opacity="0.2" />
-              <path d="M22 12a10 10 0 0 1-10 10" fill="white" />
-            </svg>
-            {{ isOAuthWaiting ? 'Ochilmoqda...' : 'Kirish' }}
+            Kirish
           </button>
         </div>
       </Transition>

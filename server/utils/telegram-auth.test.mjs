@@ -110,3 +110,14 @@ test('verifyTelegramOAuthJwt accepts a valid signed token', async () => {
   assert.ok(payload)
   assert.equal(payload.sub, '222333444')
 })
+
+test('verifyTelegramOAuthJwt accepts any configured valid secret', async () => {
+  const token = await new SignJWT({ sub: '222333444', iss: 'https://oauth.telegram.org' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('5m')
+    .sign(new TextEncoder().encode('bot-token-secret'))
+
+  const payload = await verifyTelegramOAuthJwt(token, ['wrong-client-secret', 'bot-token-secret'])
+  assert.ok(payload)
+  assert.equal(payload.sub, '222333444')
+})

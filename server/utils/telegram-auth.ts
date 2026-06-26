@@ -108,18 +108,23 @@ export function verifyTelegramWebAppInitData(
 
 export async function verifyTelegramOAuthJwt(
   idToken: string,
-  clientSecret: string
+  clientSecret: string | string[]
 ): Promise<JWTPayload | null> {
   if (!idToken || !clientSecret) return null
+  const secrets = Array.isArray(clientSecret) ? clientSecret : [clientSecret]
 
-  try {
-    const { payload } = await jwtVerify(idToken, new TextEncoder().encode(clientSecret), {
-      issuer: 'https://oauth.telegram.org',
-      algorithms: ['HS256']
-    })
+  for (const secret of secrets.map(value => value.trim()).filter(Boolean)) {
+    try {
+      const { payload } = await jwtVerify(idToken, new TextEncoder().encode(secret), {
+        issuer: 'https://oauth.telegram.org',
+        algorithms: ['HS256']
+      })
 
-    return payload.sub ? payload : null
-  } catch {
-    return null
+      if (payload.sub) return payload
+    } catch {
+      // Try the next configured secret.
+    }
   }
+
+  return null
 }

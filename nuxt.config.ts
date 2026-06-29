@@ -76,7 +76,6 @@ export default defineNuxtConfig({
     '/about-me': { swr: 3600 },
     '/rules': { swr: 3600 },
     '/guides': { swr: 600 },
-    '/guides/**': { swr: 600 },
     '/courses': { swr: 600 }
   },
 

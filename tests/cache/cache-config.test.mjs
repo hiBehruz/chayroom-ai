@@ -42,10 +42,11 @@ test('Nuxt config wires Redis cache storage and conservative SWR route rules', a
     assert.match(source, new RegExp(`['"]${route}['"]:\\s*{\\s*swr:\\s*3600\\s*}`))
   }
 
-  for (const route of ['/guides', '/guides/**', '/courses']) {
+  for (const route of ['/guides', '/courses']) {
     assert.match(source, new RegExp(`['"]${route.replace('*', '\\*')}['"]:\\s*{\\s*swr:\\s*600\\s*}`))
   }
 
+  assert.doesNotMatch(source, /['"]\/guides\/\*\*['"]:\s*{\s*swr:/)
   assert.doesNotMatch(source, /['"]\/courses\/\*\*['"]:\s*{\s*swr:/)
 })
 

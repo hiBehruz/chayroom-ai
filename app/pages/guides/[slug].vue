@@ -629,7 +629,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
         <!-- eslint-disable vue/no-v-html -->
         <div
           v-else
-          class="rich-content prose max-w-none text-[#14161f]"
+          class="rich-content guide-content prose max-w-none text-[#14161f]"
           v-html="guide.content"
         />
         <!-- eslint-enable vue/no-v-html -->
@@ -920,31 +920,32 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
 }
 
 .guide-detail--mini .guide-content :deep(h2) {
-  font-size: 20px;
-  line-height: 1.25;
-  margin: 22px 0 8px;
+  font-size: 24px;
+  line-height: 1.22;
+  margin: 42px 0 14px;
 }
 
 .guide-detail--mini .guide-content :deep(h3) {
-  font-size: 17px;
+  font-size: 21px;
   line-height: 1.3;
-  margin: 18px 0 6px;
+  margin: 34px 0 12px;
 }
 
 .guide-detail--mini .guide-content :deep(p),
 .guide-detail--mini .guide-content :deep(li) {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 400;
-  line-height: 1.65;
+  line-height: 1.72;
 }
 
 .guide-detail--mini .guide-content :deep(p) {
-  margin-bottom: 14px;
+  min-height: 1.72em;
+  margin-bottom: 22px;
 }
 
 .guide-detail--mini .guide-content :deep(ul),
 .guide-detail--mini .guide-content :deep(ol) {
-  margin-bottom: 14px;
+  margin-bottom: 24px;
   padding-left: 20px;
 }
 
@@ -955,18 +956,19 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
 .guide-detail--mini .guide-content :deep(pre) {
   font-size: 13px;
   border-radius: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 28px;
 }
 
 .guide-content :deep(img) {
   max-width: 100%;
   height: auto;
   border-radius: 16px;
-  margin: 8px 0 24px;
+  margin: 12px 0 34px;
 }
 
 .guide-detail--mini .guide-content :deep(img) {
   width: 100%;
   border-radius: 12px;
+  margin: 8px 0 28px;
 }
 </style>

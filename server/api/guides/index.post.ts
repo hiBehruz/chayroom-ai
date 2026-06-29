@@ -26,7 +26,9 @@ export default defineEventHandler(async (event) => {
       bg: body.bg ?? null,
       accent: body.accent ?? null,
       badge: body.badge ?? null,
+      level: body.level ?? null,
       isFree: body.isFree ?? false,
+      accessLevel: body.isFree ? 'free' : 'member',
       categoryId,
       publishedAt: new Date()
     })

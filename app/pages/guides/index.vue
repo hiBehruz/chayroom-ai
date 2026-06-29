@@ -281,7 +281,7 @@ useSeoMeta({ title: 'Qo\'llanmalar — Chayroom AI' })
             <button
               v-if="isOwner"
               class="absolute right-5 top-5 z-20 grid size-9 place-items-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-all hover:bg-black/60"
-              @click.stop="navigateTo('/admin/guides/edit/' + guide.slug)"
+              @click.stop="navigateTo('/guides/' + guide.slug)"
             >
               <UIcon
                 name="i-lucide-pencil"

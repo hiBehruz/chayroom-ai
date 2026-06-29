@@ -10,6 +10,9 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
 
   const { category, ...rest } = body
+  if (typeof rest.isFree === 'boolean') {
+    rest.accessLevel = rest.isFree ? 'free' : 'member'
+  }
 
   let categoryId: number | null | undefined
   if (category !== undefined) {

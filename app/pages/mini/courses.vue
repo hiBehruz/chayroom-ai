@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ComponentPublicInstance } from 'vue'
+
 const router = useRouter()
 interface MiniCourse {
   title: string
@@ -18,6 +20,10 @@ const activeChip = ref('all')
 const filterRef = ref<HTMLElement | null>(null)
 const chipRefs = ref<HTMLElement[]>([])
 const indicatorStyle = ref({ left: '0px', width: '0px', opacity: '0' })
+
+function setChipRef(index: number, el: Element | ComponentPublicInstance | null) {
+  if (el instanceof HTMLElement) chipRefs.value[index] = el
+}
 
 function updateIndicator() {
   const index = chips.findIndex(c => c.value === activeChip.value)
@@ -100,7 +106,7 @@ useSeoMeta({ title: 'Kurslar' })
         <button
           v-for="(chip, i) in chips"
           :key="chip.value"
-          :ref="el => { if (el) chipRefs[i] = el as HTMLElement }"
+          :ref="(el: Element | ComponentPublicInstance | null) => setChipRef(i, el)"
           class="relative z-10 flex-none inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[14px] font-semibold whitespace-nowrap active:scale-95 transition-[color] duration-150"
           :style="activeChip === chip.value ? 'color:#fffdf9;background:transparent' : 'color:#262831;background:#f7f5f0'"
           @click="selectChip(chip.value)"

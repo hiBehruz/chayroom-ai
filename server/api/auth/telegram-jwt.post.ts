@@ -22,10 +22,11 @@ export default defineEventHandler(async (event) => {
   }
 
   // Verify OIDC JWT token signed by Telegram.
+  const idToken = body.id_token
   const clientId = config.telegramBotToken?.includes(':')
-    ? config.telegramBotToken.split(':')[0]
+    ? (config.telegramBotToken.split(':')[0] ?? '')
     : ''
-  const payload = await verifyTelegramOAuthJwt(body.id_token, clientId)
+  const payload = await verifyTelegramOAuthJwt(idToken, clientId)
 
   if (!payload || !payload.sub) {
     throw createError({ statusCode: 401, statusMessage: 'Invalid token' })

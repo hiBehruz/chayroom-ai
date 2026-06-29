@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ComponentPublicInstance } from 'vue'
 import type { Guide } from '~/stores/guides'
 
 const router = useRouter()
@@ -17,6 +18,10 @@ const activeChip = ref('all')
 const filterRef = ref<HTMLElement | null>(null)
 const chipRefs = ref<HTMLElement[]>([])
 const indicatorStyle = ref({ left: '0px', width: '0px', opacity: '0' })
+
+function setChipRef(index: number, el: Element | ComponentPublicInstance | null) {
+  if (el instanceof HTMLElement) chipRefs.value[index] = el
+}
 
 function updateIndicator() {
   const index = chips.findIndex(chip => chip.value === activeChip.value)
@@ -124,7 +129,7 @@ useSeoMeta({ title: 'Qo\'llanmalar' })
           <button
             v-for="(chip, i) in chips"
             :key="chip.value"
-            :ref="el => { if (el) chipRefs[i] = el as HTMLElement }"
+            :ref="(el: Element | ComponentPublicInstance | null) => setChipRef(i, el)"
             class="relative z-10 inline-flex flex-none items-center gap-2 rounded-full px-4 py-2.5 text-[14px] font-semibold whitespace-nowrap transition-[color] duration-150 active:scale-95"
             :style="activeChip === chip.value ? 'color:#fffdf9;background:transparent' : 'color:#262831;background:#f4efe6'"
             @click="selectChip(chip.value)"

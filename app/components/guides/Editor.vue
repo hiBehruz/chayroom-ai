@@ -509,7 +509,7 @@ const tools = [
           accept="video/*"
           class="hidden"
           :disabled="videoUploading"
-          @change="e => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) insertVideo(f); (e.target as HTMLInputElement).value = '' }"
+          @change="(e: Event) => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) insertVideo(f); (e.target as HTMLInputElement).value = '' }"
         >
       </label>
 

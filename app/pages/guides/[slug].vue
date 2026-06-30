@@ -180,6 +180,20 @@ function onEditTagKeydown(event: KeyboardEvent) {
 const deleteConfirmOpen = ref(false)
 const deleting = ref(false)
 
+async function onGuideContentClick(event: MouseEvent) {
+  const target = event.target as HTMLElement | null
+  const copyButton = target?.closest('[data-copy-button]') as HTMLElement | null
+  if (!copyButton) return
+
+  const copyBlock = copyButton.closest('[data-copy-block]') as HTMLElement | null
+  const text = copyBlock?.querySelector('[data-copy-code]')?.textContent?.trim()
+  if (!text) return
+
+  await navigator.clipboard.writeText(text)
+  copyButton.setAttribute('data-copied', 'true')
+  window.setTimeout(() => copyButton.removeAttribute('data-copied'), 1200)
+}
+
 async function deleteGuide() {
   const g = guide.value
   if (!g) return
@@ -630,6 +644,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
         <div
           v-else
           class="rich-content guide-content prose max-w-none text-[#14161f]"
+          @click="onGuideContentClick"
           v-html="guide.content"
         />
         <!-- eslint-enable vue/no-v-html -->

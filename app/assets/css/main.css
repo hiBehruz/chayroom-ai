@@ -1008,6 +1008,110 @@
   color: #f5f7fb;
 }
 
+.rich-content [data-copy-block],
+.guide-editor-body [data-copy-block] {
+  margin: 34px 0;
+  overflow: hidden;
+  border-left: 5px solid #3480f1;
+  border-radius: 8px;
+  background: #e9eef3;
+  color: #4f7492;
+  box-shadow: 0 1px 0 rgba(52,128,241,0.08);
+}
+
+.rich-content [data-copy-toolbar],
+.guide-editor-body [data-copy-toolbar] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 42px;
+  background: #d2dee9;
+  padding: 8px 12px 8px 16px;
+}
+
+.rich-content [data-copy-label],
+.guide-editor-body [data-copy-label] {
+  color: #517899;
+  font-family: "SF Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rich-content [data-copy-button],
+.guide-editor-body [data-copy-button] {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #7fa0ba;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.rich-content [data-copy-button]::before,
+.rich-content [data-copy-button]::after,
+.guide-editor-body [data-copy-button]::before,
+.guide-editor-body [data-copy-button]::after {
+  content: '';
+  position: absolute;
+  border: 3px solid currentColor;
+  border-radius: 4px;
+}
+
+.rich-content [data-copy-button]::before,
+.guide-editor-body [data-copy-button]::before {
+  inset: 9px 8px 6px 11px;
+  background: currentColor;
+  opacity: 0.72;
+}
+
+.rich-content [data-copy-button]::after,
+.guide-editor-body [data-copy-button]::after {
+  inset: 6px 11px 9px 8px;
+  background: #d2dee9;
+}
+
+.rich-content [data-copy-button]:hover,
+.guide-editor-body [data-copy-button]:hover {
+  background: rgba(52,128,241,0.1);
+  color: #3480f1;
+  transform: translateY(-1px);
+}
+
+.rich-content [data-copy-button][data-copied],
+.guide-editor-body [data-copy-button][data-copied] {
+  color: #1f9d67;
+}
+
+.rich-content [data-copy-pre],
+.guide-editor-body [data-copy-pre] {
+  margin: 0;
+  overflow-x: auto;
+  border-radius: 0;
+  background: transparent;
+  padding: 10px 16px 4px;
+  box-shadow: none;
+}
+
+.rich-content [data-copy-code],
+.guide-editor-body [data-copy-code] {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: #4f7492;
+  font-family: "SF Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 30px;
+  font-weight: 650;
+  line-height: 1.32;
+  white-space: pre-wrap;
+}
+
 .rich-content [data-download-block],
 .guide-editor-body [data-download-block] {
   display: grid;
@@ -1201,6 +1305,8 @@
   .guide-editor-body [data-callout],
   .rich-content [data-prompt-block],
   .guide-editor-body [data-prompt-block],
+  .rich-content [data-copy-block],
+  .guide-editor-body [data-copy-block],
   .rich-content [data-download-block],
   .guide-editor-body [data-download-block] {
     margin: 28px 0;
@@ -1210,6 +1316,34 @@
   .rich-content [data-callout],
   .guide-editor-body [data-callout] {
     padding: 18px;
+  }
+
+  .rich-content [data-copy-toolbar],
+  .guide-editor-body [data-copy-toolbar] {
+    min-height: 36px;
+    padding: 7px 9px 7px 12px;
+  }
+
+  .rich-content [data-copy-label],
+  .guide-editor-body [data-copy-label] {
+    font-size: 14px;
+  }
+
+  .rich-content [data-copy-button],
+  .guide-editor-body [data-copy-button] {
+    width: 28px;
+    height: 28px;
+  }
+
+  .rich-content [data-copy-pre],
+  .guide-editor-body [data-copy-pre] {
+    padding: 10px 12px 4px;
+  }
+
+  .rich-content [data-copy-code],
+  .guide-editor-body [data-copy-code] {
+    font-size: 18px;
+    line-height: 1.45;
   }
 
   .rich-content [data-download-block],

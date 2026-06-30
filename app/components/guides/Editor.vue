@@ -102,6 +102,30 @@ const PromptBlock = Node.create({
   }
 })
 
+const CopyBlock = Node.create({
+  name: 'copyBlock',
+  group: 'block',
+  content: 'text*',
+  marks: '',
+  code: true,
+  parseHTML() {
+    return [{ tag: 'div[data-copy-block]' }]
+  },
+  renderHTML() {
+    return [
+      'div',
+      { 'data-copy-block': '' },
+      [
+        'div',
+        { 'data-copy-toolbar': '' },
+        ['span', { 'data-copy-label': '' }, 'Nusxalash'],
+        ['button', { 'type': 'button', 'data-copy-button': '', 'aria-label': 'Nusxalash' }]
+      ],
+      ['pre', { 'data-copy-pre': '' }, ['code', { 'data-copy-code': '' }, 0]]
+    ]
+  }
+})
+
 const DownloadBlock = Node.create({
   name: 'downloadBlock',
   group: 'block',
@@ -155,6 +179,7 @@ const editor = useEditor({
     VideoBlock,
     CalloutBlock,
     PromptBlock,
+    CopyBlock,
     DownloadBlock
   ],
   editorProps: {
@@ -432,6 +457,13 @@ function insertPromptBlock() {
   }).run()
 }
 
+function insertCopyBlock() {
+  editor.value?.chain().focus().insertContent({
+    type: 'copyBlock',
+    content: [{ type: 'text', text: 'Nusxa olinadigan matnni shu yerga yozing...' }]
+  }).run()
+}
+
 const tools = [
   { label: 'B', action: () => editor.value?.chain().focus().toggleBold().run(), active: () => editor.value?.isActive('bold'), class: 'font-black' },
   { label: 'I', action: () => editor.value?.chain().focus().toggleItalic().run(), active: () => editor.value?.isActive('italic'), class: 'italic' },
@@ -441,7 +473,8 @@ const tools = [
   { label: '<>', title: 'Kod bloki', action: () => editor.value?.chain().focus().toggleCodeBlock().run(), active: () => editor.value?.isActive('codeBlock'), class: 'font-mono text-[11px]' },
   { label: '❝', title: 'Iqtibos', action: () => editor.value?.chain().focus().toggleBlockquote().run(), active: () => editor.value?.isActive('blockquote') },
   { label: 'Tip', title: 'Eslatma', action: insertCallout, active: () => editor.value?.isActive('calloutBlock'), class: 'text-[12px]' },
-  { label: 'Prompt', title: 'Prompt', action: insertPromptBlock, active: () => editor.value?.isActive('promptBlock'), class: 'text-[12px]' }
+  { label: 'Prompt', title: 'Prompt', action: insertPromptBlock, active: () => editor.value?.isActive('promptBlock'), class: 'text-[12px]' },
+  { label: 'Nusxa', title: 'Nusxalash bloki', action: insertCopyBlock, active: () => editor.value?.isActive('copyBlock'), class: 'text-[12px]' }
 ]
 </script>
 

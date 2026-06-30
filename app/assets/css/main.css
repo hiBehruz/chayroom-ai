@@ -413,7 +413,7 @@
   .mini-app-shell .course-detail-desc,
   .mini-app-shell .guide-content :is(p, li),
   .mini-app-shell .course-detail-meta {
-    font-size: 16px !important;
+    font-size: 18px !important;
     line-height: 1.65 !important;
   }
 
@@ -753,7 +753,7 @@
   margin-inline: auto;
   color: #252733;
   font-family: var(--font-inter), 'Inter Fallback', sans-serif;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.7;
 }
 
@@ -827,7 +827,7 @@
   min-height: 1.7em;
   margin: 0 0 30px;
   color: #252733;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
   line-height: 1.7;
 }
@@ -895,7 +895,7 @@
   display: flex;
   gap: 12px;
   color: #252733;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
   line-height: 1.65;
 }
@@ -925,7 +925,7 @@
   display: flex;
   gap: 12px;
   color: #252733;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
   line-height: 1.65;
   counter-increment: list-counter;
@@ -1106,9 +1106,9 @@
   padding: 0;
   color: #4f7492;
   font-family: "SF Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 30px;
+  font-size: 18px;
   font-weight: 650;
-  line-height: 1.32;
+  line-height: 1.45;
   white-space: pre-wrap;
 }
 
@@ -1209,7 +1209,7 @@
   .rich-content,
   .guide-editor-body {
     max-width: none;
-    font-size: 17px;
+    font-size: 18px;
     line-height: 1.72;
   }
 
@@ -1254,7 +1254,7 @@
   .guide-editor-body p,
   .rich-content blockquote,
   .guide-editor-body blockquote {
-    font-size: 17px;
+    font-size: 18px;
     line-height: 1.72;
   }
 
@@ -1283,7 +1283,7 @@
   .rich-content ol li,
   .guide-editor-body ul li,
   .guide-editor-body ol li {
-    font-size: 17px;
+    font-size: 18px;
     line-height: 1.68;
   }
 

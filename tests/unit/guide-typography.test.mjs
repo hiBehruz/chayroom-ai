@@ -12,6 +12,20 @@ test('guide typography preserves intentional blank paragraphs from the editor', 
   assert.match(source, /min-height:\s*1\.7em/)
 })
 
+test('guide content defaults to eighteen pixel body text', async () => {
+  const css = await read('app/assets/css/main.css')
+  const editor = await read('app/components/guides/Editor.vue')
+  const guideDetail = await read('app/pages/guides/[slug].vue')
+
+  assert.match(css, /\.rich-content,[\s\S]*\.guide-editor-body \{[\s\S]*font-size:\s*18px/)
+  assert.match(css, /\.rich-content p,[\s\S]*\.guide-editor-body p \{[\s\S]*font-size:\s*18px/)
+  assert.match(css, /\.rich-content ul li,[\s\S]*\.guide-editor-body ul li \{[\s\S]*font-size:\s*18px/)
+  assert.match(css, /\.rich-content ol li,[\s\S]*\.guide-editor-body ol li \{[\s\S]*font-size:\s*18px/)
+  assert.match(css, /\.rich-content \[data-copy-code\],[\s\S]*\.guide-editor-body \[data-copy-code\] \{[\s\S]*font-size:\s*18px/)
+  assert.match(guideDetail, /\.guide-detail--mini \.guide-content :deep\(p\),[\s\S]*\.guide-detail--mini \.guide-content :deep\(li\) \{[\s\S]*font-size:\s*18px/)
+  assert.match(editor, /text-\[18px\]/)
+})
+
 test('mini guide content keeps readable paragraph spacing', async () => {
   const source = await read('app/pages/guides/[slug].vue')
 

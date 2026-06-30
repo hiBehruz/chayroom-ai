@@ -948,7 +948,7 @@ useSeoMeta({ title: computed(() => `${guide.value?.title ?? 'Qo\'llanma'} — Ch
 
 .guide-detail--mini .guide-content :deep(p),
 .guide-detail--mini .guide-content :deep(li) {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 400;
   line-height: 1.72;
 }

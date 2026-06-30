@@ -184,7 +184,7 @@ const editor = useEditor({
   ],
   editorProps: {
     attributes: {
-      class: 'guide-editor-body prose max-w-none outline-none min-h-80 px-6 py-5 text-[15px] text-[#14161f] leading-relaxed',
+      class: 'guide-editor-body prose max-w-none outline-none min-h-80 px-6 py-5 text-[18px] text-[#14161f] leading-relaxed',
       style: 'font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
     },
     handlePaste(view, event) {

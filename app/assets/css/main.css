@@ -1135,13 +1135,45 @@
 .guide-editor-body [data-copy-code] {
   background: transparent;
   border: 0;
-  padding: 0;
+  padding: 10px 16px 8px;
   color: #4f7492;
   font-family: "SF Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 18px;
   font-weight: 650;
   line-height: 1.45;
   white-space: pre-wrap;
+  cursor: text;
+  user-select: text;
+}
+
+.rich-content [data-copy-pre] [data-copy-code],
+.guide-editor-body [data-copy-pre] [data-copy-code] {
+  padding: 0;
+}
+
+.rich-content [data-copy-code] :is(p, ul, ol),
+.guide-editor-body [data-copy-code] :is(p, ul, ol) {
+  margin: 0 0 12px;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+}
+
+.rich-content [data-copy-code] :last-child,
+.guide-editor-body [data-copy-code] :last-child {
+  margin-bottom: 0;
+}
+
+.rich-content [data-copy-code] :is(ul, ol),
+.guide-editor-body [data-copy-code] :is(ul, ol) {
+  gap: 8px;
+}
+
+.rich-content [data-copy-code] li,
+.guide-editor-body [data-copy-code] li {
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
 }
 
 .rich-content [data-download-block],
@@ -1374,8 +1406,14 @@
 
   .rich-content [data-copy-code],
   .guide-editor-body [data-copy-code] {
+    padding: 10px 12px 8px;
     font-size: 18px;
     line-height: 1.45;
+  }
+
+  .rich-content [data-copy-pre] [data-copy-code],
+  .guide-editor-body [data-copy-pre] [data-copy-code] {
+    padding: 0;
   }
 
   .rich-content [data-download-block],

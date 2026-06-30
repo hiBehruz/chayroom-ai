@@ -105,10 +105,10 @@ const PromptBlock = Node.create({
 const CopyBlock = Node.create({
   name: 'copyBlock',
   group: 'block',
-  content: 'inline*',
+  content: 'block+',
   marks: '_',
   parseHTML() {
-    return [{ tag: 'div[data-copy-block]' }]
+    return [{ tag: 'div[data-copy-block]', contentElement: '[data-copy-code]' }]
   },
   renderHTML() {
     return [
@@ -120,7 +120,7 @@ const CopyBlock = Node.create({
         ['span', { 'data-copy-label': '' }, 'Nusxalash'],
         ['button', { 'type': 'button', 'data-copy-button': '', 'aria-label': 'Nusxalash' }]
       ],
-      ['pre', { 'data-copy-pre': '' }, ['code', { 'data-copy-code': '' }, 0]]
+      ['div', { 'data-copy-code': '' }, 0]
     ]
   }
 })
@@ -459,7 +459,10 @@ function insertPromptBlock() {
 function insertCopyBlock() {
   editor.value?.chain().focus().insertContent({
     type: 'copyBlock',
-    content: [{ type: 'text', text: 'Nusxa olinadigan matnni shu yerga yozing...' }]
+    content: [{
+      type: 'paragraph',
+      content: [{ type: 'text', text: 'Nusxa olinadigan matnni shu yerga yozing...' }]
+    }]
   }).run()
 }
 

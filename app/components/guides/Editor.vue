@@ -62,6 +62,81 @@ const VideoBlock = Node.create({
   }
 })
 
+const CalloutBlock = Node.create({
+  name: 'calloutBlock',
+  group: 'block',
+  content: 'block+',
+  addAttributes() {
+    return {
+      tone: {
+        default: 'tip',
+        parseHTML: el => el.getAttribute('data-callout') || 'tip',
+        renderHTML: attrs => ({ 'data-callout': attrs.tone || 'tip' })
+      }
+    }
+  },
+  parseHTML() {
+    return [{ tag: 'div[data-callout]' }]
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ['div', HTMLAttributes, 0]
+  }
+})
+
+const PromptBlock = Node.create({
+  name: 'promptBlock',
+  group: 'block',
+  content: 'text*',
+  marks: '',
+  code: true,
+  parseHTML() {
+    return [{ tag: 'div[data-prompt-block]' }]
+  },
+  renderHTML() {
+    return [
+      'div',
+      { 'data-prompt-block': '' },
+      ['div', { 'data-prompt-label': '' }, 'Prompt'],
+      ['pre', ['code', 0]]
+    ]
+  }
+})
+
+const DownloadBlock = Node.create({
+  name: 'downloadBlock',
+  group: 'block',
+  atom: true,
+  addAttributes() {
+    return {
+      href: {
+        default: null,
+        parseHTML: el => el.querySelector('a')?.getAttribute('href') || el.getAttribute('data-download-href'),
+        renderHTML: attrs => ({ 'data-download-href': attrs.href })
+      },
+      name: {
+        default: 'download.zip',
+        parseHTML: el => el.getAttribute('data-download-name') || el.querySelector('[data-download-name]')?.textContent,
+        renderHTML: attrs => ({ 'data-download-name': attrs.name })
+      }
+    }
+  },
+  parseHTML() {
+    return [{ tag: 'div[data-download-block]' }]
+  },
+  renderHTML({ HTMLAttributes }) {
+    const href = HTMLAttributes['data-download-href'] || '#'
+    const name = HTMLAttributes['data-download-name'] || 'download.zip'
+
+    return [
+      'div',
+      HTMLAttributes,
+      ['span', { 'data-download-icon': '' }],
+      ['span', { 'data-download-name': '' }, name],
+      ['a', { href, 'download': '', 'data-download-button': '' }, 'Yuklab olish']
+    ]
+  }
+})
+
 const props = defineProps<{ modelValue: string }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
@@ -77,7 +152,10 @@ const editor = useEditor({
     Image.configure({ allowBase64: true, inline: false }),
     FontFamily,
     Link.configure({ openOnClick: false }),
-    VideoBlock
+    VideoBlock,
+    CalloutBlock,
+    PromptBlock,
+    DownloadBlock
   ],
   editorProps: {
     attributes: {
@@ -284,6 +362,7 @@ function setBgColor(color: string | null) {
 }
 
 const videoUploading = ref(false)
+const fileUploading = ref(false)
 
 async function insertVideo(file: File) {
   if (!editor.value) return
@@ -301,14 +380,68 @@ async function insertVideo(file: File) {
   }
 }
 
+function onVideoPick(e: Event) {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (file) insertVideo(file)
+  input.value = ''
+}
+
+async function insertDownload(file: File) {
+  if (!editor.value) return
+  fileUploading.value = true
+  try {
+    const contentType = file.type || 'application/octet-stream'
+    const { uploadUrl, publicUrl } = await $fetch<{ uploadUrl: string, publicUrl: string }>(
+      '/api/upload/presign',
+      { method: 'POST', body: { filename: file.name, contentType } }
+    )
+    const res = await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': contentType } })
+    if (!res.ok) throw new Error(`Upload failed: ${res.status}`)
+    editor.value.chain().focus().insertContent({
+      type: 'downloadBlock',
+      attrs: { href: publicUrl, name: file.name }
+    }).run()
+  } finally {
+    fileUploading.value = false
+  }
+}
+
+function onFilePick(e: Event) {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (file) insertDownload(file)
+  input.value = ''
+}
+
+function insertCallout() {
+  editor.value?.chain().focus().insertContent({
+    type: 'calloutBlock',
+    attrs: { tone: 'tip' },
+    content: [{
+      type: 'paragraph',
+      content: [{ type: 'text', text: 'Eslatma matnini shu yerga yozing.' }]
+    }]
+  }).run()
+}
+
+function insertPromptBlock() {
+  editor.value?.chain().focus().insertContent({
+    type: 'promptBlock',
+    content: [{ type: 'text', text: 'Prompt matnini shu yerga yozing...' }]
+  }).run()
+}
+
 const tools = [
   { label: 'B', action: () => editor.value?.chain().focus().toggleBold().run(), active: () => editor.value?.isActive('bold'), class: 'font-black' },
   { label: 'I', action: () => editor.value?.chain().focus().toggleItalic().run(), active: () => editor.value?.isActive('italic'), class: 'italic' },
-  { label: '—', action: () => editor.value?.chain().focus().setHorizontalRule().run(), active: () => false },
-  { label: '•', action: () => editor.value?.chain().focus().toggleBulletList().run(), active: () => editor.value?.isActive('bulletList') },
-  { label: '1.', action: () => editor.value?.chain().focus().toggleOrderedList().run(), active: () => editor.value?.isActive('orderedList') },
-  { label: '<>', action: () => editor.value?.chain().focus().toggleCodeBlock().run(), active: () => editor.value?.isActive('codeBlock'), class: 'font-mono text-[11px]' },
-  { label: '❝', action: () => editor.value?.chain().focus().toggleBlockquote().run(), active: () => editor.value?.isActive('blockquote') }
+  { label: '—', title: 'Chiziq', action: () => editor.value?.chain().focus().setHorizontalRule().run(), active: () => false },
+  { label: '•', title: 'Ro\'yxat', action: () => editor.value?.chain().focus().toggleBulletList().run(), active: () => editor.value?.isActive('bulletList') },
+  { label: '1.', title: 'Qadamlar', action: () => editor.value?.chain().focus().toggleOrderedList().run(), active: () => editor.value?.isActive('orderedList') },
+  { label: '<>', title: 'Kod bloki', action: () => editor.value?.chain().focus().toggleCodeBlock().run(), active: () => editor.value?.isActive('codeBlock'), class: 'font-mono text-[11px]' },
+  { label: '❝', title: 'Iqtibos', action: () => editor.value?.chain().focus().toggleBlockquote().run(), active: () => editor.value?.isActive('blockquote') },
+  { label: 'Tip', title: 'Eslatma', action: insertCallout, active: () => editor.value?.isActive('calloutBlock'), class: 'text-[12px]' },
+  { label: 'Prompt', title: 'Prompt', action: insertPromptBlock, active: () => editor.value?.isActive('promptBlock'), class: 'text-[12px]' }
 ]
 </script>
 
@@ -426,6 +559,7 @@ const tools = [
             ? 'bg-cx-blue text-white'
             : 'text-cx-muted hover:bg-[#ebebea] hover:text-cx-ink'
         ]"
+        :title="tool.title ?? tool.label"
         @click="tool.action()"
       >
         {{ tool.label }}
@@ -509,7 +643,27 @@ const tools = [
           accept="video/*"
           class="hidden"
           :disabled="videoUploading"
-          @change="(e: Event) => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) insertVideo(f); (e.target as HTMLInputElement).value = '' }"
+          @change="onVideoPick"
+        >
+      </label>
+
+      <!-- File upload -->
+      <label
+        class="min-w-7 h-7 px-2 rounded-lg flex items-center justify-center cursor-pointer transition-colors"
+        :class="fileUploading ? 'text-cx-blue' : 'text-cx-muted hover:bg-[#ebebea] hover:text-cx-ink'"
+        title="Fayl qo'shish"
+      >
+        <UIcon
+          :name="fileUploading ? 'i-lucide-loader-2' : 'i-lucide-file-down'"
+          class="size-3.5"
+          :class="{ 'animate-spin': fileUploading }"
+        />
+        <input
+          type="file"
+          accept=".zip,.pdf,.txt,.md,application/zip,application/x-zip-compressed,application/pdf,text/plain,text/markdown,application/octet-stream"
+          class="hidden"
+          :disabled="fileUploading"
+          @change="onFilePick"
         >
       </label>
 

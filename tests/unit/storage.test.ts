@@ -47,5 +47,7 @@ describe('storage keys', () => {
       .toBe('images/123-my_photo.png')
     expect(createStorageKey('video/mp4', 'lesson 1.mp4', 123))
       .toBe('lessons/123-lesson_1.mp4')
+    expect(createStorageKey('application/zip', 'airc helper.zip', 123))
+      .toBe('downloads/123-airc_helper.zip')
   })
 })

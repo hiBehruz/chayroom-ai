@@ -46,6 +46,6 @@ jobs:
             git pull --ff-only origin master
             docker compose build migrate nuxt
             docker compose --profile migrate run --rm migrate
-            docker compose up -d --no-build
+            docker compose up -d --no-build --force-recreate nuxt
             docker image prune -f
           EOF

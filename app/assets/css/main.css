@@ -1019,6 +1019,29 @@
   box-shadow: 0 1px 0 rgba(52,128,241,0.08);
 }
 
+.rich-content [data-copy-block] {
+  cursor: pointer;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.rich-content [data-copy-block]:hover {
+  background: #e4edf6;
+  box-shadow: 0 10px 24px rgba(52,128,241,0.12);
+}
+
+.rich-content [data-copy-block][data-copied] {
+  border-left-color: #1f9d67;
+}
+
+.rich-content [data-copy-block][data-copied] [data-copy-toolbar] {
+  background: #d9eadf;
+}
+
+.rich-content [data-copy-block][data-copied] [data-copy-label],
+.rich-content [data-copy-block][data-copied] [data-copy-button] {
+  color: #1f7a55;
+}
+
 .rich-content [data-copy-toolbar],
 .guide-editor-body [data-copy-toolbar] {
   display: flex;

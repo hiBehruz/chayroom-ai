@@ -68,11 +68,15 @@ test('guide editor exposes premium content blocks', async () => {
 
 test('guide detail copy blocks write their content to the clipboard', async () => {
   const source = await read('app/pages/guides/[slug].vue')
+  const css = await read('app/assets/css/main.css')
 
   assert.match(source, /function onGuideContentClick/)
-  assert.match(source, /closest\('\[data-copy-button\]'\)/)
+  assert.match(source, /closest\('\[data-copy-block\]'\)/)
   assert.match(source, /navigator\.clipboard\.writeText\(text\)/)
+  assert.match(source, /textContent = 'Nusxa olindi'/)
   assert.match(source, /@click="onGuideContentClick"/)
+  assert.match(css, /\.rich-content \[data-copy-block\] \{[\s\S]*cursor:\s*pointer/)
+  assert.match(css, /\.rich-content \[data-copy-block\]\[data-copied\]/)
 })
 
 test('guide file uploads allow archive downloads', async () => {

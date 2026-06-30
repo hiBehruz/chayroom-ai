@@ -24,6 +24,7 @@ jobs:
       NUXT_JWT_SECRET: integration-jwt-secret-password-32-chars
       NUXT_PUBLIC_TELEGRAM_BOT_USERNAME: integration_test_bot
       NUXT_PUBLIC_APP_URL: http://127.0.0.1
+      NODE_OPTIONS: --max-old-space-size=6144
 
     services:
       postgres:

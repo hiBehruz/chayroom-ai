@@ -105,9 +105,8 @@ const PromptBlock = Node.create({
 const CopyBlock = Node.create({
   name: 'copyBlock',
   group: 'block',
-  content: 'text*',
-  marks: '',
-  code: true,
+  content: 'inline*',
+  marks: '_',
   parseHTML() {
     return [{ tag: 'div[data-copy-block]' }]
   },

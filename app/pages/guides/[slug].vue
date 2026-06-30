@@ -182,7 +182,10 @@ const deleting = ref(false)
 
 async function onGuideContentClick(event: MouseEvent) {
   const target = event.target as HTMLElement | null
-  const copyBlock = target?.closest('[data-copy-block]') as HTMLElement | null
+  const copyTrigger = target?.closest('[data-copy-toolbar], [data-copy-button]') as HTMLElement | null
+  if (!copyTrigger) return
+
+  const copyBlock = copyTrigger.closest('[data-copy-block]') as HTMLElement | null
   if (!copyBlock) return
 
   const text = copyBlock?.querySelector('[data-copy-code]')?.textContent?.trim()
